@@ -1,0 +1,111 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+{% load user_auth %}
+{% block title %}
+View Customer
+{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+<link href="{% static 'vendor/fonts/circular-std/style.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'libs/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fonts/fontawesome/css/fontawesome-all.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'vendor/datatables/css/dataTables.bootstrap4.css' %}">
+
+{% if request.user|has_group:"Estimate" %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <h5 class="card-header">Product List</h5>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered first" id="example">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product Name</th>
+                                <th>Product Category</th>
+                                <th>Unit</th>
+                                <th>Store Location</th>
+                                <th>Minimum Stock</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in productdata_estimate %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{i.product_name}}</td>
+                                <td>{{i.product_categ}}</td>
+                                <td>{{i.unit}}</td>
+                                <td>{{i.store_location}}</td>
+                                <td>{{i.minimum_stock}}</td>
+                                <td>
+                                    <a href="/dashboard/updateproduct/{{i.id}}">Update</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <h5 class="card-header">Product List</h5>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered first" id="example">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product Name</th>
+                                <th>Product Category</th>
+                                <th>Unit</th>
+                                <th>Store Location</th>
+                                <th>Minimum Stock</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in productdata_gst %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{i.product_name}}</td>
+                                <td>{{i.product_categ}}</td>
+                                <td>{{i.unit}}</td>
+                                <td>{{i.store_location}}</td>
+                                <td>{{i.minimum_stock}}</td>
+                                <td>
+                                    <a href="/dashboard/updateproduct/{{i.id}}">Update</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>   
+{% endif %}
+
+<script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="{% static 'vendor/datatables/js/data-table.js' %}"></script>
+<script src="{% static 'vendor/datatables/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/js/buttons.bootstrap4.min.js' %}"></script>
+
+<script>
+
+$(document).ready(function() {
+$('#example').DataTable();
+} );
+
+</script>
+
+{% endblock content %}

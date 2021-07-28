@@ -1,0 +1,309 @@
+{% extends 'pages/base.html' %}
+{% load user_auth %}
+{% block title %}
+    Profile
+{% endblock title %}
+
+{% block content %}
+{% if request.user|has_group:"Estimate" %}
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+      <h5 class="card-header">Update Profile</h5>
+      <div class="card-body">
+      <center><h1 class="display-3">{{profile_data.company_name}}</h1></center>
+        <form id="basicform" enctype="multipart/form-data" method="POST">
+        {% csrf_token %}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="inputUserName">Comapny Name</label>
+                <input
+                id="companyname"
+                type="text"
+                name="companyname"
+                required=""
+                placeholder="Enter Company Name"
+                class="form-control"
+                value="{{profile_data.company_name}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">Phone No</label>
+                <input
+                id="phoneno"
+                type="tel"
+                name="phoneno"
+                required=""
+                pattern="[0-9]{10}"
+                placeholder="Enter Phone No"
+                class="form-control"
+                value="{{profile_data.phone_no}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">Address</label>
+                <input
+                id="address"
+                type="text"
+                name="address"
+                required=""
+                placeholder="Enter Address Here"
+                class="form-control"
+                value="{{profile_data.Address}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">City</label>
+                <input
+                id="city"
+                type="text"
+                name="city"
+                required=""
+                placeholder="Enter City Here"
+                class="form-control"
+                value="{{profile_data.city}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">State</label>
+                <select class="form-control" name="state">
+                  <option value="{{profile_data.state}}">{{profile_data.state}}</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option> 
+
+              </select>
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">Pincode</label>
+                <input
+                id="city"
+                type="text"
+                name="pincode"
+                required=""
+                placeholder="Enter City Here"
+                class="form-control"
+                value="{{profile_data.pincode}}"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <p class="text-right pl-3 pt-3">
+                <input type="submit" class="btn btn-space btn-success rounded" name="Estimate" value="Submit"> 
+                <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+              </p>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% else %}
+
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+      <h5 class="card-header">Update Profile</h5>
+      <div class="card-body">
+      <center><h1 class="display-3">{{profile_data.company_name}}</h1></center>
+        <form id="basicform" enctype="multipart/form-data" method="POST" name="GST">
+        {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="inputUserName">Comapny Name</label>
+                <input
+                id="companyname"
+                type="text"
+                name="companyname"
+                required=""
+                placeholder="Enter Company Name"
+                class="form-control"
+                value="{{profile_data.company_name}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">Phone No</label>
+                <input
+                id="phoneno"
+                type="tel"
+                name="phoneno"
+                required=""
+                pattern="[0-9]{10}"
+                placeholder="Enter Phone No"
+                class="form-control"
+                value="{{profile_data.phone_no}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">Address</label>
+                <input
+                id="address"
+                type="text"
+                name="address"
+                required=""
+                placeholder="Enter Address Here"
+                class="form-control"
+                value="{{profile_data.Address}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">City</label>
+                <input
+                id="city"
+                type="text"
+                name="city"
+                required=""
+                placeholder="Enter City Here"
+                class="form-control"
+                value="{{profile_data.city}}"
+                />
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">State</label>
+                <select class="form-control" name="state">
+                  <option value="{{profile_data.state}}">{{profile_data.state}}</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option> 
+
+              </select>
+              </div>
+              <div class="form-group">
+                <label for="inputUserName">Pincode</label>
+                <input
+                id="city"
+                type="text"
+                name="pincode"
+                required=""
+                placeholder="Enter City Here"
+                class="form-control"
+                value="{{profile_data.pincode}}"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="GSTNO">GST NO</label>
+                    <input 
+                    type="text"
+                    name="GSTNO"
+                    required=""
+                    placeholder="Enter the Bank Name"
+                    class="form-control"
+                    value="{{profile_data.GSTNO}}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="Bank Name">Bank Name</label>
+                    <input 
+                    type="text"
+                    name="Bank name"
+                    required=""
+                    placeholder="Enter the Bank name"
+                    class="form-control"
+                    value="{{profile_data.Bank_name}}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="Bank AC">Bank AC</label>
+                    <input 
+                    type="text"
+                    name="Bank AC"
+                    required=""
+                    placeholder="Enter the Bank AC"
+                    class="form-control"
+                    value="{{profile_data.Bank_AC}}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="IFSC_Code">IFSC Code</label>
+                    <input 
+                    type="text"
+                    name="IFSC_Code"
+                    required=""
+                    placeholder="Enter the IFSC Code"
+                    class="form-control"
+                    value="{{profile_data.IFSC_Code}}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="Bank Branch">Branch Name</label>
+                    <input 
+                    type="text"
+                    name="Branch name"
+                    required=""
+                    placeholder="Enter the Branch name"
+                    class="form-control"
+                    value="{{profile_data.Branch_name}}"
+                    />
+                </div>
+            </div>
+
+            <div class="form-row">
+              <p class="text-right pl-3 pt-3">
+                <button type="submit" class="btn btn-space btn-success rounded">
+                  Submit
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+              </p>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endblock content %}

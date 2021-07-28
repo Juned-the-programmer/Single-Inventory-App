@@ -1,0 +1,139 @@
+{% extends 'pages/base.html' %}
+{% load user_auth %}
+{% block title %}
+Add Product
+{% endblock title %}
+
+{% block content %}
+
+{% include "pages/message.html" %}
+<div class="form-group">
+    <div class="card">
+        <h5 class="card-header">Add Product</h5>
+        <div class="card-body">
+            <form class="needs-validation" method='POST'>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="validationCustom01">Product Name</label>
+                <input
+                type="text"
+                class="form-control"
+                id="validationCustom01"
+                placeholder="Product Name"
+                name="productname"
+                {% if request.user|has_group:"Estimate" %}
+                    value="{{productdata_estimate.product_name}}"
+                {% else %}
+                    value="{{productdata_gst.product_name}}"
+                {% endif %}
+                required
+                />
+            </div>
+            <div class="form-group">
+                <label for="validationCustom01">Product Category</label>
+                <input
+                type="text"
+                class="form-control"
+                id="validationCustom01"
+                placeholder="Product Category"
+                name="productcategory"
+                {% if request.user|has_group:"Estimate" %}
+                    value="{{productdata_estimate.product_categ}}"
+                {% else %}
+                    value="{{productdata_gst.product_categ}}"
+                {% endif %}
+                required
+                />
+            </div>
+            <div class="form-group">
+                <label for="validationCustom02">Unit</label>
+                <select name="unit" id="validationCustom02" class="form-control">
+                {% if request.user|has_group:"Estimate" %}
+                    <option value="{{productdata_estimate.unit}}">{{productdata_estimate.unit}}</option>
+                {% else %}
+                    <option value="{{productdata_gst.unit}}">{{productdata_gst.unit}}</option>
+                {% endif %}
+                    <option value="pcs">Pcs.</option>
+                    <option value="set">Set.</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="validationCustom02">Selling Price</label>
+                <input
+                type="text"
+                class="form-control"
+                id="validationCustom02"
+                placeholder="Enter Selling Price"
+                name="sellingprice"
+                {% if request.user|has_group:"Estimate" %}
+                    value="{{productdata_estimate.selling_price}}"
+                {% else %}
+                    value="{{productdata_gst.selling_price}}"
+                {% endif %}
+                required
+                />
+            </div>
+            <div class="form-group">
+                <label for="validationCustom02">Minimum Stock</label>
+                <input
+                type="number"
+                class="form-control"
+                id="validationCustom02"
+                placeholder="Enter Minimum Stock Yoy Required"
+                name="minimum_stock"
+                {% if request.user|has_group:"Estimate" %}
+                    value="{{productdata_estimate.minimum_stock}}"
+                {% else %}
+                    value="{{productdata_gst.minimum_stock}}"
+                {% endif %}
+                required
+                />
+            </div>
+            <div class="form-group">
+                <label for="validationCustom02">Supplier</label>
+                <select name="supplier" id="validationCustom02" class="form-control">
+                {% if request.user|has_group:"Estimate" %}
+                    <option value="{{productdata_estimate.supplier}}">{{productdata_estimate.supplier}}</option>
+                {% else %}
+                    <option value="{{productdata_gst.supplier}}">{{productdata_gst.supplier}}</option>
+                {% endif %}
+    
+                {% if request.user|has_group:"Estimate" %}
+                    {% for i in supplierdata_estimate %}
+                        <option value="{{i.fullname}}">{{i.fullname}}</option>
+                    {% endfor %}
+                {% else %}
+                    {% for i in supplierdata_gst %}
+                        <option value="{{i.fullname}}">{{i.fullname}}</option>
+                    {% endfor %}
+                {% endif %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="validationCustom02">Store Location</label>
+                <input
+                type="text"
+                class="form-control"
+                id="validationCustom02"
+                placeholder="Enter Store Location"
+                name="storelocation"
+                {% if request.user|has_group:"Estimate" %}
+                    value="{{productdata_estimate.store_location}}"
+                {% else %}
+                    value="{{productdata_gst.store_location}}"
+                {% endif %}
+                required
+                />
+            </div>
+            <div class="form-row">
+                <p class="text-right pl-1 pt-2">
+                    <input type="submit" class="btn btn-space btn-success rounded" name="" value="Submit">
+                    <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                </p>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,295 @@
+{% extends 'pages/base.html' %}
+{% load humanize %}
+{% load user_auth %}
+{% block title %}
+Estimate Purchase
+{% endblock title %}
+
+{% block content %}
+
+{% if request.user|has_group:"Estimate" %}
+<div class="form-row">
+    <p class="text-right pl-2 pt-3">
+        <button type="submit" id="btn" class="btn btn-space btn-success rounded" onclick="printDiv('invoice_estimate')">
+        Print
+        </button>
+    </p>
+</div>
+
+<div class="row" id="invoice_estimate">
+    <div class="offset-xl-2 col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <!-- <div class="card-header p-4">
+                <div class="float-right">
+                    <h3 class="mb-0">Invoice {{bill_no}}</h3>
+                    {{bill_date}}
+                </div>
+            </div> -->
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h2 class="text-center">Estimate</h2>
+                        <hr>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h5 class="mb-1">To :</h5>
+                        <h3 class="text-dark mb-1">{{estimate.supplier}}</h3>
+                        <div>Phone: {{estimate.supplier.contactno}}</div>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <h3 class="text-dark mb-1">Bill No : {{estimate.Bill_no}}</h3>
+                        <div>Date : {{estimate.date}}</div>
+                    </div>
+                </div>
+                <div class="table-responsive-sm">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="center"><b><h4>No</b></h4></th>
+                                <th><b><h4>Product</b></h4></th>
+                                <th class="center"><b><h4>Unit</b></h4></th>
+                                <th class="center"><b><h4>Rate</b></h4></th>
+                                <th class="right"><b><h4>Qty.</b></h4></th>
+                                <th class="center"><b><h4>Disc. %</b></h4></th>
+                                <th class="center"><b><h4>Net Rate</b></h4></th>
+                                <th class="right"><b><h4>Total</b></h4></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in product %}
+                            <tr>
+                                <td class="center"><b><h4>{{forloop.counter}}</b></h4></td>
+                                <td class="left strong"><b><h4>{{i.product_name}}</b></h4></td>
+                                <td class="right"><b><h4>{{i.unit}}</b></h4></td>
+                                <td class="center"><b><h4>{{i.rate}}</b></h4></td>
+                                <td class="right"><b><h4>{{i.qty}}</b></h4></td>
+                                <td class="center"><b><h4>{{i.dis}}</b></h4></td>
+                                <td class="center"><b><h4>{{i.netrate|intcomma}}</b></h4></td>
+                                <td class="right"><b><h4>{{i.total|intcomma}}</b></h4></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <hr>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-5">
+                    </div>
+                    <div class="col-lg-4 col-sm-5 ml-auto">
+                        <table class="table table-clear">
+                            <tbody>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark"><b><h4>Total</b></h4></strong>
+                                    </td>
+                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Total_amount|intcomma}}</b></h4></td>
+                                </tr>
+                                 <tr>
+                                    <td class="left">
+                                        <strong class="text-dark"><b><h4>Old Amount</b></h4></strong>
+                                    </td>
+                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Due_amount|intcomma}}</b></h4></td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark"><b><h4>Round Off</b></h4></strong>
+                                    </td>
+                                    <td class="right">
+                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Round_off|intcomma}}</b></h4></strong>
+                                    </td>
+                                </tr> 
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark"><b><h4>Grand Total</b></h4></strong>
+                                    </td>
+                                    <td class="right">
+                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Grand_total|intcomma}}</b></h4></strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <button onclick="printDiv('invoice')">Print only the above div</button> -->
+<script>
+    function printDiv(divName){
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+
+    }
+</script>
+{% else %}
+
+<div class="form-row">
+    <p class="text-right pl-2 pt-3">
+        <button type="submit" id="btn" class="btn btn-space btn-success rounded" onclick="printDiv('gstinvoice')">
+        Print
+        </button>
+    </p>
+</div>
+
+<div class="row" id="gstinvoice">
+    <div class="offset-xl-2 col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card" style="border: 2px solid black;">
+            <div class="card-header p-4">
+            <h2 class="text-center">Tax Invoice</h2>
+                <div class="float-right">
+                    <h3 class="mb-0">Invoice {{gst.bill_no}}</h3>
+                    {{gst.date}}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h5 class="mb-3">From:</h5>
+                        <h3 class="text-dark mb-1">{{request.user.profile.company_name}}</h3>
+
+                        <div>GST : {{request.user.profile.GSTNO}}</div>
+                        <div>Address :{{request.user.profile.city}}</div>
+                        <div>State : {{request.user.profile.state}}</div>
+                        <div>E-mail : {{request.user.profile.email}}</div>
+                        <div>Phone: {{request.user.profile.phone_no}}</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <h5 class="mb-3">To:</h5>
+                        <h3 class="text-dark mb-1">{{gst.supplier_name}}</h3>
+                        <div>GST : {{gst.supplier_name.gst}}</div>
+                        <div>Address : {{gst.supplier_name.city}},{{gst.supplier_name.landmark}}</div>
+                        <div>State : {{gst.supplier_name.state}}</div>
+                        <div>Phone: {{gst.supplier_name.contactno}}</div>
+                    </div>
+                </div>
+                <div class="table-responsive-sm">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="left">No</th>
+                                <th class="left">HSN Code</th>
+                                <th>Product Name</th>
+                                <th class="left">Unit</th>
+                                <th class="left">Rate</th>
+                                <th class="left">Qty.</th>
+                                <th class="left">GST %</th>
+                                <th class="left">GST AMT</th>
+                                <th class="left">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in product_gst %}
+                            <tr>
+                                <td class="left">{{forloop.counter}}</td>
+                                <td class="left">{{i.hsncode}}</td>
+                                <td class="left strong">{{i.product_name}}</td>
+                                <td class="left">{{i.unit}}</td>
+                                <td class="left">{{i.rate}}</td>
+                                <td class="left">{{i.qty}}</td>
+                                <td class="left">{{i.gstp}}</td>
+                                <td class="left">{{i.gstamt|intcomma}}</td>
+                                <td class="left">{{i.total|intcomma}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-5">
+                        <div class="mt-5">
+                            <h4><u>Bank Detail</u></h4>
+                            <h6>Bank Name : {{request.user.profile.Bank_name}}</h6>
+                            <h6>Account No : {{request.user.profile.Bank_AC}}</h6>
+                            <h6>IFSC Code : {{request.user.profile.IFSC_Code}}</h6>
+                            <h6>Brand Name : {{request.user.profile.Branch_name}} </h6>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-5 ml-auto">
+                        <table class="table table-clear">
+                            <tbody>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark">Total</strong>
+                                    </td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.total_amount|intcomma}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark">CGST (+)</strong>
+                                    </td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.CGST|intcomma}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark">SGST (+)</strong>
+                                    </td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.SGST|intcomma}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark">IGST (+)</strong>
+                                    </td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.IGST|intcomma}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark">Round Off(-)</strong>
+                                    </td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.Round_off|intcomma}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong class="text-dark">Grand Total</strong>
+                                    </td>
+                                    <td class="right">
+                                        <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{gst.Grand_total|intcomma}}</strong>
+                                    </td>
+                                </tr> 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-lg-6 col-sm-12 col-md-6">
+                        <h5>Rupees : {{word}} only</h5>
+                    </div>
+                    <div class="col-lg-6 col-sm-12 col-md-6">
+                        <h5>Signature : </h5>
+                        <br>
+                        <br>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <button onclick="printDiv('invoice')">Print only the above div</button> -->
+<script>
+		function printDiv(divName){
+			var printContents = document.getElementById(divName).innerHTML;
+			var originalContents = document.body.innerHTML;
+
+			document.body.innerHTML = printContents;
+
+			window.print();
+
+			document.body.innerHTML = originalContents;
+
+		}
+	</script>
+{% endif %}
+
+{% endblock content %}
