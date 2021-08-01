@@ -76,7 +76,71 @@ Add Customer Payment
     });
 </script>
 {% else %}
-    <p>User doesn't belong to Estimate</p>
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+        <h5 class="card-header">Add Customer Payment</h5>
+            <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                    <div class="form-row">
+                    
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05">Date</label>
+                        <input type="text" class="form-control" id="validationCustom05" name="lm" placeholder="Date" value="{{d1}}" required readonly>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05">Customer Name</label>
+                        <select name="customer" id="editable-select" class="form-control customername" >
+                        <option value="-1" selected>------Select-------</option>
+                        {% for i in customerdata_gst %}
+                            <option value="{{i.id}}">{{i.customer_name}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    </div>
+
+                
+                    <div class="form-row">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                            <label for="validationCustom05">Total Pending Amount</label>
+                            <input type="text" class="form-control pending-amount" id="pending-amount" name="pending_amount" placeholder="Pending Amount" required readonly>
+                        </div>
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                            <label for="validationCustom05">Paid Amount</label>
+                            <input type="text" class="form-control" placeholder="paid Amount" name="paid_amount" required>
+                        </div>
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                            <label for="validationCustom05">Description</label>
+                            <textarea rows="3" class="form-control" placeholder="Description" name="Description"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <p class="text-right pl-2 pt-3">
+                            <input type="submit" class="btn btn-space btn-success rounded" name="GST" value="Submit">
+                          <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                        </p>
+                      </div>
+                </form>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        $('.customername').on("change",function(){
+            var cid=$(this).val();
+            $.ajax({
+                url: "{% url 'customer_dueamount_gst' %}",
+                data : { 'cid' : cid },
+                success : function(data){
+                   $('.card .pending-amount').val(data)
+                }
+            });
+        });
+    });
+</script>
 {% endif %}
 
 {% endblock content %}

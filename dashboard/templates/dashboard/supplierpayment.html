@@ -69,7 +69,64 @@ Add Supplier Payment
     });
 </script>
 {% else %}
-    <p>User doesn't belong to Estimate</p>
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+        <h5 class="card-header">Add Supplier Payment</h5>
+            <div class="card-body">
+                <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05">Date</label>
+                        <input type="text" class="form-control" id="validationCustom05" name="data" placeholder="Date" value="{{d1}}" required readonly>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom03">Supplier Name</label>
+                        <select name="supplier-name" id="editable-select" class="form-control suppliername" >
+                            <option value="-1" selected>------Select-------</option>
+                            {% for i in supplierdata_gst %}
+                                <option value="{{i.id}}">{{i.fullname}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom04">Pending Amount</label>
+                        <input type="text" class="form-control pending-amount" id="validationCustom04" name="pending_amount" placeholder="Pending Amount" readonly required>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom04">Paid Amount</label>
+                        <input type="text" class="form-control" id="validationCustom04" name="paid_amount" placeholder="Paid Amount" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <p class="text-right pl-2 pt-3">
+                        <input type="submit" class="btn btn-space btn-success rounded" name="GST" value="Submit">
+                        <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                    </p>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        
+        $('.suppliername').on("change",function(){
+            var sid=$(this).val();
+            // alert(id)
+            $.ajax({
+                url: "{% url 'supplier_dueamount_gst' %}",
+                data : { 'sid' : sid },
+                success : function(data){
+                   $('.card .pending-amount').val(data)
+                }
+            });
+        });
+    });
+</script>
 {% endif %}
 
 {% endblock content %}

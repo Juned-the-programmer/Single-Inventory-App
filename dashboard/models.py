@@ -49,6 +49,16 @@ class customeraccount_gst(models.Model):
     def __str__(self):
         return str(self.customer_name.fullname)
 
+class customerpay_gst(models.Model):
+    customer_name = models.ForeignKey(Customer_gst , on_delete=models.CASCADE)
+    pending_amount = models.FloatField()
+    paid_amount = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+    Description = models.CharField(max_length=100,blank=True,null=True)
+
+    def __str__(self):
+        return str(self.customer_name.fullname)
+
 class Supplier_estimate(models.Model):
     supplierid = models.IntegerField()
     fullname = models.CharField(max_length=50)
@@ -92,6 +102,15 @@ class Supplier_gst(models.Model):
 class supplieraccount_gst(models.Model):
     supplier_name = models.ForeignKey(Supplier_gst,on_delete=models.CASCADE)
     amount = models.FloatField(default=0,null=True,blank=True)
+
+    def __str__(self):
+        return str(self.supplier_name.fullname)
+
+class supplierpay_gst(models.Model):
+    supplier_name = models.ForeignKey(Supplier_gst,on_delete=models.CASCADE)
+    pending_amount = models.FloatField()
+    paid_amount = models.FloatField()
+    date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return str(self.supplier_name.fullname)

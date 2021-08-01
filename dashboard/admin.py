@@ -4,6 +4,7 @@ from .models import *
 admin.site.register(Customer_estimate)
 admin.site.register(customeraccount_estimate)
 admin.site.register(customerpay_estimate)
+admin.site.register(customerpay_gst)
 #GST
 admin.site.register(Customer_gst)
 admin.site.register(customeraccount_gst)
@@ -11,6 +12,7 @@ admin.site.register(customeraccount_gst)
 admin.site.register(Supplier_estimate)
 admin.site.register(supplieraccount_estimate)
 admin.site.register(supplierpay_estimate)
+admin.site.register(supplierpay_gst)
 #GST
 admin.site.register(Supplier_gst)
 admin.site.register(supplieraccount_gst)

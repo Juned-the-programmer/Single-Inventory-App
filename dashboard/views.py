@@ -1007,12 +1007,12 @@ def addsale(request):
                 if cash_on_hand == 0:
                     print('Cash on hand is 0')
                 else:
-                    # CustomerPay = customerpay (
-                    #     customer_name = customeraccount_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id).customer_name,
-                    #     pending_amount = Grand_total,
-                    #     paid_amount = cash_on_hand
-                    # )
-                    # CustomerPay.save()
+                    CustomerPay = customerpay_estimate (
+                        customer_name = customeraccount_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id).customer_name,
+                        pending_amount = Grand_total,
+                        paid_amount = cash_on_hand
+                    )
+                    CustomerPay.save()
                     print("nothing")
 
                 customerdata = customeraccount_estimate.objects.get(id=Customer_estimate.objects.get(fullname=request.POST['customer']).id)
@@ -1497,9 +1497,11 @@ def ownerstate_gst_sale(request):
 
 # Daily Income / Expense
 DailyIncomeData_estimate = 1
+DailyIncomeData_gst = 1
 @login_required(login_url='login')
 def dailyincome(request):
     global DailyIncomeData_estimate
+    global DailyIncomeData_gst
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -1514,6 +1516,13 @@ def dailyincome(request):
                     )
                     DailyIncome.save()
                     messages.success(request,"Daily Income Added Successfully !")
+                else:
+                    DailyIncome = dailyincome_gst(
+                        name = request.POST['name'],
+                        amount=request.POST['amount']
+                    )
+                    DailyIncome.save()
+                    messages.success(request,"Daily DailyIncome Successfully ! ")
             
             date_ = date.today()
             d1 = date_.strftime("%d/%m/%Y")
@@ -1523,11 +1532,12 @@ def dailyincome(request):
                 DailyIncomeData_estimate = dailyincome_estimate.objects.filter(date=d2)
 
             if GST_group in user.groups.all():
-                print("Nothing")
+                DailyIncomeData_gst = dailyincome_gst.objects.filter(date=d2)
 
             context = {
                 'd1':d1,
-                'DailyIncomeData_estimate':DailyIncomeData_estimate
+                'DailyIncomeData_estimate':DailyIncomeData_estimate,
+                'DailyIncomeData_gst':DailyIncomeData_gst,
             }
             return render(request, 'dashboard/dailyincome.html',context)
         else:
@@ -1535,62 +1545,81 @@ def dailyincome(request):
     except:
         return redirect('error404')
 
-category_item_estimate = 1
-DailyExpense_estimate = 1
+estimate_category = 1
+gst_category = 1
+DailyExpenseData_estimate = 1
+DailyExpenseData_gst = 1
 @login_required(login_url='login')
 def dailyexpense(request):
-    global category_item_estimate
-    global DailyExpense_estimate
+    global estimate_category
+    global gst_category
+    global DailyExpenseData_estimate
+    global DailyExpenseData_gst
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
     try:
         if user.is_authenticated:
             if request.method == 'POST':
-                if 'Estimate' in request.POST:
-                    if request.POST['category'] == "-1":
-                        print("Error")
-                    else:
-                        DailyExpense = dailyexpense_estimate(
-                            category=request.POST['category'],
-                            amount=request.POST['amount'],
-                            name=request.POST['name']
-                        )
-                        DailyExpense.save()
-                        messages.success(request,"Daily Expense Added Successfully !")
-                
-                if 'addcategory_estimate' in request.POST:
+                if 'GST' in request.POST:
+                    DailyExpense = dailyexpense_gst(
+                        category=request.POST['category'],
+                        amount=request.POST['amount'],
+                        name=request.POST['name']
+                    )
+                    DailyExpense.save()
 
-                    Category = category_estimate(
-                        category_name=request.POST['cat']
+                elif 'addcategory_gst' in request.POST:
+                    Category = category_gst(
+                        category_name=request.POST['cat'],
                     )
                     Category.save()
-                    messages.success(request,"Expense Category Added Successfully !")
 
+                elif 'Estimate' in request.POST:
+                    DailyExpense = dailyexpense_estimate(
+                        category=request.POST['category'],
+                        amount=request.POST['amount'],
+                        name=request.POST['name']
+                    )
+                    DailyExpense.save()
+
+                else:
+                    Category = category_estimate(
+                        category_name=request.POST['cat'],
+                    )
+                    Category.save()
+            
             date_ = date.today()
             d1 = date_.strftime("%d/%m/%Y")
             d2 = date_.strftime("%Y-%m-%d")
+
             if Estimate_group in user.groups.all():
-                category_item_estimate = category_estimate.objects.all()
-                DailyExpense_estimate = dailyexpense_estimate.objects.filter(date=d2)
+                DailyExpenseData_estimate = dailyexpense_estimate.objects.filter(date=d2)
+                estimate_category = category_estimate.objects.all()
 
             if GST_group in user.groups.all():
-                print("Nothing")
+                DailyExpenseData_gst = dailyexpense_gst.objects.filter(date=d2)
+                gst_category = category_gst.objects.all()
+
             context = {
                 'd1':d1,
-                'category_item_estimate':category_item_estimate,
-                'DailyExpense_estimate':DailyExpense_estimate
+                'DailyExpenseData_estimate':DailyExpenseData_estimate,
+                'DailyExpenseData_gst':DailyExpenseData_gst,
+                'estimate_category':estimate_category,
+                'gst_category':gst_category
             }
-            return render(request, 'dashboard/dailyexpense.html',context)
+            return render(request , 'dashboard/dailyexpense.html',context)
         else:
             return redirect('login')
     except:
         return redirect('error404')
 
 supplierdata_estimate = 1
+supplierdata_gst = 1
 @login_required(login_url='login')
 def supplierpayment(request):
     global supplierdata_estimate
+    global supplierdata_gst
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -1613,17 +1642,34 @@ def supplierpayment(request):
                     SupplierPay.save()
                     messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
+                else:
+
+                    SupplierPay = supplierpay_gst(
+                        supplier_name = supplieraccount_gst.objects.get(id=request.POST['supplier-name']).supplier_name,
+                        pending_amount = float(request.POST['pending_amount']),
+                        paid_amount = float(request.POST['paid_amount'])
+                    )
+                
+                    supplieraccountdata = supplieraccount_gst.objects.get(id=request.POST['supplier-name'])
+
+                    supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+
+                    supplieraccountdata.save()
+                    SupplierPay.save()
+                    messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
+
             if Estimate_group in user.groups.all():
                 supplierdata_estimate = Supplier_estimate.objects.all()
 
             if GST_group in user.groups.all():
-                print("Nothing")
+                supplierdata_gst = Supplier_gst.objects.all()
 
             date_ = date.today()
             d1 = date_.strftime("%d/%m/%Y")
             context = {
                 'd1':d1,
-                'supplierdata_estimate' : supplierdata_estimate
+                'supplierdata_estimate' : supplierdata_estimate,
+                'supplierdata_gst' : supplierdata_gst
             }
             return render(request, 'dashboard/supplierpayment.html',context)
         else:
@@ -1632,9 +1678,11 @@ def supplierpayment(request):
         return redirect('error404')
 
 customerdata_estimate = 1
+customerdata_gst = 1
 @login_required(login_url='login')
 def customerpayment(request):
     global customerdata_estimate
+    global customerdata_gst
     Estimate_group = Group.objects.get(name="Estimate")
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -1657,6 +1705,23 @@ def customerpayment(request):
 
                     customerdata.save()
                     messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
+
+                else:
+
+                    CustomerPay = customerpay_gst (
+                        customer_name = customeraccount_gst.objects.get(id=request.POST['customer']).customer_name,
+                        pending_amount = request.POST['pending_amount'],
+                        paid_amount = request.POST['paid_amount'],
+                        Description = request.POST['Description']
+                    )
+                    CustomerPay.save()
+
+                    customerdata = customeraccount_gst.objects.get(id=request.POST['customer'])
+
+                    customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+
+                    customerdata.save()
+                    messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
             
 
             date_ = date.today()
@@ -1665,11 +1730,12 @@ def customerpayment(request):
                 customerdata_estimate = customeraccount_estimate.objects.all()
             
             if GST_group in user.groups.all():
-                print("Nothing")
+                customerdata_gst = customeraccount_gst.objects.all()
 
             context = {
                 'd1':d1,
-                'customerdata_estimate':customerdata_estimate
+                'customerdata_estimate':customerdata_estimate,
+                'customerdata_gst' : customerdata_gst
             }
             return render(request, 'dashboard/customerpayment.html',context)
         else:
@@ -1690,5 +1756,21 @@ def customer_dueamount_estimate(request):
     cid = request.GET['cid']
     customerdata = customeraccount_estimate.objects.get(id = customeraccount_estimate.objects.get(id=cid).id)
     pendingamount = customerdata.amount
+
+    return HttpResponse(pendingamount)
+
+@login_required(login_url='login')
+def customer_dueamount_gst(request):
+    cid = request.GET['cid']
+    customerdata = customeraccount_gst.objects.get(id = customeraccount_gst.objects.get(id=cid).id)
+    pendingamount = customerdata.amount
+
+    return HttpResponse(pendingamount)
+
+@login_required(login_url='login')
+def supplier_dueamount_gst(request):
+    sid = request.GET['sid']
+    supplierdata = supplieraccount_gst.objects.get(id = supplieraccount_gst.objects.get(id=sid).id)
+    pendingamount = supplierdata.amount
 
     return HttpResponse(pendingamount)
