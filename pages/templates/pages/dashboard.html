@@ -24,9 +24,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{previous_month_profit}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{previous_month_profit}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -42,9 +42,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{current_month_profit}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{current_month_profit}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -60,9 +60,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
         {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{total_profit}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{total_profit}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -89,9 +89,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
             {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{previous_month_sale}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{previous_month_sale}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -107,9 +107,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{current_month_sale}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{current_month_sale}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -125,9 +125,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{today_sale}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{today_sale}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -154,9 +154,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{previous_month_total_purchase}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{previous_month_total_purchase}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -172,9 +172,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{current_month_purchase}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{current_month_purchase}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -190,9 +190,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{today_purchase}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{today_purchase}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -221,9 +221,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{productdata}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{productdata}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -292,9 +292,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{customerdata}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{customerdata}}</h1>
           {% endif %}
           </h1>
         </div>
@@ -310,9 +310,9 @@
         <div class="metric-value d-inline-block">
           <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1>{{supplierdata}}</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1>{{supplierdata}}</h1>
           {% endif %}
           </h1>
         </div>

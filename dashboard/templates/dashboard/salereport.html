@@ -1,0 +1,144 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+{% load user_auth %}
+{% block title %}
+From to Where 
+{% endblock title %}
+
+{% block content %}
+
+{% if request.user|has_group:"Estimate" %}
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+        <h5 class="card-header">From To Where Sale Records</h5>
+        <div class="card-body">
+            <form method="POST">
+            {% csrf_token %}
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05">From</label>
+                        <input type="date" class="form-control" id="validationCustom05" name="fromdate" placeholder="Date">
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05">To</label>
+                        <input type="date" class="form-control" id="validationCustom05" name="todate" placeholder="Date">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <p class="text-right pl-2 pt-3">
+                    <input type="submit" class="btn btn-space btn-success rounded" name="Estimate" value="Submit">
+                    <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                    </p>
+                </div> 
+            </form>
+
+            <table class="table mt-5">
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th>Bill No</th>
+                        <th>Customer Name</th>
+                        <th>Total Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in total_estimate_sale %}
+                        <tr>
+                            <td>{{i.Bill_no}}</td>
+                            <td>{{i.customer}}</td>
+                            <td>{{i.Total_amount}}</td>
+                            <td>{{i.date}}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for i in searchsale %}
+                        <tr>
+                            <td>{{i.Bill_no}}</td>
+                            <td>{{i.customer}}</td>
+                            <td>{{i.Total_amount}}</td>
+                            <td>{{i.date}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+        <h5 class="card-header">From To Where Sale Records</h5>
+        <div class="card-body">
+            <form method="POST">
+            {% csrf_token %}
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05">From</label>
+                        <input type="date" class="form-control" id="validationCustom05" name="fromdate" placeholder="Date">
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05">To</label>
+                        <input type="date" class="form-control" id="validationCustom05" name="todate" placeholder="Date">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <p class="text-right pl-2 pt-3">
+                    <input type="submit" class="btn btn-space btn-success rounded" name="GST" value="Submit">
+                    <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                    </p>
+                </div> 
+            </form>
+
+            <table class="table mt-5">
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th>Bill No</th>
+                        <th>Customer Name</th>
+                        <th>Total Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in total_gst_sale %}
+                        <tr>
+                            <td>{{i.Bill_no}}</td>
+                            <td>{{i.customer}}</td>
+                            <td>{{i.Grand_total}}</td>
+                            <td>{{i.date}}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for i in searchsale %}
+                        <tr>
+                            <td>{{i.Bill_no}}</td>
+                            <td>{{i.customer}}</td>
+                            <td>{{i.Grand_total}}</td>
+                            <td>{{i.date}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        
+        $('.suppliername').on("change",function(){
+            var id=$(this).val();
+            // alert(id)
+            $.ajax({
+                url: "{% url 'getsupplier' %}",
+                data : { 'sid' : id },
+                success : function(data){
+                   $('.card .pending-amount').val(data)
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock content %}

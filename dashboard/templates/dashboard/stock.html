@@ -1,0 +1,192 @@
+{% extends 'pages/base.html' %}
+{% load user_auth %}
+{% load static %}
+{% block title %}
+Stock
+{% endblock title %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+<link href="{% static 'vendor/fonts/circular-std/style.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'libs/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fonts/fontawesome/css/fontawesome-all.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'vendor/datatables/css/dataTables.bootstrap4.css' %}">
+
+{% if request.user|has_group:"Estimate" %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="align-middle">Add Stock
+                    <button type="submit" class="btn btn-space btn-success rounded float-right" data-toggle="modal" data-target="#exampleModal">
+                        Add Stock
+                    </button>
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered first" id="example">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Purchase Price</th>
+                            <th>Store Location</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in stock_data %}
+                        <tr>
+                            <td>{{i.id}}</td>
+                            <td>{{i.product}}</td>
+                            <td>{{i.quantity}}</td>
+                            <td>{{i.purchase_price}}</td>
+                            <td>{{i.product.store_location}}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Stock</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+      <div class="modal-body">
+        <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="">
+                <label for="validationCustom03">Category</label>
+                <select name="product_name" id="editable-select" class="form-control" required>
+                    <option value="-1" selected>------Select-------</option>
+                    {% for cat in stock_data %}
+                    <option value="{{cat.product}}">{{cat.product}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="">
+                <label for="validationCustom01">Quantity</label>
+                <input type="text" class="form-control mt-3" name="qty">    
+            </div>
+        </div>
+    </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-space btn-success rounded" name="Estimate" value="Submit">
+        </div>
+        </form>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="align-middle">Add Stock
+                    <button type="submit" class="btn btn-space btn-success rounded float-right" data-toggle="modal" data-target="#exampleModal">
+                        Add Stock
+                    </button>
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered first" id="example">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Purchase Price</th>
+                            <th>Store Location</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in stock_data %}
+                        <tr>
+                            <td>{{i.id}}</td>
+                            <td>{{i.product}}</td>
+                            <td>{{i.quantity}}</td>
+                            <td>{{i.purchase_price}}</td>
+                            <td>{{i.product.store_location}}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Stock</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+      <div class="modal-body">
+        <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="">
+                <label for="validationCustom03">Category</label>
+                <select name="product_name" id="editable-select" class="form-control" required>
+                    <option value="-1" selected>------Select-------</option>
+                    {% for cat in stock_data %}
+                    <option value="{{cat.product}}">{{cat.product}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="">
+                <label for="validationCustom01">Quantity</label>
+                <input type="text" class="form-control mt-3" name="qty">    
+            </div>
+        </div>
+    </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-space btn-success rounded" name="Estimate" value="Submit">
+        </div>
+        </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="{% static 'vendor/datatables/js/data-table.js' %}"></script>
+<script src="{% static 'vendor/datatables/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/js/buttons.bootstrap4.min.js' %}"></script>
+
+<script>
+
+$(document).ready(function() {
+$('#example').DataTable();
+} );
+
+</script>
+
+{% endblock content %}

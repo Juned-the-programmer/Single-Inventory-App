@@ -1774,3 +1774,184 @@ def supplier_dueamount_gst(request):
     pendingamount = supplierdata.amount
 
     return HttpResponse(pendingamount)
+
+
+# Statements
+stock_data = 1
+@login_required(login_url='login')
+def list_stock(request):
+    global stock_data
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    try:
+        if user.is_authenticated:
+            if request.method == 'POST':
+                if 'Estimate' in request.POST:
+                    stockdata = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['product_name']))
+                    stock_quantity = stockdata.quantity + int(request.POST['qty'])
+                    stockdata.save()
+                if 'GST' in request.POST:
+                    stockdata = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['product_name']))
+                    stock_quantity = stockdata.quantity + int(request.POST['qty'])
+                    stockdata.save()
+
+            if Estimate_group in user.groups.all():
+                stock_data = Stock_estimate.objects.all()
+            else:
+                stock_data = Stock_gst.objects.all()
+
+            context = {
+                'stock_data' : stock_data
+            }
+            return render(request, 'dashboard/stock.html',context)
+        else:
+            return redirect('login')
+    except:
+        return redirect('error404')
+
+@login_required(login_url='login')
+def customer_payment_list(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        customer_payment = customerpay_estimate.objects.all()
+    else:
+        customer_payment = customerpay_gst.objects.all()
+
+    context = {
+        'customer_payment':customer_payment
+    }
+    return render(request, 'dashboard/customerpaymentlist.html',context)
+
+@login_required(login_url='login')
+def supplier_payment_list(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        supplier_payment = supplierpay_estimate.objects.all()
+    else:
+        supplier_payment = supplierpay_gst.objects.all()
+    
+    context = {
+        'supplier_payment':supplier_payment
+    }
+    return render(request,"dashboard/supplierpaymentlist.html",context)
+
+@login_required(login_url='login')
+def customer_Credit(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        customer_credit_data = customeraccount_estimate.objects.all()
+    else:
+        customer_credit_data = customeraccount_gst.objects.all()
+    
+    context = {
+        'customer_credit_data':customer_credit_data
+    }
+    return render(request, 'dashboard/customercredit.html',context)
+
+@login_required(login_url='login')
+def supplier_credit(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        supplier_credit_list = supplieraccount_estimate.objects.all()
+    else:
+        supplier_credit_list = supplieraccount_gst.objects.get()
+
+    context = {
+        'supplier_credit_list':supplier_credit_list
+    }
+    return render(request,'dashboard/suppliercredit.html',context)
+
+@login_required(login_url='login')
+def totalincome(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        daily_income_data = dailyincome_estimate.objects.all()
+        customer_income_data = customerpay_estimate.objects.all()
+    else:
+        daily_income_data = dailyincome_gst.objects.all()
+        customer_income_data = customerpay_gst.objects.all()
+
+    context = {
+        'daily_income_data':daily_income_data,
+        'customer_income_data':customer_income_data
+    }
+    return render(request,'dashboard/totalincome.html',context)
+
+@login_required(login_url='login')
+def totalexpense(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        daily_expense_data = dailyexpense_estimate.objects.all()
+        supplier_expense_data = supplierpay_estimate.objects.all()
+    else:
+        daily_expense_data = dailyexpense_gst.objects.all()
+        supplier_expense_data = supplierpay_gst.objects.all()
+    
+    context = {
+        'daily_expense_data':daily_expense_data,
+        'supplier_expense_data':supplier_expense_data
+    }
+    return render(request,'dashboard/totalexpense.html',context)
+
+@login_required(login_url='login')
+def salereport(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        if request.method == 'POST':
+            if 'Estimate' in request.POST:
+                searchsale = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+
+                context = {
+                    'searchsale' : searchsale
+                }
+                return render(request,'dashboard/salereport.html',context)
+        else:
+            if request.method == 'POST':
+                if 'GST' in request.POST:
+                    searchsale = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+
+                    context = {
+                        'searchsale' : searchsale
+                    }
+                    return render(request,'dashboard/fromtowhere.html',context)
+
+    total_estimate_sale = Estimate_sales.objects.all()
+    total_gst_sale = gstsale.objects.all()
+    
+    context = {
+        'total_estimate_sale' : total_estimate_sale,
+        'total_gst_sale' : total_gst_sale,
+    }
+    return render(request,'dashboard/salereport.html',context)
+
+@login_required(login_url='login')
+def getsupplier(request):
+    sid = request.GET['sid']
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    if Estimate_group in user.groups.all():
+        supplier = supplieraccount_estimate.objects.get(id=1)
+        amount = supplier.amount
+        print(amount)
+    else:
+        supplier = supplieraccount_estimate.objects.get(id=1)
+        amount = supplier.amount
+        print(amount)
+    
+    return HttpResponse(amount)
