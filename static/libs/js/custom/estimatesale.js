@@ -78,7 +78,7 @@ $(document).ready(function () {
             console.log("error not data found")
           }
         })
-
+        
         $.ajax({
           type:"GET",
           url: $('#check_stock_estimate').attr('data-href'),

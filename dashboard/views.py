@@ -984,7 +984,7 @@ def addsale(request):
                     cash_on_hand = 0
                 
                 if len(request.POST['roff']):
-                    Round_off = Round_off
+                    Round_off = request.POST['roff']
                 else:
                     Round_off = 0
 

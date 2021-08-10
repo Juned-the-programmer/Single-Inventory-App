@@ -1,4 +1,4 @@
-from django.shortcuts import render , redirect
+from django.shortcuts import render , redirect ,HttpResponse
 from django.contrib.auth.models import auth,User,Group
 from django.contrib import messages
 from .models import *
@@ -493,3 +493,8 @@ def logout(request):
 
 def error404(request):
     return render(request,"pages/error404.html")
+
+def user_name(request):
+    user = User.objects.get(username=request.user.username)
+    print(user)
+    return user 
