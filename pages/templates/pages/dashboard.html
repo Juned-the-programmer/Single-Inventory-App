@@ -1,6 +1,6 @@
 {% extends 'pages/base.html' %}
 {% load user_auth %}
-
+{% load static %}
 {% block title %}
     Dashboard
 {% endblock title %}
@@ -237,13 +237,11 @@
       <div class="card-body">
         <h3 class="text-muted">In Stock</h3>
         <div class="metric-value d-inline-block">
-          <h1 class="mb-1 text-primary">
           {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1 class="instock mb-1">0</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1 class="instock mb-1">0</h1>
           {% endif %}
-          </h1>
         </div>
       </div>
       <div id="sparkline-2"></div>
@@ -256,13 +254,11 @@
         <div class="card-body stockclass">
           <h3 class="stocktext">Out of Stock</h3>
           <div class="metric-value d-inline-block">
-            <h1 class="outstock">
             {% if request.user|has_group:"Estimate" %}
-            <h1>Estimate</h1>
+            <h1 class="outstock">0</h1>
           {% else %}
-            <h1>GST</h1>
+            <h1 class="outstock">0</h1>
           {% endif %}
-            </h1>
           </div>
         </div>
         <div id="sparkline-2"></div>
@@ -322,22 +318,51 @@
   </div>
 </div>
 
+<script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+
 <script>
-  let outstock = document.querySelector(".outstock");
-  let card = document.querySelector(".stockclass");
-  console.log(card);
-  if (outstock.textContent >= 1) 
-  {
-    card.style.backgroundColor = "red";
-    document.querySelector(".stocktext").style.color = "black";
-    document.querySelector(".outstock").style.color = "black";
-  } 
-  else 
-  {
-    document.querySelector(".stocktext").classList.add("text-muted");
-    document.querySelector(".outstock").classList.add("mb-1 text-primary");
-  }
-  console.log(outstock.textContent);
+  $(document).ready(function () {
+    var minimum_stock =[]
+    var stock = []
+    $.ajax({
+      type:"GET",
+      url: "{% url 'product_data_estimate' %}",
+      async : false,
+      success: function(response){
+        minimum_stock = response
+      },
+    })
+
+    $.ajax({
+      type:"GET",
+      url: "{% url 'stock_data_estimate' %}",
+      async : false,
+      success: function(response){ 
+        stock = response
+      },
+    })
+    var counter_stock = 0;
+    var stock_total_value = 0;
+    for(var i=0;i<minimum_stock.productdata.length;i++){
+      if(minimum_stock.productdata[i].minimum_stock >= stock.stock_data[i].quantity){
+        counter_stock+=1;
+        console.log(counter_stock)
+      }
+      stock_total_value += stock.stock_data[i].quantity * stock.stock_data[i].purchase_price
+    }
+    if (counter_stock >= 1){
+      $('.card_out').css('background-color','red');
+      $('.stocktext').css('color','black')
+      $('.outstock').css('color','black')
+    }
+    else{
+      $('.stocktext').addClass("text-muted")
+      $('.outstock').addClass("mb-1 text-primary")
+    }
+    $('.outstock').text(counter_stock)
+    $('.stock_value').text(stock_total_value)
+    $('.instock').text(minimum_stock.productdata.length - counter_stock)
+  })
 </script>
   
 {% endblock content %}

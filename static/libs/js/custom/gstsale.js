@@ -1,6 +1,60 @@
 $(document).ready(function () {
+  var $loading = $('#overlay').hide();
+  $(document)
+  .ajaxStart(function () {
+    $loading.show();
+  })
+  .ajaxStop(function () {
+    $loading.hide();
+  });
 
+  var product_data = []
+  var customer_state;
+  var profile_state;
+  var stock = []
+  
+    $.ajax({
+      type:"GET",
+      url: $('#sto').attr('data-href'),
+      success: function(response){
+        stock = response
+      },
+    })
 
+  $.ajax({
+    type: "GET",
+    url: $('#ownerstate_gst').attr('data-href'),
+    async: false,
+    success: function (response) {
+      profile_state = response
+    },
+  })
+
+  $.ajax({
+    type: "GET",
+    url: $('.product_data_gst').attr('data-href'),
+    async: false,
+    success: function (response) {
+      product_data = response
+    },
+  })
+
+  $('.customer').change(function () {
+    var name = $('.customer').val();
+    $.ajax({
+      type: "GET",
+      url: $('#st').attr('data-href'),
+      data: { 'cname': name },
+      success: function (response) {
+        customer_state = response
+        alert(customer_state)
+      },
+    })
+  })
+  
+  console.log(profile_state);
+  console.log(product_data);
+  console.log(stock);
 
   var counter = 1;
   $(document).on('focus', "tr td", function (e) {
@@ -20,23 +74,17 @@ $(document).ready(function () {
 
         counter++;
         no = counter + 1
-        $.ajax({
-          type: "GET",
-          url: $('.comboprod0').attr('data-href'),
-          success: function (response) {
-            for (var i in response.productdata) {
-              $('#prod' + counter).append('<option value="' + response.productdata[i].product_name + '">' + response.productdata[i].product_name + '</option>')
-            }
-          },
-          error: function (response) {
-            console.log("error not data found")
-          }
-        })
+
         var newRow = $(document.createElement('tr'))
           .attr("id", 'row' + counter)
           .attr("itemid", counter)
-        newRow.html('<td><a id="del' + counter + '" href="#"> <i class="fa fa-trash" style="color: red;"aria-hidden="true"></i> </a></td><td><input type="number" min="0" class="form-control" id="hsn' + counter + '" name="hsn' + counter + '"></td><td><select name="prod' + counter + '" id="prod' + counter + '" placeholder="Select Product" class="form-control" ><option selected>--------Select Product--------</option></select></td><td><input type="text" class="tot form-control" id="unit' + counter + '" name="unit' + counter + '" readonly ></td><td><input type="number" min="0" step="any" class="form-control" id="rate' + counter + '" name="rate' + counter + '"></td><td><input type="number" min="0" class="form-control" id="qty' + counter + '" name="qty' + counter + '"></td><td><input type="number" min="0" step="any" class="addbtntext' + counter + ' form-control" id="gstp' + counter + '" name="gstp' + counter + '"></td><td><input type="number" class="gstamt form-control" id="gstamt' + counter + '" name="gstamt' + counter + '"readonly  ></td><td><input type="text" class="tot form-control" id="tot' + counter + '" name="tot' + counter + '" readonly ></td>')
+        newRow.html('<td><a id="del' + counter + '" href="#"> <i class="fa fa-trash" style="color: red;"aria-hidden="true"></i> </a></td><td><input type="number" min="0" class="form-control" id="hsn' + counter + '" name="hsn' + counter + '"></td><td><select name="prod' + counter + '" id="prod' + counter + '" placeholder="Select Product" class="product-select form-control" ><option selected>--------Select Product--------</option></select></td><td><input type="text" class="tot form-control" id="unit' + counter + '" name="unit' + counter + '" readonly ></td><td><input type="number" min="0" step="any" class="form-control" id="rate' + counter + '" name="rate' + counter + '"></td><td><input type="number" min="0" class="form-control" id="qty' + counter + '" name="qty' + counter + '"></td><td><input type="number" min="0" step="any" class="addbtntext' + counter + ' form-control" id="gstp' + counter + '" name="gstp' + counter + '"></td><td><input type="number" class="gstamt form-control" id="gstamt' + counter + '" name="gstamt' + counter + '"readonly  ></td><td><input type="text" class="tot form-control" id="tot' + counter + '" name="tot' + counter + '" readonly ></td>')
         newRow.appendTo('#itemtable')
+
+        $('.product-select').select2();
+        for (var i = 0; i < product_data.productdata.length; i++) {
+          $('#prod' + counter).append('<option value="' + product_data.productdata[i].product_name + '">' + product_data.productdata[i].product_name + '</option>')
+        }
       }
     });
 
@@ -55,33 +103,27 @@ $(document).ready(function () {
         }
       })
 
-      $.ajax({
-        type: "GET",
-        url: $('.punit').attr('data-href'),
-        data: { 'pname': pname },
-        success: function (response) {
-          $('#unit' + counter).val(response)
-        },
-        error: function (response) {
-          console.log("error not data found")
+      for(var i=0;i<product_data.productdata.length;i++){
+        if(product_data.productdata[i].product_name === pname){
+          $('#unit'+counter).val(product_data.productdata[i].unit)
         }
-      })
-
-      $.ajax({
-        type: "GET",
-        url: $('#sto').attr('data-href'),
-        data: { 'pname': pname },
-        success: function (response) {
-          if (response <= 0) {
-            alert('You dont have enought stock');
+        if(product_data.productdata[i].product_name === pname){
+          var id = product_data.productdata[i].id;
+          if(stock.stock_data[i].product_id === id){
+              var stock_check = stock.stock_data[i]
+              if (stock_check.quantity <= 0){
+                $('#qty'+counter).prop('disabled',true)
+                alert("you don't have enough stock")
+              }
+              else{
+                $('#qty'+counter).prop('disabled',false)
+                $('#qty'+counter).attr('max',stock_check.quantity)
+                $('#qty'+counter).attr('title','You have only '+stock_check.quantity+' quantity')
+              }
           }
-          $('#qty' + counter).change(function () {
-            if (response <= $('#qty' + counter).val()) {
-              alert(`You dont have enough stock , You have only ${response} qty`)
-            }
-          });
         }
-      })
+      }
+
     })
 
     var id = $(this).closest('tr').attr('itemid');
@@ -102,64 +144,47 @@ $(document).ready(function () {
         }
       })
       $('#total').val(sum)
-      var name = $('.customer').val();
-      var state;
-      $.ajax({
-        url: $('#st').attr('data-href'),
-        data: { 'cname': name },
-        success: function (data) {
 
-          state = data;
+      if (customer_state == profile_state) {
+        var gstsum = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
+          }
+        })
+        var cgst = gstsum / 2
+        $('#cgst').val(cgst)
+        $('#sgst').val(cgst)
+      }
+      else {
+        var gstsum = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
+          }
+        })
+        $('#igst').val(gstsum)
+      }
 
-          $.ajax({
-            url: $('#ownerstate').attr('data-href'),
-            data: {},
-            success: function (data) {
-              profile_state = data;
-
-              if (state == profile_state) {
-                var gstsum = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
-                  }
-                })
-                var cgst = gstsum / 2
-                $('#cgst').val(cgst)
-                $('#sgst').val(cgst)
-              }
-              else {
-                var gstsum = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
-                  }
-                })
-                $('#igst').val(gstsum)
-              }
-
-              if ($('#roff').keyup(function () {
-                var gsts = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gsts += parseFloat(this.value)
-                  }
-                })
-                var roff = $('#roff').val()
-                var total = $('#total').val()
-                var gt = parseFloat(total) + gsts
-                var gtot = gt - parseFloat(roff)
-                $('#gtot').val(gtot)
-              })) { }
-              var total = $('#total').val()
-              var gt = parseFloat(total) + parseFloat(gstsum)
-              $('#gtot').val(gt)
-            }
-          });
-
-        }
-      })
+      if ($('#roff').keyup(function () {
+        var gsts = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gsts += parseFloat(this.value)
+          }
+        })
+        var roff = $('#roff').val()
+        var total = $('#total').val()
+        var gt = parseFloat(total) + gsts
+        var gtot = gt - parseFloat(roff)
+        $('#gtot').val(gtot)
+      })) { }
+      var total = $('#total').val()
+      var gt = parseFloat(total) + parseFloat(gstsum)
+      $('#gtot').val(gt)
+            
     })
+
     $('#qty' + id).keyup(function () {
       var rate = $('#rate' + id).val()
       var qty = $('#qty' + id).val()
@@ -177,65 +202,47 @@ $(document).ready(function () {
         }
       })
       $('#total').val(sum)
-      var name = $('.customer').val();
-      var state;
 
-      $.ajax({
-        url: $('#st').attr('data-href'),
-        data: { 'cname': name },
-        success: function (data) {
+      if (customer_state == profile_state) {
+        var gstsum = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
+          }
+        })
+        var cgst = gstsum / 2
+        $('#cgst').val(cgst)
+        $('#sgst').val(cgst)
+      }
+      else {
+        var gstsum = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
+          }
+        })
+        $('#igst').val(gstsum)
+      }
 
-          state = data;
-
-          $.ajax({
-            url: $('#ownerstate').attr('data-href'),
-            data: {},
-            success: function (data) {
-              profile_state = data;
-
-              if (state == profile_state) {
-                var gstsum = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
-                  }
-                })
-                var cgst = gstsum / 2
-                $('#cgst').val(cgst)
-                $('#sgst').val(cgst)
-              }
-              else {
-                var gstsum = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
-                  }
-                })
-                $('#igst').val(gstsum)
-              }
-
-              if ($('#roff').keyup(function () {
-                var gsts = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gsts += parseFloat(this.value)
-                  }
-                })
-                var roff = $('#roff').val()
-                var total = $('#total').val()
-                var gt = parseFloat(total) + gsts
-                var gtot = gt - parseFloat(roff)
-                $('#gtot').val(gtot)
-              })) { }
-              var total = $('#total').val()
-              var gt = parseFloat(total) + parseFloat(gstsum)
-                ($('#gtot').val(gt)).toFixed(3)
-            }
-          });
-        }
-      });
+      if ($('#roff').keyup(function () {
+        var gsts = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gsts += parseFloat(this.value)
+          }
+        })
+        var roff = $('#roff').val()
+        var total = $('#total').val()
+        var gt = parseFloat(total) + gsts
+        var gtot = gt - parseFloat(roff)
+        $('#gtot').val(gtot)
+      })) { }
+      var total = $('#total').val()
+      var gt = parseFloat(total) + parseFloat(gstsum)
+        ($('#gtot').val(gt)).toFixed(3)
 
     })
+
     $(".addbtntext" + id).keyup(function () {
 
       var rate = $('#rate' + id).val()
@@ -254,61 +261,45 @@ $(document).ready(function () {
         }
       })
       $('#total').val(sum)
-      var name = $('.customer').val();
-      var state;
-      $.ajax({
-        url: $('#st').attr('data-href'),
-        data: { 'cname': name },
-        success: function (data) {
-          state = data;
 
-          $.ajax({
-            url: $('#ownerstate').attr('data-href'),
-            data: {},
-            success: function (data) {
-              profile_state = data;
+      if (customer_state == profile_state) {
+        var gstsum = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
+          }
+        })
+        var cgst = gstsum / 2
+        $('#cgst').val(cgst)
+        $('#sgst').val(cgst)
+      }
+      else {
+        var gstsum = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
+          }
+        })
+        $('#igst').val(gstsum)
+      }
 
-              if (state == profile_state) {
-                var gstsum = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
-                  }
-                })
-                var cgst = gstsum / 2
-                $('#cgst').val(cgst)
-                $('#sgst').val(cgst)
-              }
-              else {
-                var gstsum = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gstsum = (parseFloat(this.value) + parseFloat(gstsum)).toFixed(3)
-                  }
-                })
-                $('#igst').val(gstsum)
-              }
-
-              if ($('#roff').keyup(function () {
-                var gsts = 0;
-                $('tr').find('.gstamt').each(function () {
-                  if (!isNaN(this.value) && this.value.length != 0) {
-                    gsts += parseFloat(this.value)
-                  }
-                })
-                var roff = $('#roff').val()
-                var total = $('#total').val()
-                var gt = parseFloat(total) + gsts
-                var gtot = gt - parseFloat(roff)
-                $('#gtot').val(gtot)
-              })) { }
-              var total = $('#total').val()
-              var gt = parseFloat(total) + parseFloat(gstsum)
-              $('#gtot').val(gt)
-            }
-          });
-        }
-      });
+      if ($('#roff').keyup(function () {
+        var gsts = 0;
+        $('tr').find('.gstamt').each(function () {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            gsts += parseFloat(this.value)
+          }
+        })
+        var roff = $('#roff').val()
+        var total = $('#total').val()
+        var gt = parseFloat(total) + gsts
+        var gtot = gt - parseFloat(roff)
+        $('#gtot').val(gtot)
+      })) { }
+      var total = $('#total').val()
+      var gt = parseFloat(total) + parseFloat(gstsum)
+      $('#gtot').val(gt)
+    
 
     })
     $('#del' + counter).click(function () {
@@ -321,24 +312,8 @@ $(document).ready(function () {
             sum += parseFloat(this.value)
           }
         })
-        var name = $('.customer').val();
-        var state;
-        $.ajax({
-          url: $('#st').attr('data-href'),
-          data: { 'cname': name },
-          success: function (data) {
-            state = data;
-          }
-        });
-        $.ajax({
-          url: $('#ownerstate').attr('data-href'),
-          data: {},
-          success: function (data) {
-            profile_state = data;
-          }
-        });
         // gst calculate
-        if (state == profile_state) {
+        if (customer_state == profile_state) {
           var gstsum = 0;
           $('tr').find('.gstamt').each(function () {
             if (!isNaN(this.value) && this.value.length != 0) {
@@ -369,7 +344,7 @@ $(document).ready(function () {
       }
     })
 
-    $('.gstaddsales').hover(function () {
+    $('.gstaddsales').Click(function () {
       var c = $('tbody').find('tr:last').attr('itemid')
       $.ajax({
         type: "GET",

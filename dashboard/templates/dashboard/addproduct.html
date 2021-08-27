@@ -68,7 +68,7 @@ Add Product
             </div>
             <div class="form-group">
                 <label for="validationCustom02">Supplier</label>
-                <select name="supplier" id="validationCustom02" class="form-control">
+                <select name="supplier" id="validationCustom02" class="form-control supplier">
                 <option value="-1">-------Select Supplier-------</option>
                 {% if request.user|has_group:"Estimate" %}
                     {% for i in supplierdata_estimate %}
@@ -162,7 +162,7 @@ Add Product
             </div>
             <div class="form-group">
                 <label for="validationCustom02">Supplier</label>
-                <select name="supplier" id="validationCustom02" class="form-control">
+                <select name="supplier" id="validationCustom02" class="form-control supplier">
                 <option value="-1">-------Select Supplier-------</option>
                 {% if request.user|has_group:"Estimate" %}
                     {% for i in supplierdata_estimate %}
@@ -197,5 +197,11 @@ Add Product
     </div>
 </div>
 {% endif %}
+
+<script>
+$(document).ready(function () {
+    $('.supplier').select2();
+  })
+</script>
 
 {% endblock content %}

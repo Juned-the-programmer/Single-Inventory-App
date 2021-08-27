@@ -47,7 +47,7 @@ Add Product
             </div>
             <div class="form-group">
                 <label for="validationCustom02">Unit</label>
-                <select name="unit" id="validationCustom02" class="form-control">
+                <select name="unit" id="validationCustom02" class="form-control supplier">
                 {% if request.user|has_group:"Estimate" %}
                     <option value="{{productdata_estimate.unit}}">{{productdata_estimate.unit}}</option>
                 {% else %}
@@ -91,7 +91,7 @@ Add Product
             </div>
             <div class="form-group">
                 <label for="validationCustom02">Supplier</label>
-                <select name="supplier" id="validationCustom02" class="form-control">
+                <select name="supplier" id="validationCustom02" class="form-control supplier">
                 {% if request.user|has_group:"Estimate" %}
                     <option value="{{productdata_estimate.supplier}}">{{productdata_estimate.supplier}}</option>
                 {% else %}
@@ -135,5 +135,11 @@ Add Product
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function () {
+    $('.supplier').select2();
+  })
+</script>
 
 {% endblock content %}

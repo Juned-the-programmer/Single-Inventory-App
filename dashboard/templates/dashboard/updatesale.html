@@ -49,7 +49,7 @@ Edit Sales
                 </div>
                 <div id="c" data-href="{% url 'estimatesalec' %}"></div>
                 <table class="table table-striped table-bordered table-condensed table-hover">
-                    <thead class="thead-dark punit" data-href="{% url 'punit' %}">
+                    <thead class="thead-dark punit">
                         <tr>
                             <th scope="col" width="2%">#</th>
                             <th scope="col" width="35%">Product Name</th>
@@ -68,8 +68,8 @@ Edit Sales
                                 <a id="del{{forloop.counter0}}" href="#"> <i class="fa fa-trash" style="color: red;" aria-hidden="true"></i> </a>
                             </td>
                             <td>
-                                <div class="combo{{forloop.counter0}}" data-href="{% url 'getproducts_estimate_sale' %}">
-                                    <select name="prod{{forloop.counter0}}" id="prod{{forloop.counter0}}" placeholder="Select Poduct" class="editable-select form-control">
+                                <div class="combo{{forloop.counter0}}">
+                                    <select name="prod{{forloop.counter0}}" id="prod{{forloop.counter0}}" placeholder="Select Poduct" class="product-select form-control">
                                     <option value="{{i.product_name}}" selected>{{i.product_name}}</option>
                                     {% for i in productdata_estimate %}
                                         <option value="{{i.product_name}}">{{i.product_name}}</option>
@@ -135,17 +135,25 @@ Edit Sales
             </div>
         </div>
     </div>
-<div id="check_stock_estimate" data-href="{% url 'check_stock_estimate' %}"></div>
 </div>
 
 <div class="sellingprice_estimate" data-href="{% url 'sellingprice_estimate' %}"></div>
 <div class="previous_discount_estimate" data-href="{% url 'previous_discount_estimate' %}"></div>
+
+<div class="product_data_estimate" data-href="{% url 'product_data_estimate' %}"></div>
+<div class="stock_data_estimate" data-href="{% url 'stock_data_estimate' %}"></div>
+
+{% else %}
+    <p>User doesn't belong to Estimate</p>
+{% endif %}
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script src="{% static 'libs/js/custom/estimatesale.js' %}"></script>
 
 <script>
   $(document).ready(function () {
+    $('.product-select').select2();
+    $('.customer_estimate').select2();
     $('.customer_estimate').on("change", function () {
       var name = $(this).val();
       // alert(name)
@@ -159,9 +167,5 @@ Edit Sales
     });
   })
 </script>
-{% else %}
-    <p>User doesn't belong to Estimate</p>
-{% endif %}
-
 
 {% endblock content %}

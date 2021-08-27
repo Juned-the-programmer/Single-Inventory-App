@@ -113,7 +113,7 @@ Add Supplier Payment
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script>
     $(document).ready(function(){
-        
+    $('.suppliername').select2();
         $('.suppliername').on("change",function(){
             var sid=$(this).val();
             // alert(id)

@@ -32,7 +32,7 @@ View Customer
                             </tr>
                         </thead>
                         <tbody>
-                        {% for i in customerdata_estimate %}
+                        {% for i in customer_data %}
                             <tr>
                                 <td>{{i.customerid}}</td>
                                 <td>{{i.fullname}}</td>
@@ -74,7 +74,7 @@ View Customer
                             </tr>
                         </thead>
                         <tbody>
-                        {% for i in customerdata_gst %}
+                        {% for i in customer_data %}
                             <tr>
                                 <td>{{i.customerid}}</td>
                                 <td>{{i.fullname}}</td>
@@ -99,7 +99,7 @@ View Customer
 {% endif %}
 
 <script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="{% static 'vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'vendor/datatables/js/data-table.js' %}"></script>
 <script src="{% static 'vendor/datatables/js/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'vendor/datatables/js/buttons.bootstrap4.min.js' %}"></script>
