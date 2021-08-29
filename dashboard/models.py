@@ -247,7 +247,6 @@ class gstsale(models.Model):
     IGST = models.FloatField()
     Round_off = models.FloatField()
     Grand_total = models.FloatField()
-    
 
     def __str__(self):
         return str(self.Bill_no)

@@ -344,7 +344,7 @@ $(document).ready(function () {
       }
     })
 
-    $('.gstaddsales').Click(function () {
+    $('.gstaddsales').click(function () {
       var c = $('tbody').find('tr:last').attr('itemid')
       $.ajax({
         type: "GET",

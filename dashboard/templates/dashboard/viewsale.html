@@ -68,6 +68,7 @@ View Sales
                         <th>Grand Amount</th>
                         <th>Date</th>
                         <th>View Sale</th>
+                        <th>Edit Sale</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -79,6 +80,9 @@ View Sales
                             <td>{{i.date}}</td>
                             <td>
                                 <a href="/dashboard/saleinvoice/{{i.id}}">view</a>
+                            </td>
+                             <td>
+                                <a href="/dashboard/updatesale/{{i.id}}">Edit</a>
                             </td>
                         </tr>
                         {% endfor %}

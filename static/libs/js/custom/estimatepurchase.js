@@ -207,7 +207,7 @@ $(document).ready(function () {
       
   });
   
-  $('.addpurchase').Click(function (){
+  $('.addpurchase').click(function (){
     var c=$('tbody').find('tr:last').attr('itemid')
         $.ajax({
           type:"GET",

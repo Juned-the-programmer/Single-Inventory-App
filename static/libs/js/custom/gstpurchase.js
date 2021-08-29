@@ -95,6 +95,7 @@ $(document).ready(function () {
           $('#unit' + counter).val(product_data.productdata[i].unit)
         }
       }
+    });
 
       var id = $(this).closest('tr').attr('itemid');
       $("#rate" + id).keyup(function () {
@@ -288,8 +289,8 @@ $(document).ready(function () {
               }
             })
             var cgst = gstsum / 2
-              ($('#cgst').val(cgst)).toFixed(2)
-              ($('#sgst').val(cgst)).toFixed(2)
+            $('#cgst').val(cgst)
+            $('#sgst').val(cgst)
           }
           else {
             var gstsum = 0;
@@ -298,20 +299,20 @@ $(document).ready(function () {
                 gstsum += parseFloat(this.value)
               }
             })
-              ($('#igst').val(gstsum)).toFixed(2)
+            $('#igst').val(gstsum)
           }
           // end gst calculate 
-
+  
           $('#total').val(sum)
           $('#row' + counter).remove()
           var total = $('#total').val()
           var roff = $('#roff').val()
           var gt = parseFloat(total) + parseFloat(gstsum) - parseFloat(roff)
-            ($('#gtot').val(gt)).toFixed(2)
+          $('#gtot').val(gt)
         }
       })
 
-      $('.gstaddpurchase').Click(function () {
+      $('.gstaddpurchase').click(function () {
         var c = $('tbody').find('tr:last').attr('itemid')
         $.ajax({
           type: "GET",
@@ -376,5 +377,4 @@ $(document).ready(function () {
     //     $('#upt_error').show();
     //     })
     // })
-  });
 });

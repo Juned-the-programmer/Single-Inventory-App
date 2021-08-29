@@ -266,7 +266,7 @@ $(document).ready(function () {
       
   });
   
-  $('#addsales').Click(function (){
+  $('#addsales').click(function (){
     var c=$('tbody').find('tr:last').attr('itemid')
         $.ajax({
           type:"GET",

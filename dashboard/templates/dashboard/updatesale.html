@@ -25,13 +25,13 @@ Edit Sales
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom05"><strong style="color: black;">Date</strong></label>
                         <input type="text" class="form-control" id="validationCustom05" name="lm" placeholder="Date"
-                            value="{{sale_estimate.date}}" required readonly>
+                            value="{{sale_data.date}}" required readonly>
                     </div>
 
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom05"><strong style="color: black;">Bill No</strong></label>
                         <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No"
-                            value="{{sale_estimate.Bill_no}}" required readonly>
+                            value="{{sale_data.Bill_no}}" required readonly>
                     </div>
             
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
@@ -39,8 +39,8 @@ Edit Sales
                             <label for="validationCustom01"><strong style="color: black;">Customer Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'addcustomer' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
                             <select name="customer" id="cname" class="form-control customer_estimate">
                                 <!-- style="margin-left: 150px; margin-right: 100px;" -->
-                                <option selected>{{sale_estimate.customer}}</option>
-                                    {% for i in customerdata_estimate %}
+                                <option selected>{{sale_data.customer}}</option>
+                                    {% for i in customer_data %}
                                         <option value="{{i.fullname}}">{{i.fullname}}</option>
                                     {% endfor %}
                             </select>
@@ -71,7 +71,7 @@ Edit Sales
                                 <div class="combo{{forloop.counter0}}">
                                     <select name="prod{{forloop.counter0}}" id="prod{{forloop.counter0}}" placeholder="Select Poduct" class="product-select form-control">
                                     <option value="{{i.product_name}}" selected>{{i.product_name}}</option>
-                                    {% for i in productdata_estimate %}
+                                    {% for i in product_data %}
                                         <option value="{{i.product_name}}">{{i.product_name}}</option>
                                     {% endfor %}
                                     </select>
@@ -105,24 +105,24 @@ Edit Sales
                         <tr>
                             <td align="right" width="75%">Total(Rs.)</td>
                             <td align="right" width="25%"><input type="number" class="form-control" id="total" name="total"
-                                placeholder="Total" value="{{sale_estimate.Total_amount}}" readonly></td>
+                                placeholder="Total" value="{{sale_data.Total_amount}}" readonly></td>
                         </tr>
                         <tr>
                             <td align="right" width="75%">Old Amount(Rs.) (+)</td>
                             <td align="right" width="25%"><input type="number" class="form-control due-amount" id="oldamt"
-                                name="oldamt" placeholder="Old Amount" value="{{sale_estimate.Due_amount}}" readonly></td>
+                                name="oldamt" placeholder="Old Amount" value="{{sale_data.Due_amount}}" readonly></td>
                         </tr>
                         <tr>
                             <td align="right" width="75%">Round Off (-)</td>
                             <td align="right" width="25%"><input type="number" min="0" step="any" class="form-control" id="roff"
-                                name="roff" placeholder="Round Off" value="{{sale_estimate.Round_off}}"></td>
+                                name="roff" placeholder="Round Off" value="{{sale_data.Round_off}}"></td>
                         </tr>
                         <tr>
                             <td align="right" width="75%">Grand Total(Rs.)</td>
                             <td align="right" width="25%"><input type="number" class="form-control" id="gtot" name="gtot"
-                                placeholder="Grand Total" value="{{sale_estimate.Grand_total}}" readonly></td>
+                                placeholder="Grand Total" value="{{sale_data.Grand_total}}" readonly></td>
                         </tr>
-                            <input type="hidden" class="form-control" id="cod" name="cod" placeholder="Cash Payment" value="{{sale_estimate.Grand_total}}">
+                            <input type="hidden" class="form-control" id="cod" name="cod" placeholder="Cash Payment" value="{{sale_data.Grand_total}}">
                     </tbody>
                 </table>
                 <div class="form-row">
@@ -144,11 +144,147 @@ Edit Sales
 <div class="stock_data_estimate" data-href="{% url 'stock_data_estimate' %}"></div>
 
 {% else %}
-    <p>User doesn't belong to Estimate</p>
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <h3 class="card-header"><strong style="color: black;">Add Sales</strong></h3>
+            <div class="card-body">
+                <form method="POST">
+                {% csrf_token %}
+                <div class="form-row justify-content-md-center">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05"><strong style="color: black;">Date</strong></label>
+                        <input type="text" class="form-control" id="validationCustom05" name="lm" placeholder="Date" value="{{sale_data.date}}" required readonly>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05"><strong style="color: black;">Bill No</strong></label>
+                        <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No" value="{{sale_data.Bill_no}}" required readonly>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <br>
+                            <label for="validationCustom01"><strong style="color: black;">Customer Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'addcustomer' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
+                            <select name="customer" id="cname" class="form-control customer">
+                            <option value="{{sale_data.customer_name}}" selected>{{sale_data.customer_name}}</option>
+                            {% for i in customer_data %}
+                                <option value="{{i.fullname}}">{{i.fullname}}</option>
+                            {% endfor %}
+                            </select>   
+                        <br>
+                    </div>
+                </div>
+
+                <div id="c" data-href="{% url 'gstsalec' %}"></div>
+                <table class="table table-striped table-bordered table-condensed table-hover">
+                    <thead class="thead-dark punit">
+                        <tr>
+                            <th scope="col"width="2%">#</th>
+                            <th scope="col" width="10%">HSN Code</th>
+                            <th scope="col" width="25%">Product Name</th>
+                            <th scope="col" width="7%">Unit</th>
+                            <th scope="col">Rate</th>
+                            <th scope="col">Qty.</th>
+                            <th scope="col">GST(%)</th>
+                            <th scope="col">GST AMT</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemtable" data-href="">
+                    {% for i in sale_product %}
+                        <tr id="row{{forloop.counter0}}" itemid="{{forloop.counter0}}">
+                        <td>
+                            <a id="del{{forloop.counter0}}" href="#"> <i class="fa fa-trash" style="color: red;"aria-hidden="true"></i> </a>
+                        </td>
+                        <td>
+                            <input type="number" min="0" class="form-control" id="hsn{{forloop.counter0}}" value="{{i.hsncode}}" name="hsn{{forloop.counter0}}">
+                        </td>
+                        <td>
+                            <div class="comboprod{{forloop.counter0}}" data-href="{% url 'getproducts_gst_sale' %}">
+                            <select name="prod{{forloop.counter0}}" id="prod0" placeholder="Select Product" class="product-select form-control" >
+                                <option value="{{i.product_name}}" selected>{{i.product_name}}</option>
+                                {% for i in product_data %}
+                                    <option value="{{i.product_name}}">{{i.product_name}}</option>
+                                {% endfor %}
+                            </select>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="tot form-control" id="unit{{forloop.counter0}}" value="{{i.unit}}" name="unit{{forloop.counter0}}" readonly >
+                        </td>
+                        <td>
+                            <input type="number" min="0" step="any" class="form-control" id="rate{{forloop.counter0}}" value="{{i.rate}}" name="rate{{forloop.counter0}}">
+                        </td>
+                        <td>
+                            <input type="number" min="0" class="form-control" id="qty{{forloop.counter0}}" value="{{i.qty}}" name="qty{{forloop.counter0}}">
+                        </td>
+                        <td>
+                            <input type="number" min="0" step="any" class="addbtntext{{forloop.counter0}} form-control" id="gstp{{forloop.counter0}}" value="{{i.gstp}}" name="gstp{{forloop.counter0}}">
+                        </td>
+                        <td>
+                            <input type="number" class="gstamt form-control" id="gstamt{{forloop.counter0}}" name="gstamt{{forloop.counter0}}" value="{{i.gstamt}}" readonly>
+                        </td>
+                        <td>
+                            <input type="text" class="tot form-control" id="tot{{forloop.counter0}}" name="tot{{forloop.counter0}}" value="{{i.total}}" readonly  >
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <br><br>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td align="right" width="75%">Total(Rs.)</td>
+                            <td align="right" width="25%"><input type="number" class="form-control" id="total" name="total" value="{{sale_data.total_amount}}" placeholder="Total" readonly></td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="75%">CGST(Rs.) (+)</td>
+                            <td align="right" width="25%"><input type="number" class="form-control" id="cgst" name="cgst" value="{{sale_data.CGST}}" placeholder="" readonly></td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="75%">SGST(Rs.) (+)</td>
+                            <td align="right" width="25%"><input type="number" class="form-control" id="sgst" name="sgst" value="{{sale_data.SGST}}" placeholder="" readonly></td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="75%">IGST(Rs.) (+)</td>
+                            <td align="right" width="25%"><input type="number" class="form-control" id="igst" name="igst" value="{{sale_data.IGST}}" placeholder="" readonly></td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="75%">Round Off (-)</td>
+                            <td align="right" width="25%"><input type="number" min="0" step="any" class="form-control" value="{{sale_data.Round_off}}" id="roff" name="roff" placeholder="Round Off"></td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="75%">Grand Total(Rs.)</td>
+                            <td align="right" width="25%"><input type="number" class="form-control" id="gtot" name="gtot" value="{{sale_data.Grand_total}}" placeholder="Grand Total" readonly></td>
+                        </tr>
+                        <input type="hidden" class="form-control" id="cod" name="grant_total_gst" placeholder="Cash Payment" value="{{purchase_data.Grand_total}}">
+                    </tbody>
+                </table>
+                <div class="form-row">
+                    <p class="text-right pl-2 pt-3">
+                        <input type="submit" class="btn btn-space btn-success rounded gstaddsales" name="GST" value="Submit">
+                        <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                    </p>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="st" data-href="{% url 'customer_state_gst' %}"></div>
+<div id="ownerstate_gst" data-href="{% url 'ownerstate_gst' %}"></div>
+<div id="sto" data-href="{% url 'check_stock_gst' %}"></div>
+<div class="product_data_gst" data-href="{% url 'product_data_gst' %}"></div>
+<div class="sellingprice" data-href="{% url 'sellingprice_gst' %}"></div>
+
 {% endif %}
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
-<script src="{% static 'libs/js/custom/estimatesale.js' %}"></script>
+{% if request.user|has_group:"Estimate" %}
+    <script src="{% static 'libs/js/custom/estimatesale.js' %}"></script>
+{% else %}
+    <script src="{% static 'libs/js/custom/gstsale.js' %}"></script>
+{% endif %}
+
 
 <script>
   $(document).ready(function () {
