@@ -41,7 +41,7 @@ Daily Expense
                         <label for="validationCustom03">Category</label>
                         <select name="category" id="editable-select" class="form-control" required>
                             <option value="-1" selected>------Select-------</option>
-                            {% for cat in estimate_category %}
+                            {% for cat in category_data %}
                             <option value="{{cat.category_name}}">{{cat.category_name}}</option>
                             {% endfor %}
                         </select>
@@ -80,7 +80,7 @@ Daily Expense
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in DailyExpenseData_estimate %}
+                        {% for i in DailyExpense_data %}
                         <tr>
                             <td>{{i.date}}</td>
                             <td>{{i.time|naturaltime}}</td>
@@ -152,7 +152,7 @@ Daily Expense
                         <label for="validationCustom03">Category</label>
                         <select name="category" id="editable-select" class="form-control" required>
                             <option value="-1" selected>------Select-------</option>
-                            {% for cat in gst_category %}
+                            {% for cat in category_data %}
                             <option value="{{cat.category_name}}">{{cat.category_name}}</option>
                             {% endfor %}
                         </select>
@@ -192,7 +192,7 @@ Daily Expense
                             </tr>
                         </thead>
                         <tbody>
-                        {% for i in DailyExpenseData_gst %}
+                        {% for i in DailyExpense_data %}
                         <tr>
                             <td>{{i.date}}</td>
                             <td>{{i.time|naturaltime}}</td>

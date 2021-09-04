@@ -25,7 +25,7 @@ Add Supplier Payment
                         <label for="validationCustom03">Supplier Name</label>
                         <select name="supplier-name" id="editable-select" class="form-control suppliername" >
                             <option value="-1" selected>------Select-------</option>
-                            {% for i in supplierdata_estimate %}
+                            {% for i in supplier_data %}
                                 <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                         </select>
@@ -84,7 +84,7 @@ Add Supplier Payment
                         <label for="validationCustom03">Supplier Name</label>
                         <select name="supplier-name" id="editable-select" class="form-control suppliername" >
                             <option value="-1" selected>------Select-------</option>
-                            {% for i in supplierdata_gst %}
+                            {% for i in supplier_data %}
                                 <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                         </select>

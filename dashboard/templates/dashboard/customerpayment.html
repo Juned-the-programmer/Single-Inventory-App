@@ -26,7 +26,7 @@ Add Customer Payment
                         <label for="validationCustom05">Customer Name</label>
                         <select name="customer" id="editable-select" class="form-control customername" >
                         <option value="-1" selected>------Select-------</option>
-                        {% for i in customerdata_estimate %}
+                        {% for i in customer_data %}
                             <option value="{{i.id}}">{{i.customer_name}}</option>
                         {% endfor %}
                         </select>
@@ -92,7 +92,7 @@ Add Customer Payment
                         <label for="validationCustom05">Customer Name</label>
                         <select name="customer" id="editable-select" class="form-control customername" >
                         <option value="-1" selected>------Select-------</option>
-                        {% for i in customerdata_gst %}
+                        {% for i in customer_data %}
                             <option value="{{i.id}}">{{i.customer_name}}</option>
                         {% endfor %}
                         </select>

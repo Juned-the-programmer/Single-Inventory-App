@@ -291,6 +291,7 @@ Estimate Purchase
   $(document).ready(function () {
     $('.product-select').select2();
     $('.supplier_estimate').select2();
+    $('.supplier_gst').select2();
     $('.supplier_estimate').on("change", function () {
         var name = $(this).val();
         $.ajax({

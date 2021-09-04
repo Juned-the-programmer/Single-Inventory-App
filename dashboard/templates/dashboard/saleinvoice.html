@@ -35,12 +35,12 @@ Sale Invoice
                 <div class="row mb-4">
                     <div class="col-sm-6">
                         <h5 class="mb-1">To :</h5>
-                        <h3 class="text-dark mb-1">{{estimate.customer}}</h3>
-                        <div>Phone: {{estimate.customer.contactno}}</div>
+                        <h3 class="text-dark mb-1">{{sale_data.customer}}</h3>
+                        <div>Phone: {{sale_data.customer.contactno}}</div>
                     </div>
                     <div class="col-sm-6 text-right">
-                        <h3 class="text-dark mb-1">Bill No : {{estimate.Bill_no}}</h3>
-                        <div>Date : {{estimate.date}}</div>
+                        <h3 class="text-dark mb-1">Bill No : {{sale_data.Bill_no}}</h3>
+                        <div>Date : {{sale_data.date}}</div>
                     </div>
                 </div>
                 <div class="table-responsive-sm">
@@ -58,7 +58,7 @@ Sale Invoice
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in product %}
+                            {% for i in product_data %}
                             <tr>
                                 <td class="center"><b><h4>{{forloop.counter}}</b></h4></td>
                                 <td class="left strong"><b><h4>{{i.product_name}}</b></h4></td>
@@ -85,20 +85,20 @@ Sale Invoice
                                     <td class="left">
                                         <strong class="text-dark"><b><h4>Total</b></h4></strong>
                                     </td>
-                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Total_amount|intcomma}}</b></h4></td>
+                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{sale_data.Total_amount|intcomma}}</b></h4></td>
                                 </tr>
                                  <tr>
                                     <td class="left">
                                         <strong class="text-dark"><b><h4>Old Amount</b></h4></strong>
                                     </td>
-                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Due_amount|intcomma}}</b></h4></td>
+                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{sale_data.Due_amount|intcomma}}</b></h4></td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong class="text-dark"><b><h4>Round Off</b></h4></strong>
                                     </td>
                                     <td class="right">
-                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Round_off|intcomma}}</b></h4></strong>
+                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{sale_data.Round_off|intcomma}}</b></h4></strong>
                                     </td>
                                 </tr> 
                                 <tr>
@@ -106,7 +106,7 @@ Sale Invoice
                                         <strong class="text-dark"><b><h4>Grand Total</b></h4></strong>
                                     </td>
                                     <td class="right">
-                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Grand_total|intcomma}}</b></h4></strong>
+                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{sale_data.Grand_total|intcomma}}</b></h4></strong>
                                     </td>
                                 </tr>
                             </tbody>
@@ -145,8 +145,8 @@ Sale Invoice
             <div class="card-header p-4">
             <h2 class="text-center">Tax Invoice</h2>
                 <div class="float-right">
-                    <h3 class="mb-0">Invoice {{gst.bill_no}}</h3>
-                    {{gst.date}}
+                    <h3 class="mb-0">Invoice {{sale_data.bill_no}}</h3>
+                    {{sale_data.date}}
                 </div>
             </div>
             <div class="card-body">
@@ -163,11 +163,11 @@ Sale Invoice
                     </div>
                     <div class="col-sm-6">
                         <h5 class="mb-3">To:</h5>
-                        <h3 class="text-dark mb-1">{{gst.customer_name}}</h3>
-                        <div>GST : {{gst.customer_name.gst}}</div>
-                        <div>Address : {{gst.customer_name.city}},{{gst.customer_name.landmark}}</div>
-                        <div>State : {{gst.customer_name.state}}</div>
-                        <div>Phone: {{gst.customer_name.contactno}}</div>
+                        <h3 class="text-dark mb-1">{{sale_data.customer_name}}</h3>
+                        <div>GST : {{sale_data.customer_name.gst}}</div>
+                        <div>Address : {{sale_data.customer_name.city}},{{sale_data.customer_name.landmark}}</div>
+                        <div>State : {{sale_data.customer_name.state}}</div>
+                        <div>Phone: {{sale_data.customer_name.contactno}}</div>
                     </div>
                 </div>
                 <div class="table-responsive-sm">
@@ -186,7 +186,7 @@ Sale Invoice
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in product_gst %}
+                            {% for i in product_data %}
                             <tr>
                                 <td class="left">{{forloop.counter}}</td>
                                 <td class="left">{{i.hsncode}}</td>
@@ -220,38 +220,38 @@ Sale Invoice
                                     <td class="left">
                                         <strong class="text-dark">Total</strong>
                                     </td>
-                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.total_amount|intcomma}}</td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{sale_data.total_amount|intcomma}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong class="text-dark">CGST (+)</strong>
                                     </td>
-                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.CGST|intcomma}}</td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{sale_data.CGST|intcomma}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong class="text-dark">SGST (+)</strong>
                                     </td>
-                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.SGST|intcomma}}</td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{sale_data.SGST|intcomma}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong class="text-dark">IGST (+)</strong>
                                     </td>
-                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.IGST|intcomma}}</td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{sale_data.IGST|intcomma}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong class="text-dark">Round Off(-)</strong>
                                     </td>
-                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{gst.Round_off|intcomma}}</td>
+                                    <td class="right">{{raw_text}}&nbsp;&nbsp;{{sale_data.Round_off|intcomma}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong class="text-dark">Grand Total</strong>
                                     </td>
                                     <td class="right">
-                                        <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{gst.Grand_total|intcomma}}</strong>
+                                        <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Grand_total|intcomma}}</strong>
                                     </td>
                                 </tr> 
                             </tbody>
