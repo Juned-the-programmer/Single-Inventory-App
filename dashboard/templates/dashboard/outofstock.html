@@ -1,0 +1,155 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+{% load user_auth %}
+{% block title %}
+Out Of stock
+{% endblock title %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+<link href="{% static 'vendor/fonts/circular-std/style.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'libs/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fonts/fontawesome/css/fontawesome-all.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'vendor/datatables/css/dataTables.bootstrap4.css' %}">
+
+{% if request.user|has_group:"Estimate" %}
+<div class="row">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+      <h5 class="card-header">Out of Stock List</h5>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered first" id="example">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody id="addtr">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+<script>
+  
+  $(document).ready(function() {
+    var minimum_stock =[]
+    var stock = []
+    $.ajax({
+      type:"GET",
+      url: "{% url 'product_data_estimate' %}",
+      async : false,
+      success: function(response){
+        minimum_stock = response
+      },
+    })
+
+    $.ajax({
+      type:"GET",
+      url: "{% url 'stock_data_estimate' %}",
+      async : false,
+      success: function(response){ 
+        stock = response
+      },
+    })
+    var outofstock_data = []
+    for(var i=0;i<minimum_stock.productdata.length;i++){
+      if(minimum_stock.productdata[i].minimum_stock >= stock.stock_data[i].quantity){
+        outofstock_data.push(stock.stock_data[i])
+      }
+    }
+    console.log(outofstock_data.length);
+    for(var j=0;j<outofstock_data.length;j++){
+      console.log(outofstock_data[j]);
+      // $('#example #out_of_data #id_').append(outofstock_data[j].id)
+      var newRow= $(document.createElement('tr'))
+            .attr("id", 'out_of_data')
+            newRow.html('<td>'+outofstock_data[j].id+'</td><td>'+minimum_stock.productdata[j].product_name+'</td><td>'+outofstock_data[j].quantity+'</td>')
+            newRow.appendTo('#addtr')
+    }
+    $('#example').DataTable();
+  });
+  
+    </script>
+{% else %}
+<div class="row">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+      <h5 class="card-header">Out of Stock Stock List</h5>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered first" id="example">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody id="addtr">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+<script>
+  
+  $(document).ready(function() {
+    var minimum_stock =[]
+    var stock = []
+    $.ajax({
+      type:"GET",
+      url: "{% url 'product_data_gst' %}",
+      async : false,
+      success: function(response){
+        minimum_stock = response
+      },
+    })
+
+    $.ajax({
+      type:"GET",
+      url: "{% url 'stock_data_gst' %}",
+      async : false,
+      success: function(response){ 
+        stock = response
+      },
+    })
+    var outofstock_data = []
+    for(var i=0;i<minimum_stock.productdata.length;i++){
+      if(minimum_stock.productdata[i].minimum_stock >= stock.stock_data[i].quantity){
+        outofstock_data.push(stock.stock_data[i])
+      }
+    }
+    console.log(outofstock_data.length);
+    for(var j=0;j<outofstock_data.length;j++){
+      console.log(outofstock_data[j]);
+      // $('#example #out_of_data #id_').append(outofstock_data[j].id)
+      var newRow= $(document.createElement('tr'))
+            .attr("id", 'out_of_data')
+            newRow.html('<td>'+outofstock_data[j].id+'</td><td>'+minimum_stock.productdata[j].product_name+'</td><td>'+outofstock_data[j].quantity+'</td>')
+            newRow.appendTo('#addtr')
+    }
+    $('#example').DataTable();
+  });
+  
+    </script>
+{% endif %}
+
+<script src="{% static 'vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/js/data-table.js' %}"></script>
+<script src="{% static 'vendor/datatables/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/js/buttons.bootstrap4.min.js' %}"></script>
+
+{% endblock content %}

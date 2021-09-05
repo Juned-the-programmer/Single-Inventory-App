@@ -32,7 +32,7 @@ View Sales
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in estimate_sales %}
+                        {% for i in Sale_data %}
                         <tr>
                             <td>{{i.Bill_no}}</td>
                             <td>{{i.customer}}</td>
@@ -72,7 +72,7 @@ View Sales
                     </tr>
                     </thead>
                     <tbody>
-                        {% for i in gst_sales %}
+                        {% for i in Sale_data %}
                         <tr>
                             <td>{{i.Bill_no}}</td>
                             <td>{{i.customer_name}}</td>

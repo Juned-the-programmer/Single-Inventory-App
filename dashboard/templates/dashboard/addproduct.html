@@ -71,7 +71,7 @@ Add Product
                 <select name="supplier" id="validationCustom02" class="form-control supplier">
                 <option value="-1">-------Select Supplier-------</option>
                 {% if request.user|has_group:"Estimate" %}
-                    {% for i in supplierdata_estimate %}
+                    {% for i in Supplier_data %}
                         <option value="{{i.fullname}}">{{i.fullname}}</option>
                     {% endfor %}
                 {% else %}
@@ -165,7 +165,7 @@ Add Product
                 <select name="supplier" id="validationCustom02" class="form-control supplier">
                 <option value="-1">-------Select Supplier-------</option>
                 {% if request.user|has_group:"Estimate" %}
-                    {% for i in supplierdata_estimate %}
+                    {% for i in Supplier_data %}
                         <option value="{{i.fullname}}">{{i.fullname}}</option>
                     {% endfor %}
                 {% else %}

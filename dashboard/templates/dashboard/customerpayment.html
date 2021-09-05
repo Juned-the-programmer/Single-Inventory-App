@@ -37,11 +37,15 @@ Add Customer Payment
                     <div class="form-row">
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                             <label for="validationCustom05">Total Pending Amount</label>
-                            <input type="text" class="form-control pending-amount" id="pending-amount" name="pending_amount" placeholder="Pending Amount" required readonly>
+                            <input type="text" class="form-control pending_amount" id="pending-amount" name="pending_amount" placeholder="Pending Amount" required readonly>
                         </div>
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                             <label for="validationCustom05">Paid Amount</label>
-                            <input type="text" class="form-control" placeholder="paid Amount" name="paid_amount" required>
+                            <input type="text" class="form-control paid_amount" placeholder="paid Amount" name="paid_amount" required>
+                        </div>
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                            <label for="validationCustom05">Round Off</label>
+                            <input type="text" class="form-control" step="any" placeholder="Round Off" name="round_off" required>
                         </div>
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                             <label for="validationCustom05">Description</label>
@@ -69,7 +73,7 @@ Add Customer Payment
                 url: "{% url 'customer_dueamount_estimate' %}",
                 data : { 'cid' : cid },
                 success : function(data){
-                   $('.card .pending-amount').val(data)
+                   $('.card .pending_amount').val(data)
                 }
             });
         });
@@ -108,6 +112,10 @@ Add Customer Payment
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                             <label for="validationCustom05">Paid Amount</label>
                             <input type="text" class="form-control" placeholder="paid Amount" name="paid_amount" required>
+                        </div>
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+                            <label for="validationCustom05">Round Off</label>
+                            <input type="text" class="form-control" step="any" placeholder="Round Off" name="round_off" required>
                         </div>
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                             <label for="validationCustom05">Description</label>

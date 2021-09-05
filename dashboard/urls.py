@@ -48,6 +48,7 @@ urlpatterns = [
     path('check_stock_gst/',views.check_stock_gst,name="check_stock_gst"),
     path('sellingprice_gst/',views.sellingprice_gst,name="sellingprice_gst"),
     path('ownerstate_gst_sale/',views.ownerstate_gst_sale,name="ownerstate_gst_sale"),
+    path('stock_data_gst/',views.stock_data_gst,name="stock_data_gst"),
 
     # Daily Income/Expense
     path('dailyincome/',views.dailyincome,name="dailyincome"),
@@ -71,4 +72,5 @@ urlpatterns = [
     path('totalexpense/',views.totalexpense,name="totalexpense"),
     path('salereport/',views.salereport,name="salereport"),
     path('getsupplier/',views.getsupplier,name="getsupplier"),
+    path('outofstock/',views.outofstock,name="outofstock"),
 ]

@@ -32,7 +32,7 @@ View Purchase
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in estimate_purchase    %}
+                        {% for i in Purchase_data    %}
                         <tr>
                             <td>{{i.Bill_no}}</td>
                             <td>{{i.supplier}}</td>
@@ -72,7 +72,7 @@ View Purchase
                         </tr>
                         </thead>
                         <tbody>
-                        {% for i in gst_purchase %}
+                        {% for i in Purchase_data %}
                         <tr>
                             <td>{{i.Bill_no}}</td>
                             <td>{{i.supplier_name}}</td>

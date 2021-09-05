@@ -99,11 +99,11 @@ Update Product
                 {% endif %}
     
                 {% if request.user|has_group:"Estimate" %}
-                    {% for i in supplierdata_estimate %}
+                    {% for i in Product_data %}
                         <option value="{{i.fullname}}">{{i.fullname}}</option>
                     {% endfor %}
                 {% else %}
-                    {% for i in supplierdata_gst %}
+                    {% for i in Product_data %}
                         <option value="{{i.fullname}}">{{i.fullname}}</option>
                     {% endfor %}
                 {% endif %}

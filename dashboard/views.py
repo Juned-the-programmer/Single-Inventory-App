@@ -90,8 +90,6 @@ def viewcustomer(request):
 
 @login_required(login_url='login')
 def updatecustomer(request,pk):
-    global customerdata_estimate
-    global customerdata_gst
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -292,12 +290,8 @@ def updatesupplier(request,pk):
     except:
         return redirect('error404')
 
-supplierdata_estimate = 1
-supplierdata_gst = 1
 @login_required(login_url='login')
 def addproduct(request):
-    global supplierdata_estimate
-    global supplierdata_gst
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -330,13 +324,12 @@ def addproduct(request):
                     messages.success(request , "Product Addedd Successfully ! ")
 
             if Estimate_group in user.groups.all():
-                supplierdata_estimate = Supplier_estimate.objects.all()
+                Supplier_data = Supplier_estimate.objects.all()
             if GST_group in user.groups.all():
-                supplierdata_gst = Supplier_gst.objects.all()
+                Supplier_data = Supplier_gst.objects.all()
 
             context = {
-                'supplierdata_estimate' : supplierdata_estimate,
-                'supplierdata_gst' : supplierdata_gst
+                'Supplier_data':Supplier_data
             }
             return render(request,"dashboard/addproduct.html",context)
         else:
@@ -344,24 +337,19 @@ def addproduct(request):
     except:
         return redirect('error404')
 
-productdata_estimate = 1
-productdata_gst = 1
 @login_required(login_url='login')
 def viewproduct(request):
-    global productdata_estimate
-    global productdata_gst
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
     try:
         if user.is_authenticated:
             if Estimate_group in user.groups.all():
-                productdata_estimate = Product_estimate.objects.all()
+                Product_data = Product_estimate.objects.all()
             if GST_group in user.groups.all():
-                productdata_gst = Product_gst.objects.all()
+                Product_data = Product_gst.objects.all()
             context = {
-                'productdata_estimate' : productdata_estimate,
-                'productdata_gst' : productdata_gst
+                'Product_data' : Product_data
             }
             return render(request,"dashboard/viewproduct.html",context)
         else:
@@ -369,12 +357,8 @@ def viewproduct(request):
     except:
         return redirect('error404')
 
-productdata_estimate = 1
-productdata_gst = 1
 @login_required(login_url='login')
 def updateproduct(request,pk):
-    global productdata_estimate
-    global productdata_gst
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -408,18 +392,13 @@ def updateproduct(request,pk):
                     messages.success(request , "Product Updated Successfully ! ")
             
             if Estimate_group in user.groups.all():
-                productdata_estimate = Product_estimate.objects.get(pk=pk)
-                print(productdata_estimate)
-                productdata_gst = 1
+                Product_data = Product_estimate.objects.get(pk=pk)
             
             if GST_group in user.groups.all():
-                productdata_gst = Product_gst.objects.get(pk=pk)
-                print(productdata_gst)
-                productdata_estimate = 1
+                Product_data = Product_gst.objects.get(pk=pk)
 
             context = {
-                'productdata_estimate' : productdata_estimate,
-                'productdata_gst' : productdata_gst
+                'Product_data' : Product_data
             }
             return render(request,"dashboard/updateproduct.html",context)
         else:
@@ -440,20 +419,9 @@ def gstpurchasec(request):
     gstp=int(request.GET['c'])
     return HttpResponse(gstp)
 
-productdata_estimate = 1
-productdata_gst = 1
-supplierdata_estimate = 1
-supplierdata_gst = 1
-estimate_newbillno = 1
-gst_newbillno = 1
+
 @login_required(login_url='login')
 def addpurchase(request):
-    global productdata_estimate
-    global productdata_gst
-    global supplierdata_estimate
-    global supplierdata_gst
-    global estimate_newbillno
-    global gst_newbillno
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -579,37 +547,30 @@ def addpurchase(request):
         d1 = date_.strftime("%d/%m/%Y")
 
         if Estimate_group in user.groups.all():
-            productdata_estimate = Product_estimate.objects.all()
-            supplierdata_estimate = Supplier_estimate.objects.all()
-            productdata_gst = 1
-            supplierdata_gst = 1
+            Product_data = Product_estimate.objects.all()
+            Supplier_data = Supplier_estimate.objects.all()
 
             if Estimate_Purchase.objects.all().exists():
-                estimate_newbill = Estimate_Purchase.objects.last().Bill_no
-                estimate_newbillno = estimate_newbill + 1
+                new_bill = Estimate_Purchase.objects.last().Bill_no
+                new_bill = new_bill + 1
             else:
-                estimate_newbillno = 1
+                new_bill = 1
 
         if GST_group in user.groups.all():
-            productdata_gst = Product_gst.objects.all()
-            supplierdata_gst = Supplier_gst.objects.all()
-            productdata_estimate = 1
-            supplierdata_estimate = 1
+            Product_data = Product_gst.objects.all()
+            Supplier_data = Supplier_gst.objects.all()
 
             if GST_Purchase.objects.all().exists():
-                gst_newbillno = GST_Purchase.objects.last().Bill_no
-                gst_newbillno = gst_newbillno + 1
+                new_bill = GST_Purchase.objects.last().Bill_no
+                new_bill = new_bill + 1
             else:
-                gst_newbillno = 1
+                new_bill = 1
 
         context = {
-            'productdata_estimate' : productdata_estimate,
-            'supplierdata_estimate' : supplierdata_estimate,
-            'estimate_newbillno' : estimate_newbillno,
+            'Product_data' : Product_data,
+            'Supplier_data' : Supplier_data,
+            'new_bill' : new_bill,
             'd1' : d1,
-            'productdata_gst' : productdata_gst,
-            'supplierdata_gst' : supplierdata_gst,
-            'gst_newbillno' : gst_newbillno
         }
         return render(request,"dashboard/purchase.html",context)
     else:
@@ -724,26 +685,21 @@ def purchaseprice_gst(request):
 
     return HttpResponse(last_rate)
 
-estimate_purchase = 1
-gst_purchase = 1
 @login_required(login_url='login')
 def viewpurchase(request):
-    global estimate_purchase
-    global gst_purchase
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
     try:
         if user.is_authenticated:
             if Estimate_group in user.groups.all():
-                estimate_purchase = Estimate_Purchase.objects.all()
+                Purchase_data = Estimate_Purchase.objects.all()
 
             if GST_group in user.groups.all():
-                gst_purchase = GST_Purchase.objects.all()
+                Purchase_data = GST_Purchase.objects.all()
 
             context = {
-                'estimate_purchase': estimate_purchase,
-                'gst_purchase' : gst_purchase
+                'Purchase_data' : Purchase_data
             }
             return render(request,"dashboard/viewpurchase.html",context)
         else:
@@ -751,18 +707,8 @@ def viewpurchase(request):
     except:
         return redirect('error404')
 
-purchase_Bill_no = 1
-purchase_estimate = 1
-purchase_product = 1
-supplierdata_estimate = 1
-productdata_estimate = 1
 @login_required(login_url='login')
 def updatepurchase(request,pk):
-    global purchase_Bill_no
-    global purchase_estimate
-    global purchase_product
-    global supplierdata_estimate
-    global productdata_estimate
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -942,44 +888,30 @@ def updatepurchase(request,pk):
     else:
         return redirect('login')
 
-estimate = 1
-product = 1
-gst = 1
-product_gst = 1
-word = 1
-profile_info = 1
+
 @login_required(login_url='login')
 def purchaseinvoice(request,pk):
-    global estimate
-    global product
-    global gst
-    global product_gst
-    global word
-    global profile_info
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
     if user.is_authenticated:
         if Estimate_group in user.groups.all():
-            estimate = Estimate_Purchase.objects.get(pk=pk)
-            product = estimatepurchase_Product.objects.filter(Bill_no = estimate.Bill_no)
+            Purchase_data = Estimate_Purchase.objects.get(pk=pk)
+            Purchase_data_product = estimatepurchase_Product.objects.filter(Bill_no = estimate.Bill_no)
+            word = 1
 
         if GST_group in user.groups.all():
-            gst = GST_Purchase.objects.get(pk=pk)
-            product_gst = gstpurchase_Product.objects.filter(Bill_no = gst.Bill_no)
+            Purchase_data = GST_Purchase.objects.get(pk=pk)
+            Purchase_data_product = gstpurchase_Product.objects.filter(Bill_no = gst.Bill_no)
             word =num2words(gst.Grand_total)
 
         raw_text = u"\u20B9"
         print(raw_text)
 
         context = {
-            'estimate' : estimate,
-            'product' : product,
-            'raw_text' : raw_text,
-            'gst' : gst,
-            'product_gst' : product_gst,
-            'word' : word,
-            'profile_info' : profile_info
+            'Purchase_data' : Purchase_data,
+            'Purchase_data_product' : Purchase_data_product,
+            'word' : word
         }
         return render(request,"dashboard/purchaseinvoice.html",context)
     else:
@@ -995,20 +927,8 @@ def gstsalec(request):
     gst=int(request.GET['c'])
     return HttpResponse(gst)
 
-productdata_estimate = 1
-customerdata_estimate = 1
-estimate_newbillno = 1
-productdata_gst = 1
-customerdata_gst = 1
-gst_newbillno = 1
 @login_required(login_url='login')
 def addsale(request):
-    global productdata_estimate
-    global customerdata_estimate
-    global estimate_newbillno
-    global productdata_gst
-    global customerdata_gst
-    global gst_newbillno
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
@@ -1038,7 +958,7 @@ def addsale(request):
 
                 customerAccount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']))
                 customerAccount.amount = float(Grand_total)
-                
+                customerAccount.save()
                 
                 if cash_on_hand == 0:
                     print('Cash on hand is 0')
@@ -1046,10 +966,9 @@ def addsale(request):
                     CustomerPay = customerpay_estimate (
                         customer_name = customeraccount_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id).customer_name,
                         pending_amount = Grand_total,
-                        paid_amount = cash_on_hand
+                        paid_amount = cash_on_hand,
+                        round_off = 0
                     )
-                    
-                    print("nothing")
 
                 customerdata = customeraccount_estimate.objects.get(id=Customer_estimate.objects.get(fullname=request.POST['customer']).id)
                 pendingamount = customeraccount_estimate.objects.get(id=Customer_estimate.objects.get(fullname=request.POST['customer']).id).amount
@@ -1082,7 +1001,6 @@ def addsale(request):
                     estimate.save()
 
                 Estimatesale.save()
-                customerAccount.save()
                 CustomerPay.save()
                 customerdata.save()
 
@@ -1160,57 +1078,49 @@ def addsale(request):
         d1 = date_.strftime("%d/%m/%Y")
 
         if Estimate_group in user.groups.all():
-            productdata_estimate = Product_estimate.objects.all()
-            customerdata_estimate = Customer_estimate.objects.all()
+            Product_data = Product_estimate.objects.all()
+            Customer_data = Customer_estimate.objects.all()
     
             if Estimate_sales.objects.all().exists():
-                estimate_newbill = Estimate_sales.objects.last().Bill_no
-                estimate_newbillno = estimate_newbill + 1
+                new_billno = Estimate_sales.objects.last().Bill_no
+                new_billno = new_billno + 1
             else:
-                estimate_newbillno = 1
+                new_billno = 1
         
         if GST_group in user.groups.all():
-            productdata_gst = Product_gst.objects.all()
-            customerdata_gst = Customer_gst.objects.all()
+            Product_data = Product_gst.objects.all()
+            Customer_data = Customer_gst.objects.all()
             
             if gstsale.objects.all().exists():
-                gst_newbill = gstsale.objects.last().Bill_no
-                gst_newbillno = gst_newbill + 1
+                new_billno = gstsale.objects.last().Bill_no
+                new_billno = new_billno + 1
             else:
-                gst_newbillno = 1
+                new_billno = 1
 
         context = {
-            'productdata_estimate' : productdata_estimate,
-            'customerdata_estimate' : customerdata_estimate,
-            'estimate_newbillno' : estimate_newbillno,
-            'productdata_gst' : productdata_gst,
-            'customerdata_gst' : customerdata_gst,
-            'gst_newbillno' : gst_newbillno,
+            'Product_data' : Product_data,
+            'Customer_data' : Customer_data,
+            'new_billno' : new_billno,
             'd1' : d1,
         }
         return render(request,"dashboard/sale.html",context)
     else:
         return redirect('login')
 
-estimate_sales = 1
-gst_sales = 1
 @login_required(login_url='login')
 def viewsale(request):
-    global estimate_sales
-    global gst_sales
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
     if user.is_authenticated:
         if Estimate_group in user.groups.all():
-            estimate_sales = Estimate_sales.objects.all()
+            Sale_data = Estimate_sales.objects.all()
 
         if GST_group in user.groups.all():
-            gst_sales = gstsale.objects.all()
+            Sale_data = gstsale.objects.all()
 
         context = {
-            'estimate_sales': estimate_sales,
-            'gst_sales' : gst_sales,
+            'Sale_data' : Sale_data
         }
         return render(request,"dashboard/viewsale.html",context)
     else:
@@ -1479,6 +1389,10 @@ def stock_data_estimate(request):
     stock_data = Stock_estimate.objects.all()
     return JsonResponse({"stock_data":list(stock_data.values())})
 
+def stock_data_gst(request):
+    stock_data = Stock_gst.objects.objects.all()
+    return JsonResponse({"stock_data":list(stock_data.values())})
+
 @login_required(login_url='login')
 def previous_discount_estimate(request):
     pname = request.GET['pname']
@@ -1703,58 +1617,69 @@ def supplierpayment(request):
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if request.method == 'POST':
-                if 'Estimate' in request.POST:
-
-                    SupplierPay = supplierpay_estimate(
-                        supplier_name = supplieraccount_estimate.objects.get(id=request.POST['supplier-name']).supplier_name,
-                        pending_amount = float(request.POST['pending_amount']),
-                        paid_amount = float(request.POST['paid_amount'])
-                    )
+    if user.is_authenticated:
+        if request.method == 'POST':
+            if 'Estimate' in request.POST:
                 
-                    supplieraccountdata = supplieraccount_estimate.objects.get(id=request.POST['supplier-name'])
-
-                    supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
-
-                    supplieraccountdata.save()
-                    SupplierPay.save()
-                    messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
-
+                if len(request.POST['round_off']) >= 1:
+                    round_off = request.POST['round_off']
                 else:
+                    round_off = 0
 
-                    SupplierPay = supplierpay_gst(
-                        supplier_name = supplieraccount_gst.objects.get(id=request.POST['supplier-name']).supplier_name,
-                        pending_amount = float(request.POST['pending_amount']),
-                        paid_amount = float(request.POST['paid_amount'])
-                    )
+                SupplierPay = supplierpay_estimate(
+                    supplier_name = supplieraccount_estimate.objects.get(id=request.POST['supplier-name']).supplier_name,
+                    pending_amount = float(request.POST['pending_amount']),
+                    paid_amount = float(request.POST['paid_amount']),
+                    round_off = round_off
+                )
+            
+                supplieraccountdata = supplieraccount_estimate.objects.get(id=request.POST['supplier-name'])
+
+                supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+                supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
+
+                supplieraccountdata.save()
+                SupplierPay.save()
+                messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
+
+            else:
                 
-                    supplieraccountdata = supplieraccount_gst.objects.get(id=request.POST['supplier-name'])
+                if len(request.POST['round_off']) >= 1:
+                    round_off = request.POST['round_off']
+                else:
+                    round_off = 0
 
-                    supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+                SupplierPay = supplierpay_gst(
+                    supplier_name = supplieraccount_gst.objects.get(id=request.POST['supplier-name']).supplier_name,
+                    pending_amount = float(request.POST['pending_amount']),
+                    paid_amount = float(request.POST['paid_amount']),
+                    round_off = round_off
+                )
+            
+                supplieraccountdata = supplieraccount_gst.objects.get(id=request.POST['supplier-name'])
 
-                    supplieraccountdata.save()
-                    SupplierPay.save()
-                    messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
+                supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+                supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
 
-            if Estimate_group in user.groups.all():
-                supplier_data = Supplier_estimate.objects.all()
+                supplieraccountdata.save()
+                SupplierPay.save()
+                messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
-            if GST_group in user.groups.all():
-                supplier_data = Supplier_gst.objects.all()
+        if Estimate_group in user.groups.all():
+            supplier_data = Supplier_estimate.objects.all()
 
-            date_ = date.today()
-            d1 = date_.strftime("%d/%m/%Y")
-            context = {
-                'd1':d1,
-                'supplier_data':supplier_data
-            }
-            return render(request, 'dashboard/supplierpayment.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
+        if GST_group in user.groups.all():
+            supplier_data = Supplier_gst.objects.all()
+
+        date_ = date.today()
+        d1 = date_.strftime("%d/%m/%Y")
+        context = {
+            'd1':d1,
+            'supplier_data':supplier_data
+        }
+        return render(request, 'dashboard/supplierpayment.html',context)
+    else:
+        return redirect('login')
 
 @login_required(login_url='login')
 def customerpayment(request):
@@ -1766,10 +1691,16 @@ def customerpayment(request):
             if request.method == 'POST':
                 if 'Estimate' in request.POST:
 
+                    if len(request.POST['round_off']) >= 1:
+                        round_off = request.POST['round_off']
+                    else:
+                        round_off = 0
+
                     CustomerPay = customerpay_estimate (
                         customer_name = customeraccount_estimate.objects.get(id=request.POST['customer']).customer_name,
                         pending_amount = request.POST['pending_amount'],
                         paid_amount = request.POST['paid_amount'],
+                        round_off = round_off,
                         Description = request.POST['Description']
                     )
                     CustomerPay.save()
@@ -1777,16 +1708,23 @@ def customerpayment(request):
                     customerdata = customeraccount_estimate.objects.get(id=request.POST['customer'])
 
                     customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+                    customerdata.amount = customerdata.amount - float(round_off)
 
                     customerdata.save()
                     messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
                 else:
 
+                    if len(request.POST['round_off']) >= 1:
+                        round_off = request.POST['round_off']
+                    else:
+                        round_off = 0
+
                     CustomerPay = customerpay_gst (
                         customer_name = customeraccount_gst.objects.get(id=request.POST['customer']).customer_name,
                         pending_amount = request.POST['pending_amount'],
                         paid_amount = request.POST['paid_amount'],
+                        round_off = round_off,
                         Description = request.POST['Description']
                     )
                     CustomerPay.save()
@@ -1794,6 +1732,7 @@ def customerpayment(request):
                     customerdata = customeraccount_gst.objects.get(id=request.POST['customer'])
 
                     customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+                    customerdata.amount = customerdata.amount - float(round_off)
 
                     customerdata.save()
                     messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
@@ -2028,3 +1967,6 @@ def getsupplier(request):
         print(amount)
     
     return HttpResponse(amount)
+
+def outofstock(request):
+    return render(request,'dashboard/outofstock.html')

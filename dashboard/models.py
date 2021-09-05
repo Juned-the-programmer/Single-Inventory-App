@@ -23,6 +23,7 @@ class customerpay_estimate(models.Model):
     customer_name = models.ForeignKey(Customer_estimate , on_delete=models.CASCADE)
     pending_amount = models.FloatField()
     paid_amount = models.FloatField()
+    round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
     Description = models.CharField(max_length=100,blank=True,null=True)
 
@@ -53,6 +54,7 @@ class customerpay_gst(models.Model):
     customer_name = models.ForeignKey(Customer_gst , on_delete=models.CASCADE)
     pending_amount = models.FloatField()
     paid_amount = models.FloatField()
+    round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
     Description = models.CharField(max_length=100,blank=True,null=True)
 
@@ -81,6 +83,7 @@ class supplierpay_estimate(models.Model):
     supplier_name = models.ForeignKey(Supplier_estimate,on_delete=models.CASCADE)
     pending_amount = models.FloatField()
     paid_amount = models.FloatField()
+    round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -110,6 +113,7 @@ class supplierpay_gst(models.Model):
     supplier_name = models.ForeignKey(Supplier_gst,on_delete=models.CASCADE)
     pending_amount = models.FloatField()
     paid_amount = models.FloatField()
+    round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):

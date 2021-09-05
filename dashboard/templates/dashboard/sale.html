@@ -28,7 +28,7 @@ Add Sales
                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                 <label for="validationCustom05"><strong style="color: black;">Bill No</strong></label>
                 <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No"
-                    value="{{estimate_newbillno}}" required readonly>
+                    value="{{new_billno}}" required readonly>
                 </div>
                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                 <br>
@@ -36,7 +36,7 @@ Add Sales
                     <select name="customer" id="cname" class="form-control customer_estimate">
                         <!-- style="margin-left: 150px; margin-right: 100px;" -->
                         <option selected>------------------------------------------Select Customer---------------------------------------------</option>
-                            {% for i in customerdata_estimate %}
+                            {% for i in Customer_data %}
                                 <option value="{{i.fullname}}">{{i.fullname}}</option>
                             {% endfor %}
                     </select>
@@ -66,7 +66,7 @@ Add Sales
                             <div class="combo0">
                                 <select name="prod0" id="prod0" placeholder="Select Poduct" class="product-select form-control">
                                 <option value="-1" selected>-----------------Select Product-----------------</option>
-                                    {% for i in productdata_estimate %}
+                                    {% for i in Product_data %}
                                     <option value="{{i.product_name}}">{{i.product_name}}</option>
                                     {% endfor %}
                                 </select>
@@ -160,14 +160,14 @@ Add Sales
                     </div>
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom05"><strong style="color: black;">Bill No</strong></label>
-                        <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No" value="{{gst_newbillno}}" required readonly>
+                        <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No" value="{{new_billno}}" required readonly>
                     </div>
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <br>
                             <label for="validationCustom01"><strong style="color: black;">Customer Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'addcustomer' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
                             <select name="customer" id="cname" class="form-control customer">
                             <option value="-1" selected>-----------------------Select Customer-----------------------</option>
-                            {% for i in customerdata_gst %}
+                            {% for i in Customer_data %}
                                 <option value="{{i.fullname}}">{{i.fullname}}</option>
                             {% endfor %}
                             </select>   
@@ -202,7 +202,7 @@ Add Sales
                             <div class="comboprod0" data-href="{% url 'getproducts_gst_sale' %}">
                             <select name="prod0" id="prod0" placeholder="Select Product" class="product-select form-control" >
                                 <option selected>--------Select Product--------</option>
-                                {% for i in productdata_gst %}
+                                {% for i in Product_data %}
                                     <option value="{{i.product_name}}">{{i.product_name}}</option>
                                 {% endfor %}
                             </select>
