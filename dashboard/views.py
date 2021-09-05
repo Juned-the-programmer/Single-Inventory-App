@@ -959,34 +959,31 @@ def purchaseinvoice(request,pk):
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                estimate = Estimate_Purchase.objects.get(pk=pk)
-                product = estimatepurchase_Product.objects.filter(Bill_no = estimate.Bill_no)
+    if user.is_authenticated:
+        if Estimate_group in user.groups.all():
+            estimate = Estimate_Purchase.objects.get(pk=pk)
+            product = estimatepurchase_Product.objects.filter(Bill_no = estimate.Bill_no)
 
-            if GST_group in user.groups.all():
-                gst = GST_Purchase.objects.get(pk=pk)
-                product_gst = gstpurchase_Product.objects.filter(Bill_no = gst.Bill_no)
-                word =num2words(gst.Grand_total)
+        if GST_group in user.groups.all():
+            gst = GST_Purchase.objects.get(pk=pk)
+            product_gst = gstpurchase_Product.objects.filter(Bill_no = gst.Bill_no)
+            word =num2words(gst.Grand_total)
 
-            raw_text = u"\u20B9"
-            print(raw_text)
+        raw_text = u"\u20B9"
+        print(raw_text)
 
-            context = {
-                'estimate' : estimate,
-                'product' : product,
-                'raw_text' : raw_text,
-                'gst' : gst,
-                'product_gst' : product_gst,
-                'word' : word,
-                'profile_info' : profile_info
-            }
-            return render(request,"dashboard/purchaseinvoice.html",context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
+        context = {
+            'estimate' : estimate,
+            'product' : product,
+            'raw_text' : raw_text,
+            'gst' : gst,
+            'product_gst' : product_gst,
+            'word' : word,
+            'profile_info' : profile_info
+        }
+        return render(request,"dashboard/purchaseinvoice.html",context)
+    else:
+        return redirect('login')
 
 def estimatesalec(request):
     global esc
@@ -1418,7 +1415,7 @@ def saleinvoice(request,pk):
                 product_data = gstsales_Product.objects.filter(Bill_no = gst.Bill_no)
                 word =num2words(gst.Grand_total)
 
-            raw_text = u"\u20B9"
+            raw_text = u"\u20B9"        
             print(raw_text)
 
             context = {

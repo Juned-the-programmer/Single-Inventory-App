@@ -44,37 +44,36 @@ Estimate Purchase
                     </div>
                 </div>
                 <div class="table-responsive-sm">
-                    <table class="table table-striped">
+                    <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th class="center"><b><h4>No</b></h4></th>
-                                <th><b><h4>Product</b></h4></th>
-                                <th class="center"><b><h4>Unit</b></h4></th>
-                                <th class="center"><b><h4>Rate</b></h4></th>
-                                <th class="right"><b><h4>Qty.</b></h4></th>
-                                <th class="center"><b><h4>Disc. %</b></h4></th>
-                                <th class="center"><b><h4>Net Rate</b></h4></th>
-                                <th class="right"><b><h4>Total</b></h4></th>
+                                <th class="center">No</th>
+                                <th>Product</th>
+                                <th class="center">Unit</th>
+                                <th class="center">Rate</th>
+                                <th class="right">Qty.</th>
+                                <th class="center">Disc. %</th>
+                                <th class="center">Net Rate</th>
+                                <th class="right">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for i in product %}
                             <tr>
-                                <td class="center"><b><h4>{{forloop.counter}}</b></h4></td>
-                                <td class="left strong"><b><h4>{{i.product_name}}</b></h4></td>
-                                <td class="right"><b><h4>{{i.unit}}</b></h4></td>
-                                <td class="center"><b><h4>{{i.rate}}</b></h4></td>
-                                <td class="right"><b><h4>{{i.qty}}</b></h4></td>
-                                <td class="center"><b><h4>{{i.dis}}</b></h4></td>
-                                <td class="center"><b><h4>{{i.netrate|intcomma}}</b></h4></td>
-                                <td class="right"><b><h4>{{i.total|intcomma}}</b></h4></td>
+                                <td class="center">{{forloop.counter}}</td>
+                                <td class="left strong">{{i.product_name}}</td>
+                                <td class="right">{{i.unit}}</td>
+                                <td class="center">{{i.rate}}</td>
+                                <td class="right">{{i.qty}}</td>
+                                <td class="center">{{i.dis}}</td>
+                                <td class="center">{{i.netrate|intcomma}}</td>
+                                <td class="right text-dark"><b>{{i.total|intcomma}}</b></td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <br>
-                <hr>
                 <div class="row">
                     <div class="col-lg-4 col-sm-5">
                     </div>
@@ -83,30 +82,34 @@ Estimate Purchase
                             <tbody>
                                 <tr>
                                     <td class="left">
-                                        <strong class="text-dark"><b><h4>Total</b></h4></strong>
+                                        <strong class="text-dark">Total</strong>
                                     </td>
-                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Total_amount|intcomma}}</b></h4></td>
+                                    <td class="right text-dark">
+                                        <b>{{raw_text}}&nbsp;&nbsp;{{estimate.Total_amount|intcomma}}</b>
+                                    </td>
                                 </tr>
                                  <tr>
                                     <td class="left">
-                                        <strong class="text-dark"><b><h4>Old Amount</b></h4></strong>
+                                        <strong class="text-dark">Old Amount</strong>
                                     </td>
-                                    <td class="right"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Due_amount|intcomma}}</b></h4></td>
+                                    <td class="right text-dark">
+                                        <b>{{raw_text}}&nbsp;&nbsp;{{estimate.Due_amount|intcomma}}</b>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="left">
-                                        <strong class="text-dark"><b><h4>Round Off</b></h4></strong>
+                                        <strong class="text-dark">Round Off</strong>
                                     </td>
-                                    <td class="right">
-                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Round_off|intcomma}}</b></h4></strong>
+                                    <td class="right text-dark">
+                                        <b>{{raw_text}}&nbsp;&nbsp;{{estimate.Round_off|intcomma}}</b>
                                     </td>
                                 </tr> 
                                 <tr>
                                     <td class="left">
-                                        <strong class="text-dark"><b><h4>Grand Total</b></h4></strong>
+                                        <strong class="text-dark">Grand Total</strong>
                                     </td>
-                                    <td class="right">
-                                        <strong class="text-dark"><b><h4>{{raw_text}}&nbsp;&nbsp;{{estimate.Grand_total|intcomma}}</b></h4></strong>
+                                    <td class="right text-dark">
+                                        <b>{{raw_text}}&nbsp;&nbsp;{{estimate.Grand_total|intcomma}}</b>
                                     </td>
                                 </tr>
                             </tbody>
