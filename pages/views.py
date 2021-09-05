@@ -185,7 +185,7 @@ def dashboard(request):
                 current_roundoff = Estimate_sales.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
                 current_total_sale = current_total['Total_amount__sum']
                 current_roundoff_sale = current_roundoff['Round_off__sum']
-                if total_sale_record:
+                if total_sale_record == 0:
                     print("Current Month Estimate Sale")
                 else:
                     current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
@@ -355,7 +355,7 @@ def dashboard(request):
                 current_roundoff = gstsale.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
                 current_total_sale = current_total['Grand_total__sum']
                 current_roundoff_sale = current_roundoff['Round_off__sum']
-                if total_sale_record:
+                if total_sale_record == 0:
                     print("Current Month Estimate Sale")
                 else:
                     current_month_sale = float(current_total_sale) - float(current_roundoff_sale)

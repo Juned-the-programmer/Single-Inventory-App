@@ -317,7 +317,7 @@ class category_gst(models.Model):
 
     def __str__(self):
         return self.category_name
-
+    
 def create_stock_estimate(sender,instance,created,**kwargs):
     if created:
         Stock_estimate.objects.create(product=instance)
