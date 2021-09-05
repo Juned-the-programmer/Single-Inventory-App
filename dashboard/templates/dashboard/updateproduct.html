@@ -1,7 +1,7 @@
 {% extends 'pages/base.html' %}
 {% load user_auth %}
 {% block title %}
-Add Product
+Update Product
 {% endblock title %}
 
 {% block content %}
@@ -9,7 +9,7 @@ Add Product
 {% include "pages/message.html" %}
 <div class="form-group">
     <div class="card">
-        <h5 class="card-header">Add Product</h5>
+        <h5 class="card-header">Update Product</h5>
         <div class="card-body">
             <form class="needs-validation" method='POST'>
             {% csrf_token %}

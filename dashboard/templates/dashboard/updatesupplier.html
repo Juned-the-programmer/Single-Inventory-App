@@ -1,19 +1,19 @@
 {% extends 'pages/base.html' %} 
 {% load user_auth %}
 
-{% block title %} Add Customer {% endblock title %}
+{% block title %} Update Customer {% endblock title %}
 
 {% block content %}
 {% include "pages/message.html" %}
 {% if request.user|has_group:"Estimate" %}
 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
     <div class="card">
-        <h5 class="card-header">Add customer</h5>
+        <h5 class="card-header">Update Supplier</h5>
         <div class="card-body">
             <form method="POST">
             {% csrf_token %}
                 <div class="form-group">
-                    <label for="inputUserName">Customer ID</label>
+                    <label for="inputUserName">Supplier ID</label>
                     <input
                     id="customerid"
                     type="text"
@@ -124,12 +124,12 @@
 {% else %}
 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
     <div class="card">
-        <h5 class="card-header">Add customer</h5>
+        <h5 class="card-header">Update Supplier</h5>
         <div class="card-body">
             <form method="POST">
             {% csrf_token %}
                 <div class="form-group">
-                    <label for="inputUserName">Customer ID</label>
+                    <label for="inputUserName">Supplier ID</label>
                     <input
                     id="customerid"
                     type="text"
