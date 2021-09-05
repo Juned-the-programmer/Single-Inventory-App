@@ -104,7 +104,7 @@ $(document).ready(function () {
         var gstp = $('#gstp' + id).val()
 
         var tot = parseFloat(rate) * parseFloat(qty)
-        var gstamt = (tot * gstp / 100).toFixed(2)
+        var gstamt = tot * gstp / 100
         $('#gstamt' + id).val(gstamt)
         $('#tot' + id).val(tot)
 
@@ -145,12 +145,12 @@ $(document).ready(function () {
           })
           var roff = $('#roff').val()
           var total = $('#total').val()
-          var gt = parseFloat(total).toFixed(2) + gsts
-          var gtot = gt - parseFloat(roff).toFixed(2)
+          var gt = parseFloat(total) + gsts
+          var gtot = gt - parseFloat(roff)
           $('#gtot').val(gtot)
         })) { }
         var total = $('#total').val()
-        var gt = parseFloat(total).toFixed(2) + parseFloat(gstsum).toFixed(2)
+        var gt = parseFloat(total) + parseFloat(gstsum)
         $('#gtot').val(gt)
       })
 
@@ -160,7 +160,7 @@ $(document).ready(function () {
         var gstp = $('#gstp' + id).val()
 
         var tot = parseFloat(rate) * parseFloat(qty)
-        var gstamt = (tot * gstp / 100).toFixed(2)
+        var gstamt = tot * gstp / 100
         $('#gstamt' + id).val(gstamt)
         $('#tot' + id).val(tot)
 
@@ -201,12 +201,12 @@ $(document).ready(function () {
           })
           var roff = $('#roff').val()
           var total = $('#total').val()
-          var gt = parseFloat(total).toFixed(2) + gsts
-          var gtot = gt - parseFloat(roff).toFixed(2)
+          var gt = parseFloat(total) + gsts
+          var gtot = gt - parseFloat(roff)
           $('#gtot').val(gtot)
         })) { }
         var total = $('#total').val()
-        var gt = parseFloat(total).toFixed(2) + parseFloat(gstsum).toFixed(2)
+        var gt = parseFloat(total) + parseFloat(gstsum)
         $('#gtot').val(gt)
 
       })
@@ -217,8 +217,8 @@ $(document).ready(function () {
         var qty = $('#qty' + id).val()
         var gstp = $('#gstp' + id).val()
 
-        var tot = parseFloat(rate).toFixed(2) * parseFloat(qty).toFixed(2)
-        var gstamt = (tot * gstp / 100).toFixed(2)
+        var tot = parseFloat(rate) * parseFloat(qty)
+        var gstamt = tot * gstp / 100
         $('#gstamt' + id).val(gstamt)
         $('#tot' + id).val(tot)
 
@@ -260,12 +260,12 @@ $(document).ready(function () {
           })
           var roff = $('#roff').val()
           var total = $('#total').val()
-          var gt = parseFloat(total).toFixed(2) + gsts
-          var gtot = gt - parseFloat(roff).toFixed(2)
+          var gt = parseFloat(total) + gsts
+          var gtot = gt - parseFloat(roff)
           $('#gtot').val(gtot)
         })) { }
         var total = $('#total').val()
-        var gt = parseFloat(total).toFixed(2) + parseFloat(gstsum).toFixed(2)
+        var gt = parseFloat(total) + parseFloat(gstsum)
         $('#gtot').val(gt)
 
       })
@@ -307,7 +307,7 @@ $(document).ready(function () {
           $('#row' + counter).remove()
           var total = $('#total').val()
           var roff = $('#roff').val()
-          var gt = parseFloat(total).toFixed(2) + parseFloat(gstsum).toFixed(2) - parseFloat(roff).toFixed(2)
+          var gt = parseFloat(total) + parseFloat(gstsum) - parseFloat(roff)
           $('#gtot').val(gt)
         }
       })
