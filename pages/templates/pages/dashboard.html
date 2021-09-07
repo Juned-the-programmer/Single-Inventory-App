@@ -321,7 +321,7 @@
 <script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
 
 {% if request.user|has_group:"Estimate" %}
-{% comment %} <script>
+<script>
   $(document).ready(function () {
     var minimum_stock =[]
     var stock = []
@@ -333,7 +333,7 @@
         minimum_stock = response
       },
     })
-  
+
     $.ajax({
       type:"GET",
       url: "{% url 'stock_data_estimate' %}",
@@ -364,9 +364,9 @@
     $('.stock_value').text(stock_total_value)
     $('.instock').text(minimum_stock.productdata.length - counter_stock)
   })
-</script> {% endcomment %}
+</script>
 {% else %}
-{% comment %} <script>
+<script>
   $(document).ready(function () {
     var minimum_stock =[]
     var stock = []
@@ -409,7 +409,7 @@
     $('.stock_value').text(stock_total_value)
     $('.instock').text(minimum_stock.productdata.length - counter_stock)
   })
-</script> {% endcomment %}
+</script>
 {% endif %}
   
 {% endblock content %}
