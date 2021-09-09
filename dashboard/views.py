@@ -1317,12 +1317,12 @@ def saleinvoice(request,pk):
         if user.is_authenticated:
             if Estimate_group in user.groups.all():
                 sale_data = Estimate_sales.objects.get(pk=pk)
-                product_data = estimatesales_Product.objects.filter(Bill_no = estimate.Bill_no)
+                product_data = estimatesales_Product.objects.filter(Bill_no = sale_data.Bill_no)
                 word = 1
 
             if GST_group in user.groups.all():
                 sale_data = gstsale.objects.get(pk=pk)
-                product_data = gstsales_Product.objects.filter(Bill_no = gst.Bill_no)
+                product_data = gstsales_Product.objects.filter(Bill_no = sale_data.Bill_no)
                 word =num2words(gst.Grand_total)
 
             raw_text = u"\u20B9"        
