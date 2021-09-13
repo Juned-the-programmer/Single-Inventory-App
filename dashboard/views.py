@@ -961,7 +961,7 @@ def addsale(request):
                 customerAccount.save()
                 
                 if cash_on_hand == 0:
-                    print('Cash on hand is 0')
+                    print("Customer Payment")
                 else:
                     CustomerPay = customerpay_estimate (
                         customer_name = customeraccount_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id).customer_name,
@@ -969,6 +969,7 @@ def addsale(request):
                         paid_amount = cash_on_hand,
                         round_off = 0
                     )
+                    CustomerPay.save()
 
                 customerdata = customeraccount_estimate.objects.get(id=Customer_estimate.objects.get(fullname=request.POST['customer']).id)
                 pendingamount = customeraccount_estimate.objects.get(id=Customer_estimate.objects.get(fullname=request.POST['customer']).id).amount
@@ -1001,7 +1002,6 @@ def addsale(request):
                     estimate.save()
 
                 Estimatesale.save()
-                CustomerPay.save()
                 customerdata.save()
 
             # esti_id = Estimate_sales.objects.all().last().pk
@@ -1175,6 +1175,7 @@ def updatesale(request , pk):
                         dis = request.POST['dis'+str(i)]
                     else:
                         dis = 0
+                        
                     estimate = estimatesales_Product (
                         Bill_no = request.POST['bill_no'],
                         product_name = request.POST['prod'+str(i)],

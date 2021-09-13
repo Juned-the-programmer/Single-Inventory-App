@@ -61,6 +61,19 @@ $(document).ready(function () {
       } else {
         counter++;
         no = counter + 1
+
+        $.ajax({
+          type: "GET",
+          url: $('#c').attr('data-href'),
+          data: { 'c': c },
+          success: function (response) {
+            console.log(response)
+          },
+          error: function (response) {
+            alert("error c")
+          }
+        })
+
         var newRow = $(document.createElement('tr'))
           .attr("id", 'row' + counter)
           .attr("itemid", counter)
@@ -312,20 +325,20 @@ $(document).ready(function () {
         }
       })
 
-      $('.gstaddpurchase').click(function () {
-        var c = $('tbody').find('tr:last').attr('itemid')
-        $.ajax({
-          type: "GET",
-          url: $('#c').attr('data-href'),
-          data: { 'c': c },
-          success: function (response) {
-            console.log(response)
-          },
-          error: function (response) {
-            alert("error c")
-          }
-        })
-      })
+      // $('.gstaddpurchase').submit(function () {
+      //   var c = $('tbody').find('tr:last').attr('itemid')
+      //   $.ajax({
+      //     type: "GET",
+      //     url: $('#c').attr('data-href'),
+      //     data: { 'c': c },
+      //     success: function (response) {
+      //       console.log(response)
+      //     },
+      //     error: function (response) {
+      //       alert("error c")
+      //     }
+      //   })
+      // })
 
     });
     // $('#gstaddsales').click(function (){

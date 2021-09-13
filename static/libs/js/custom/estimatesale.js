@@ -47,6 +47,18 @@ $(document).ready(function () {
               counter++;
               no=counter+1
               unit='pcs'
+
+              $.ajax({
+                type:"GET",
+                url: $('#c').attr('data-href'),
+                data:{'c':counter},
+                success: function(response){
+                  console.log(response)
+                },
+                error: function(response){
+                  alert("error c")
+                }
+              })
               
               var newRow= $(document.createElement('tr'))
               .attr("id", 'row' + counter)
@@ -266,18 +278,18 @@ $(document).ready(function () {
       
   });
   
-  $('.addsales').click(function (){
-    var c=$('tbody').find('tr:last').attr('itemid')
-        $.ajax({
-          type:"GET",
-          url: $('#c').attr('data-href'),
-          data:{'c':c},
-          success: function(response){
-            console.log(response)
-          },
-          error: function(response){
-            alert("error c")
-          }
-        })
-  })
+  // $('.addsales').submit(function (){
+  //   var c=$('tbody').find('tr:last').attr('itemid')
+  //       $.ajax({
+  //         type:"GET",
+  //         url: $('#c').attr('data-href'),
+  //         data:{'c':c},
+  //         success: function(response){
+  //           console.log(response)
+  //         },
+  //         error: function(response){
+  //           alert("error c")
+  //         }
+  //       })
+  // })
 });
