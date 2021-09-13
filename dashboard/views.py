@@ -455,13 +455,17 @@ def addpurchase(request):
                 
 
                 for i in range(0,epc):
+                    if len(request.POST['dis'+str(i)]) >= 1:
+                        dis = request.POST['dis'+str(i)]
+                    else:
+                        dis = 0
                     estimate = estimatepurchase_Product (
                         Bill_no = request.POST['bill_no'],
                         product_name = request.POST['prod'+str(i)],
                         unit = request.POST['unit'+str(i)],
                         rate = request.POST['rate'+str(i)],
                         qty = request.POST['qty'+str(i)],
-                        dis = request.POST['dis'+str(i)],
+                        dis = dis,
                         netrate = request.POST['nr'+str(i)],
                         total = request.POST['tot'+str(i)]
                     )
@@ -897,12 +901,12 @@ def purchaseinvoice(request,pk):
     if user.is_authenticated:
         if Estimate_group in user.groups.all():
             Purchase_data = Estimate_Purchase.objects.get(pk=pk)
-            Purchase_data_product = estimatepurchase_Product.objects.filter(Bill_no = estimate.Bill_no)
+            Purchase_data_product = estimatepurchase_Product.objects.filter(Bill_no = Purchase_data.Bill_no)
             word = 1
 
         if GST_group in user.groups.all():
             Purchase_data = GST_Purchase.objects.get(pk=pk)
-            Purchase_data_product = gstpurchase_Product.objects.filter(Bill_no = gst.Bill_no)
+            Purchase_data_product = gstpurchase_Product.objects.filter(Bill_no = Purchase_data.Bill_no)
             word =num2words(gst.Grand_total)
 
         raw_text = u"\u20B9"
@@ -1796,16 +1800,17 @@ def list_stock(request):
     Estimate_group = Group.objects.get(name='Estimate')
     GST_group = Group.objects.get(name='GST')
     user = User.objects.get(username=request.user.username)
-    try:
+    try:    
         if user.is_authenticated:
             if request.method == 'POST':
                 if 'Estimate' in request.POST:
                     stockdata = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['product_name']))
-                    stock_quantity = stockdata.quantity + int(request.POST['qty'])
+                    stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
                     stockdata.save()
+
                 if 'GST' in request.POST:
                     stockdata = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['product_name']))
-                    stock_quantity = stockdata.quantity + int(request.POST['qty'])
+                    stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
                     stockdata.save()
 
             if Estimate_group in user.groups.all():

@@ -51,7 +51,7 @@ $(document).ready(function () {
               $.ajax({
                 type:"GET",
                 url: $('#c').attr('data-href'),
-                data:{'c':c},
+                data:{'c':counter},
                 success: function(response){
                   console.log(response)
                 },
