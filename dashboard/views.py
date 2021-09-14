@@ -787,10 +787,11 @@ def updatepurchase(request,pk):
                     a = int(c)
                     stock.quantity = a + int(request.POST['qty'+str(i)])
                     stock.save()
+                    estimate.save()
 
                 Estimate.save()
                 supplierAccount.save()
-                estimate.save()
+                
                 return redirect('viewpurchase')
                 messages.success(request,"Purchase Successfully !")
 
