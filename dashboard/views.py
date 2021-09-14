@@ -393,12 +393,15 @@ def updateproduct(request,pk):
             
             if Estimate_group in user.groups.all():
                 Product_data = Product_estimate.objects.get(pk=pk)
+                supplier_data = Supplier_estimate.objects.all()
             
             if GST_group in user.groups.all():
                 Product_data = Product_gst.objects.get(pk=pk)
+                supplier_data = Supplier_gst.objects.all()
 
             context = {
-                'Product_data' : Product_data
+                'Product_data' : Product_data,
+                'supplier_data' :  supplier_data
             }
             return render(request,"dashboard/updateproduct.html",context)
         else:
@@ -459,6 +462,7 @@ def addpurchase(request):
                         dis = request.POST['dis'+str(i)]
                     else:
                         dis = 0
+
                     estimate = estimatepurchase_Product (
                         Bill_no = request.POST['bill_no'],
                         product_name = request.POST['prod'+str(i)],
@@ -760,13 +764,18 @@ def updatepurchase(request,pk):
                 supplierAccount.amount = float(supplierAccount.amount) + float(old_amount)
                 
                 for i in range(0,epc):
+                    if len(request.POST['dis'+str(i)]) >= 1:
+                        dis = request.POST['dis'+str(i)]
+                    else:
+                        dis = 0
+
                     estimate = estimatepurchase_Product (
                         Bill_no = request.POST['bill_no'],
                         product_name = request.POST['prod'+str(i)],
                         unit = request.POST['unit'+str(i)],
                         rate = request.POST['rate'+str(i)],
                         qty = request.POST['qty'+str(i)],
-                        dis = request.POST['dis'+str(i)],
+                        dis = dis,
                         netrate = request.POST['nr'+str(i)],
                         total = request.POST['tot'+str(i)]
                     )
