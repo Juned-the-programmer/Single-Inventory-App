@@ -25,7 +25,7 @@ class customerpay_estimate(models.Model):
     paid_amount = models.FloatField()
     round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
-    Description = models.CharField(max_length=100,blank=True,null=True)
+    Description = models.CharField(max_length=100,blank=True,null=True,default="Cash on Hand")
 
     def __str__(self):
         return str(self.customer_name.fullname)
@@ -56,7 +56,7 @@ class customerpay_gst(models.Model):
     paid_amount = models.FloatField()
     round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
-    Description = models.CharField(max_length=100,blank=True,null=True)
+    Description = models.CharField(max_length=100,blank=True,null=True,default="Cash on Hand")
 
     def __str__(self):
         return str(self.customer_name.fullname)
