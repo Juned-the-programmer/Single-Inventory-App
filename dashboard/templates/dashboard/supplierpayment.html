@@ -58,7 +58,15 @@ Add Supplier Payment
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script>
     $(document).ready(function(){
-        
+    var $loading = $('#overlay').hide();
+    $(document)
+    .ajaxStart(function () {
+        $loading.show();
+    })
+    .ajaxStop(function () {
+        $loading.hide();
+    });
+    $('.suppliername').select2();
         $('.suppliername').on("change",function(){
             var sid=$(this).val();
             // alert(id)
@@ -121,6 +129,14 @@ Add Supplier Payment
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script>
     $(document).ready(function(){
+    var $loading = $('#overlay').hide();
+    $(document)
+    .ajaxStart(function () {
+        $loading.show();
+    })
+    .ajaxStop(function () {
+        $loading.hide();
+    });
     $('.suppliername').select2();
         $('.suppliername').on("change",function(){
             var sid=$(this).val();

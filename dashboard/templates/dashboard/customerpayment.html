@@ -67,10 +67,19 @@ Add Customer Payment
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script>
     $(document).ready(function(){
+        var $loading = $('#overlay').hide();
+    $(document)
+    .ajaxStart(function () {
+        $loading.show();
+    })
+    .ajaxStop(function () {
+        $loading.hide();
+    });
+    $('.customername').select2();
         $('.customername').on("change",function(){
             var cid=$(this).val();
             $.ajax({
-                url: "{% url 'customer_dueamount_estimate' %}",
+                url: "{% url 'customer_dueamount_estimate' %}", 
                 data : { 'cid' : cid },
                 success : function(data){
                    $('.card .pending_amount').val(data)
@@ -137,6 +146,14 @@ Add Customer Payment
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script>
     $(document).ready(function(){
+    var $loading = $('#overlay').hide();
+    $(document)
+    .ajaxStart(function () {
+        $loading.show();
+    })
+    .ajaxStop(function () {
+        $loading.hide();
+    });
     $('.customername').select2();
         $('.customername').on("change",function(){
             var cid=$(this).val();

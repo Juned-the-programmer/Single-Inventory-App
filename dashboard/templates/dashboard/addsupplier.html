@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom04">State</label>
-                        <select name="state" id="validationCustom02" class="form-control customer">
+                        <select name="state" id="validationCustom02" class="form-control state">
                             <option value="-1" selected>-----------------Select State Of Customer--------------------</option>
                             <option value="Andaman and Nicobar Isaland">Andaman and Nicobar Isaland</option>
                             <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -194,7 +194,7 @@
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom04">State</label>
-                        <select name="state" id="validationCustom02" class="form-control customer">
+                        <select name="state" id="validationCustom02" class="form-control state">
                             <option value="-1" selected>-----------------Select State Of Customer--------------------</option>
                             <option value="Andaman and Nicobar Isaland">Andaman and Nicobar Isaland</option>
                             <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -256,5 +256,12 @@
     </div>
 </div>
 {% endif %}
+
+<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
+<script>
+$(document).ready(function () {
+    $('.state').select2();
+  })
+</script>
 
 {% endblock content %}
