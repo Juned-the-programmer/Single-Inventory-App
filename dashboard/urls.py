@@ -73,4 +73,6 @@ urlpatterns = [
     path('salereport/',views.salereport,name="salereport"),
     path('getsupplier/',views.getsupplier,name="getsupplier"),
     path('outofstock/',views.outofstock,name="outofstock"),
+    path('customerstatement/',views.customerstatement,name="customerstatement"),
+    path('customer_statement_view/<pk>',views.customer_statement_view,name="customer_statement_view")
 ]

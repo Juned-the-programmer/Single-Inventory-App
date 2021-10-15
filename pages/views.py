@@ -228,11 +228,12 @@ def dashboard(request):
 
             #Current Month Estimate Purchase
             current_month_purchase = 0
+            current_month_purchase_record = Estimate_Purchase.objects.filter(date__month=month,date__year=year).count()
             current_total_purchase = Estimate_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Total_amount'))
             current_roundoff_purchase = Estimate_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
             current_total_eatimate_purchase = current_total_purchase['Total_amount__sum']
             current_roundoff_estimate_purchase = current_roundoff_purchase['Round_off__sum']
-            if total_purchase_record == 0:
+            if current_month_purchase_record == 0:
                 print("Current Month Estimate Purchase")
             else:
                 current_month_purchase = float(current_total_eatimate_purchase) - float(current_roundoff_estimate_purchase)

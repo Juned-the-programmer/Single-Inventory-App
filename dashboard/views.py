@@ -2028,3 +2028,50 @@ def getsupplier(request):
 
 def outofstock(request):
     return render(request,'dashboard/outofstock.html')
+
+def customerstatement(request):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+    
+    if Estimate_group in user.groups.all():
+        customer_data = Customer_estimate.objects.all()
+        customer_pending_amount = customeraccount_estimate.objects.all()
+    else:
+        customer_data = Customer_gst.objects.all()
+        customer_pending_amount = customeraccount_estimate.objects.all()
+
+    context = {
+        'customer_data' : customer_data
+    }
+    return render(request,'dashboard/customerstatement.html',context)
+
+def customer_statement_view(request,pk):
+    Estimate_group = Group.objects.get(name='Estimate')
+    GST_group = Group.objects.get(name='GST')
+    user = User.objects.get(username=request.user.username)
+
+    if user.is_authenticated:
+        if request.method == "POST":
+            if "Estimate" in request.POST:
+                sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+                payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+        
+                context = {
+                    'sale_data' : sale_data,
+                    'payment_data' : payment_data
+                }
+                return render(request , 'dashboard/customer_statement_view.html',context)
+            else:
+                sale_data = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+                payment_data = customerpay_gst.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+
+                context = {
+                    'sale_data' : sale_data,
+                    'payment_data' : payment_data
+                }
+                return render(request , 'dashboard/customer_statement_view.html',context)
+    else:
+        return redirect('login')
+
+    return render(request , 'dashboard/customer_statement_view.html')
