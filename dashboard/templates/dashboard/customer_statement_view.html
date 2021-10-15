@@ -47,7 +47,7 @@ From to Where
                 </p>
             </div>
 
-            <div style="display:flex; flex-direction: row;" id="invoice_estimate">
+            <!-- <div id="invoice_estimate">
                 <table cellspacing="0" border="0" class="table table-striped table-bordered">
                     <thead class="text-center">
                         <tr>
@@ -64,16 +64,73 @@ From to Where
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td height="20" align="left" valiagn="bottom">03-12-16</td>
-                            <td height="20" align="left" valiagn="bottom">03-12-16</td>
-                            <td height="20" align="left" valiagn="bottom">03-12-16</td>
-                            <td height="20" align="left" valiagn="bottom">03-12-16</td>
-                            <td height="20" align="left" valiagn="bottom">03-12-16</td>
-                            <td height="20" align="left" valiagn="bottom">03-12-16</td>
+                        <tr>    
+                            
+                            <td height="20" align="left" valiagn="bottom">{{j.date}}</td>
+                            <td height="20" align="left" valiagn="bottom">{{j.Description}}</td>
+                            <td height="20" align="left" valiagn="bottom">{{j.paid_amount}}</td>    
+                            <td height="20" align="left" valiagn="bottom">{{i.date}}</td>
+                            <td height="20" align="left" valiagn="bottom">{{i.Bill_no}}</td>
+                            <td height="20" align="left" valiagn="bottom">{{i.Total_amount}}</td>
+                            
                         </tr>
                     </tbody>
                 </table>       
+            </div> -->
+
+            <div style="display: flex;" id="invoice_estimate">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-2">
+                    <table cellspacing="0" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <td colspan="3" height="26" align="center" valign="bottom" class="text-dark" >Debit/Jama</td>
+                            </tr>
+                            <tr>
+                                <td height="26" width=10% align="left" valiagn="middle" class="text-dark">Date</td>
+                                <td height="26" align="middle" valiagn="middle" class="text-dark">Particular</td>
+                                <td height="26" width=10% align="left" valiagn="bottom" class="text-dark">Amount RS.</td>
+                            </tr>
+                        </thead>       
+                        <tbody>
+                            {% for i in payment_data %}
+                            <tr>
+                                <td  height="20" align="left" valiagn="bottom">{{i.date}}</td>
+                                <td  height="20" align="left" valiagn="bottom">
+                                    {% if i.Description == None %}
+                                        Nothing
+                                    {% else %}
+                                        {{i.Description}}
+                                    {% endif %}
+                                </td>
+                                <td  height="20" align="left" valiagn="bottom">{{i.paid_amount}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>     
+                    </table>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-2">
+                    <table cellspacing="0" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <td colspan="3" height="26" align="center" valign="bottom" class="text-dark" >Credit/Udhar</td>
+                            </tr>
+                            <tr>
+                                <td height="26" width=10% align="left" valiagn="middle" class="text-dark">Date</td>
+                                <td height="26" align="middle" valiagn="middle" class="text-dark">Particular</td>
+                                <td height="26" width=10% align="left" valiagn="bottom" class="text-dark">Amount RS.</td>
+                            </tr>
+                        </thead>       
+                        <tbody>
+                        {% for j in sale_data %}
+                            <tr>
+                                <td  height="20" align="left" valiagn="bottom">{{j.date}}</td>
+                                <td  height="20" align="left" valiagn="bottom">{{j.Bill_no}}</td>
+                                <td  height="20" align="left" valiagn="bottom">{{j.Total_amount}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>     
+                    </table>
+                </div>
             </div>
         </div>
     </div>

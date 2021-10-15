@@ -2056,10 +2056,14 @@ def customer_statement_view(request,pk):
             if "Estimate" in request.POST:
                 sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
                 payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
-        
+
+                total_data = map(payment_data,sale_data)
+                print(total_data)
+
                 context = {
                     'sale_data' : sale_data,
-                    'payment_data' : payment_data
+                    'payment_data' : payment_data,
+                    'total_data' : total_data
                 }
                 return render(request , 'dashboard/customer_statement_view.html',context)
             else:
