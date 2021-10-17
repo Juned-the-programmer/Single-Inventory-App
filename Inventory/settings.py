@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'pages',
     'dashboard',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [

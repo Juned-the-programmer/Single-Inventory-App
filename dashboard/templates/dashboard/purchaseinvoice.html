@@ -8,15 +8,7 @@ Estimate Purchase
 {% block content %}
 
 {% if request.user|has_group:"Estimate" %}
-<div class="form-row">
-    <p class="text-right pl-2 pt-3">
-        <button type="submit" id="btn" class="btn btn-space btn-success rounded" onclick="printDiv('invoice_estimate')">
-        Print
-        </button>
-    </p>
-</div>
-
-<div class="row" id="invoice_estimate">
+<div class="row" >
     <div class="offset-xl-2 col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="card">
             <!-- <div class="card-header p-4">
@@ -25,28 +17,33 @@ Estimate Purchase
                     {{bill_date}}
                 </div>
             </div> -->
-            <div class="card-body">
+            <div class="form-row">
+                <p class="text-right pl-2 pt-3">
+                    <button type="submit" id="btn" class="btn btn-space btn-success rounded" onclick="printDiv('invoice_estimate')">
+                    Print
+                    </button>
+                </p>
+            </div>
+            <div class="card-body" id="invoice_estimate">
                 <div class="row">
                     <div class="col">
                         <h2 class="text-center">Estimate</h2>
-                        <hr>
                     </div>
                 </div>
                 <div class="row mb-4">
                     <div class="col-sm-6">
-                        <h5 class="mb-1">To :</h5>
-                        <h3 class="text-dark mb-1">{{Purchase_data.supplier}}</h3>
-                        <div>Phone: {{Purchase_data.supplier.contactno}}</div>
+                        <h3 class=" text-dark mb-1">&nbsp;&nbsp;&nbsp;To : {{Purchase_data.supplier}}</h3>
+                        <div>&nbsp;&nbsp;&nbsp;Phone: {{Purchase_data.supplier.contactno}}</div>
                     </div>
                     <div class="col-sm-6 text-right">
-                        <h3 class="text-dark mb-1">Bill No : {{Purchase_data.Bill_no}}</h3>
-                        <div>Date : {{Purchase_data.date}}</div>
+                        <h3 class="text-dark mb-1">Bill No : {{Purchase_data.Bill_no}}&nbsp;&nbsp;&nbsp;</h3>
+                        <div>Date : {{Purchase_data.date}}&nbsp;&nbsp;&nbsp;</div>
                     </div>
                 </div>
                 <div class="table-responsive-sm">
-                    <table class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
+                    <table class="table table-striped table-bordered" style="border: 1.5px solid black;" width=100%>
+                        <thead style="border: 2px solid black;">
+                            <tr style="border: 2px solid black;">
                                 <th class="center">No</th>
                                 <th>Product</th>
                                 <th class="center">Unit</th>
@@ -71,50 +68,45 @@ Estimate Purchase
                             </tr>
                             {% endfor %}
                         </tbody>
+                        <tfoot style="border: 1.5px solid black;">
+                            <tr>
+                                <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left">
+                                    <strong class="text-dark">Total</strong>
+                                </td>
+                                <td class="right text-dark">
+                                    <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Total_amount|intcomma}}</b>
+                                </td>
+                            </tr>
+                             <tr>
+                                <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left">
+                                    <strong class="text-dark">Old Amount</strong>
+                                </td>
+                                <td class="right text-dark">
+                                    <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Due_amount|intcomma}}</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left">
+                                    <strong class="text-dark">Round Off</strong>
+                                </td>
+                                <td class="right text-dark">
+                                    <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Round_off|intcomma}}</b>
+                                </td>
+                            </tr> 
+                            <tr>
+                                <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left">
+                                    <strong class="text-dark">Grand Total</strong>
+                                </td>
+                                <td class="right text-dark">
+                                    <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Grand_total|intcomma}}</b>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-lg-4 col-sm-5">
-                    </div>
-                    <div class="col-lg-4 col-sm-5 ml-auto">
-                        <table class="table table-clear">
-                            <tbody>
-                                <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Total</strong>
-                                    </td>
-                                    <td class="right text-dark">
-                                        <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Total_amount|intcomma}}</b>
-                                    </td>
-                                </tr>
-                                 <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Old Amount</strong>
-                                    </td>
-                                    <td class="right text-dark">
-                                        <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Due_amount|intcomma}}</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Round Off</strong>
-                                    </td>
-                                    <td class="right text-dark">
-                                        <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Round_off|intcomma}}</b>
-                                    </td>
-                                </tr> 
-                                <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Grand Total</strong>
-                                    </td>
-                                    <td class="right text-dark">
-                                        <b>{{raw_text}}&nbsp;&nbsp;{{Purchase_data.Grand_total|intcomma}}</b>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
         </div>

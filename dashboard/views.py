@@ -7,6 +7,8 @@ from django.contrib import messages
 from django.http import  HttpResponse , JsonResponse
 from datetime import date
 from num2words import num2words
+import itertools
+from django.db.models import Sum,Min,Max,Avg
 # Create your views here.
 @login_required(login_url='login')
 def addcustomer(request):
@@ -2055,15 +2057,40 @@ def customer_statement_view(request,pk):
         if request.method == "POST":
             if "Estimate" in request.POST:
                 sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+                
+                sale_data_total_filter =  Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('Total_amount'))
+                sale_data_total = sale_data_total_filter['Total_amount__sum']
+                sale_data_round_off_filter = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('Round_off')) 
+                sale_data_round_off = sale_data_round_off_filter['Round_off__sum']
+
+                if sale_data.count() == 0:
+                    sale_data_money = 0
+                else:
+                    sale_data_money = sale_data_total - sale_data_round_off
+                    sale_data_money = round(sale_data_money , 2)
+                    print(sale_data_money)
+
                 payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
 
-                total_data = map(payment_data,sale_data)
+                payment_data_total_filter = customerpay_estimate.objects.filter(date__gte=request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('paid_amount'))
+                payment_data_total = payment_data_total_filter['paid_amount__sum']
+                payment_data_round_off_filter = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('round_off'))
+                payment_data_round_off = payment_data_round_off_filter['round_off__sum']
+
+                if payment_data.count() == 0:
+                    payment_data_money = 0
+                else:
+                    payment_data_total_money = round(payment_data_total , 2)
+                    payment_data_round_off_money = round(payment_data_round_off , 2)
+
+                total_data = itertools.zip_longest(payment_data,sale_data)
                 print(total_data)
 
                 context = {
-                    'sale_data' : sale_data,
-                    'payment_data' : payment_data,
-                    'total_data' : total_data
+                    'sale_data_money' : sale_data_money,
+                    'total_data' : total_data,
+                    'payment_data_total_money' : payment_data_total_money,
+                    'payment_data_round_off_money' : payment_data_round_off_money
                 }
                 return render(request , 'dashboard/customer_statement_view.html',context)
             else:

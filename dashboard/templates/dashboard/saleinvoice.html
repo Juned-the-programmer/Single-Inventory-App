@@ -6,17 +6,14 @@ Sale Invoice
 {% endblock title %}
 
 {% block content %}
-
+<style>
+table {
+    margin: 0px;
+    padding: 0px;
+}
+</style>
 {% if request.user|has_group:"Estimate" %}
-<div class="form-row">
-    <p class="text-right pl-2 pt-3">
-        <button type="submit" id="btn" class="btn btn-space btn-success rounded" onclick="printDiv('invoice_estimate')">
-        Print
-        </button>
-    </p>
-</div>
-
-<div class="row" id="invoice_estimate">
+<div class="row">
     <div class="offset-xl-2 col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="card">
             <!-- <div class="card-header p-4">
@@ -25,27 +22,33 @@ Sale Invoice
                     {{bill_date}}
                 </div>
             </div> -->
-            <div class="card-body">
+            <div class="form-row">
+                <p class="text-right pl-2 pt-3">
+                    <button type="submit" id="btn" class="btn btn-space btn-success rounded" onclick="printDiv('invoice_estimate')">
+                    Print
+                    </button>
+                </p>
+            </div>
+            <div class="card-body" id="invoice_estimate">
                 <div class="row">
                     <div class="col">
                         <h2 class="text-center">Estimate</h2>
-                        <hr>
                     </div>
                 </div>
                 <div class="row mb-4">
-                    <div class="col-sm-6">
-                        <h3 class="mb-1 text-dark mb-1">To : {{sale_data.customer}}</h3>
-                        <div>Phone: {{sale_data.customer.contactno}}</div>
+                    <div class="col-sm-6 text-left">
+                        <h3 class="mb-1 text-dark mb-1">&nbsp;&nbsp;&nbsp;To : {{sale_data.customer}}</h3>
+                        <div>&nbsp;&nbsp;&nbsp;Phone: {{sale_data.customer.contactno}}</div>
                     </div>
                     <div class="col-sm-6 text-right">
-                        <h3 class="text-dark mb-1">Bill No : {{sale_data.Bill_no}}</h3>
-                        <div>Date : {{sale_data.date}}</div>
+                        <h3 class="text-dark mb-1">Bill No : {{sale_data.Bill_no}}&nbsp;&nbsp;&nbsp;</h3>
+                        <div>Date : {{sale_data.date}}&nbsp;&nbsp;&nbsp;</div>
                     </div>
                 </div>
                 <div class="table-responsive-sm">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
+                    <table class="table table-striped table-bordered" style="border: 1.5px solid black;" width=100%>
+                        <thead style="border: 2px solid black;" width=100%>
+                            <tr style="border: 2px solid black;">
                                 <th class="center">No</th>
                                 <th>Product</th>
                                 <th class="center">Unit</th>
@@ -72,11 +75,47 @@ Sale Invoice
                             </tr>
                             {% endfor %}
                         </tbody>
+                        <tfoot style="border: 1.5px solid black;">
+                            <tr>
+                            <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left">
+                                    <strong class="text-dark">Total</strong>
+                                </td>
+                                <td class="right">
+                                    <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Total_amount|intcomma}}</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                            <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left" >
+                                    <strong class="text-dark">Old Amount</strong>
+                                </td>
+                                <td class="right">
+                                    <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Due_amount|intcomma}}</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                            <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left" >
+                                    <strong class="text-dark">Round Off</strong>
+                                </td>
+                                <td class="right">
+                                    <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Round_off|intcomma}}</strong>
+                                </td>
+                            </tr> 
+                            <tr>
+                            <th></th><th></th><th></th><th></th><th></th><th></th>
+                                <td class="left" >
+                                    <strong class="text-dark">Grand Total</strong>
+                                </td>
+                                <td class="right">
+                                    <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Grand_total|intcomma}}</strong>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
-                <br>
-                <hr>
-                <div class="row">
+                {% comment %} <div class="row">
                     <div class="col-lg-4 col-sm-5">
                     </div>
                     <div class="col-lg-4 col-sm-5 ml-auto">
@@ -117,7 +156,7 @@ Sale Invoice
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> {% endcomment %}
             </div>
         </div>
     </div>
