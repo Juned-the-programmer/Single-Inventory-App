@@ -95,10 +95,10 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'BharatAuto',
+#         'NAME': 'bharatauto',
 #         'USER' : 'root',
 #         'PASSWORD' : 'AJInfotech@9801',
-#         'HOST' : '35.223.127.109',
+#         'HOST' : '35.202.154.31',
 #         'PORT' : '3306',
 #         'OPTIONS' : {
 #             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'" ,
