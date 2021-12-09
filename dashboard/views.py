@@ -2071,11 +2071,16 @@ def customer_statement_view(request,pk):
                     print(sale_data_money)
 
                 payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
-
-                payment_data_total_filter = customerpay_estimate.objects.filter(date__gte=request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('paid_amount'))
-                payment_data_total = payment_data_total_filter['paid_amount__sum']
-                payment_data_round_off_filter = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('round_off'))
-                payment_data_round_off = payment_data_round_off_filter['round_off__sum']
+                payment_data_total_money = 0
+                payment_data_round_off_money = 0
+                if customerpay_estimate.objects.all().count() >= 0 and payment_data.count() >= 0:
+                    payment_data_total_filter = customerpay_estimate.objects.filter(date__gte=request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('paid_amount'))
+                    payment_data_total = payment_data_total_filter['paid_amount__sum']
+                    payment_data_round_off_filter = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('round_off'))
+                    payment_data_round_off = payment_data_round_off_filter['round_off__sum']
+                else:
+                    payment_data_total = 0
+                    payment_data_round_off = 0
 
                 if payment_data.count() == 0:
                     payment_data_money = 0
