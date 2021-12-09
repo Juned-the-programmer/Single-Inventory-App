@@ -70,7 +70,7 @@ Stock
         <div class="form-group">
             <div class="">
                 <label for="validationCustom03">Category</label>
-                <select name="product_name" class="form-control stock" required>
+                <select name="product_name" id="editable-select" class="form-control" required>
                     <option value="-1" selected>------Select-------</option>
                     {% for cat in stock_data %}
                     <option value="{{cat.product}}">{{cat.product}}</option>
@@ -187,14 +187,6 @@ $(document).ready(function() {
 $('#example').DataTable();
 } );
 
-</script>
-
-
-<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
-<script>
-$(document).ready(function () {
-    $('.stock').select2();
-  })
 </script>
 
 {% endblock content %}
