@@ -85,26 +85,23 @@ WSGI_APPLICATION = 'Inventory.wsgi.application'
 
 # from dashboard.views import *    
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'bharatauto',
-#         'USER' : 'root',
-#         'PASSWORD' : 'AJInfotech@9801',
-#         'HOST' : '35.202.154.31',
-#         'PORT' : '3306',
-#         'OPTIONS' : {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'" ,
-#         },   
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
+
+DATABASES = {
+        'default': {
+            'ENGINE': 'djongo',
+            'NAME': 'Inventory_sahara_2022',
+            'ENFORCE_SCHEMA': False,
+            'CLIENT': {
+                'host': 'mongodb+srv://Banas:wVU9x3fFItZQmjFG@banaswater.8a7bb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+            }  
+        }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

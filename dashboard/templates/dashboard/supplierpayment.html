@@ -40,7 +40,7 @@ Add Supplier Payment
                     </div>
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom04">Round Off</label>
-                        <input type="text" class="form-control" id="validationCustom04" name="round_off" placeholder="Round Off" required>
+                        <input type="text" class="form-control" id="validationCustom04" name="round_off" placeholder="Round Off">
                     </div>
                 </div>
                 <div class="form-row">
@@ -69,7 +69,7 @@ Add Supplier Payment
     $('.suppliername').select2();
         $('.suppliername').on("change",function(){
             var sid=$(this).val();
-            // alert(id)
+            console.log(sid);
             $.ajax({
                 url: "{% url 'supplier_dueamount_estimate' %}",
                 data : { 'sid' : sid },
@@ -111,7 +111,7 @@ Add Supplier Payment
                     </div>
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom04">Round Off</label>
-                        <input type="text" class="form-control" id="validationCustom04" name="round_off" placeholder="Round Off" required>
+                        <input type="text" class="form-control" id="validationCustom04" name="round_off" placeholder="Round Off">
                     </div>
                 </div>
                 <div class="form-row">

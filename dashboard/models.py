@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
+import uuid
+
 # Create your models here.
 class Customer_estimate(models.Model):
     customerid = models.IntegerField()
@@ -8,6 +10,7 @@ class Customer_estimate(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     landmark = models.CharField(max_length=50)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.fullname
@@ -15,6 +18,7 @@ class Customer_estimate(models.Model):
 class customeraccount_estimate(models.Model):
     customer_name = models.ForeignKey(Customer_estimate,on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.customer_name.fullname)
@@ -26,6 +30,7 @@ class customerpay_estimate(models.Model):
     round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
     Description = models.CharField(max_length=100,blank=True,null=True,default="Cash on Hand")
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.customer_name.fullname)
@@ -39,6 +44,7 @@ class Customer_gst(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     landmark = models.CharField(max_length=50)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.fullname
@@ -46,6 +52,7 @@ class Customer_gst(models.Model):
 class customeraccount_gst(models.Model):
     customer_name = models.ForeignKey(Customer_gst,on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.customer_name.fullname)
@@ -57,6 +64,7 @@ class customerpay_gst(models.Model):
     round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
     Description = models.CharField(max_length=100,blank=True,null=True,default="Cash on Hand")
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.customer_name.fullname)
@@ -68,6 +76,7 @@ class Supplier_estimate(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     landmark = models.CharField(max_length=50)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.fullname
@@ -75,6 +84,7 @@ class Supplier_estimate(models.Model):
 class supplieraccount_estimate(models.Model):
     supplier_name = models.ForeignKey(Supplier_estimate,on_delete=models.CASCADE)
     amount = models.FloatField(default=0,null=True,blank=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.supplier_name.fullname)
@@ -85,6 +95,7 @@ class supplierpay_estimate(models.Model):
     paid_amount = models.FloatField()
     round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.supplier_name.fullname)
@@ -98,6 +109,7 @@ class Supplier_gst(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     landmark = models.CharField(max_length=50)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.fullname
@@ -105,6 +117,7 @@ class Supplier_gst(models.Model):
 class supplieraccount_gst(models.Model):
     supplier_name = models.ForeignKey(Supplier_gst,on_delete=models.CASCADE)
     amount = models.FloatField(default=0,null=True,blank=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.supplier_name.fullname)
@@ -115,6 +128,7 @@ class supplierpay_gst(models.Model):
     paid_amount = models.FloatField()
     round_off = models.FloatField()
     date = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.supplier_name.fullname)
@@ -127,6 +141,7 @@ class Product_estimate(models.Model):
     store_location = models.CharField(max_length=50)
     supplier = models.ForeignKey(Supplier_estimate , on_delete=models.CASCADE , blank=True,null=True)
     minimum_stock=models.IntegerField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.product_name
@@ -135,6 +150,7 @@ class Stock_estimate(models.Model):
     product = models.OneToOneField(Product_estimate,on_delete=models.CASCADE)    
     quantity = models.IntegerField(null=True,blank=True,default=0)
     purchase_price = models.IntegerField(null=True,blank=True,default=0)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.product.product_name)
@@ -147,6 +163,7 @@ class Product_gst(models.Model):
     store_location = models.CharField(max_length=50)
     supplier = models.ForeignKey(Supplier_gst , on_delete=models.CASCADE , blank=True,null=True)
     minimum_stock=models.IntegerField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.product_name
@@ -155,6 +172,7 @@ class Stock_gst(models.Model):
     product = models.OneToOneField(Product_gst,on_delete=models.CASCADE)    
     quantity = models.IntegerField(null=True,blank=True,default=0)
     purchase_price = models.IntegerField(null=True,blank=True,default=0)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.product.product_name)
@@ -167,6 +185,7 @@ class Estimate_Purchase(models.Model):
     Due_amount = models.FloatField()
     Round_off = models.FloatField()
     Grand_total = models.FloatField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -182,6 +201,7 @@ class estimatepurchase_Product(models.Model):
     netrate = models.FloatField()
     total = models.FloatField()
     # date = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -196,6 +216,7 @@ class GST_Purchase(models.Model):
     IGST = models.FloatField()
     Round_off = models.FloatField()
     Grand_total = models.FloatField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -211,6 +232,7 @@ class gstpurchase_Product(models.Model):
     gstamt = models.FloatField()
     total = models.FloatField()
     # date = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -223,6 +245,7 @@ class Estimate_sales(models.Model):
     Due_amount = models.FloatField()
     Round_off = models.FloatField()
     Grand_total = models.FloatField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -237,6 +260,7 @@ class estimatesales_Product(models.Model):
     netrate = models.FloatField()
     total = models.FloatField()
     # date = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -251,6 +275,7 @@ class gstsale(models.Model):
     IGST = models.FloatField()
     Round_off = models.FloatField()
     Grand_total = models.FloatField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -266,6 +291,7 @@ class gstsales_Product(models.Model):
     gstamt = models.FloatField()
     total = models.FloatField()
     # date = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return str(self.Bill_no)
@@ -275,6 +301,7 @@ class dailyincome_estimate(models.Model):
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
     time = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.name
@@ -284,6 +311,7 @@ class dailyincome_gst(models.Model):
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
     time = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.name
@@ -294,6 +322,7 @@ class dailyexpense_estimate(models.Model):
     name = models.CharField(max_length=500)
     date = models.DateField(auto_now_add=True)
     time = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.category
@@ -304,6 +333,7 @@ class dailyexpense_gst(models.Model):
     name = models.CharField(max_length=500)
     date = models.DateField(auto_now_add=True)
     time = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.category
@@ -311,6 +341,7 @@ class dailyexpense_gst(models.Model):
 class category_estimate(models.Model):
     category_name = models.CharField(max_length=100)
     date_created = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.category_name
@@ -318,6 +349,7 @@ class category_estimate(models.Model):
 class category_gst(models.Model):
     category_name = models.CharField(max_length=100)
     date_created = models.DateField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.category_name

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+import uuid
 
 # Create your models here.
 class Profile(models.Model):
@@ -18,6 +19,7 @@ class Profile(models.Model):
     Bank_AC = models.CharField(max_length=50)
     IFSC_Code = models.CharField(max_length=50)
     Branch_name = models.CharField(max_length=50)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
         return self.user.username

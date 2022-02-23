@@ -590,7 +590,7 @@ def addpurchase(request):
 @login_required(login_url='login')
 def supplierdueamount_estimate(request):
     cname = request.GET['cname']
-    camount = supplieraccount_estimate.objects.get(id = Supplier_estimate.objects.get(fullname=cname).id)
+    camount = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(fullname=cname).id)
     due_amount = camount.amount
 
     return HttpResponse(due_amount)
@@ -980,15 +980,15 @@ def addsale(request):
                     print("Customer Payment")
                 else:
                     CustomerPay = customerpay_estimate (
-                        customer_name = customeraccount_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id).customer_name,
+                        customer_name = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']).id).customer_name,
                         pending_amount = Grand_total,
                         paid_amount = cash_on_hand,
                         round_off = 0
                     )
                     CustomerPay.save()
 
-                customerdata = customeraccount_estimate.objects.get(id=Customer_estimate.objects.get(fullname=request.POST['customer']).id)
-                pendingamount = customeraccount_estimate.objects.get(id=Customer_estimate.objects.get(fullname=request.POST['customer']).id).amount
+                customerdata = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']).id)
+                pendingamount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']).id).amount
                 customerdata.amount  = float(pendingamount) - float(cash_on_hand)
                 
 
@@ -1454,7 +1454,7 @@ def previous_discount_estimate(request):
 @login_required(login_url='login')
 def customerdue_estimate(request):
     cname = request.GET['cname']
-    camount = customeraccount_estimate.objects.get(id = Customer_estimate.objects.get(fullname=cname).id)
+    camount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=cname).id)
     due_amount = camount.amount
 
     return HttpResponse(due_amount)
@@ -1644,13 +1644,13 @@ def supplierpayment(request):
                     round_off = 0
 
                 SupplierPay = supplierpay_estimate(
-                    supplier_name = supplieraccount_estimate.objects.get(id=request.POST['supplier-name']).supplier_name,
+                    supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']),
                     pending_amount = float(request.POST['pending_amount']),
                     paid_amount = float(request.POST['paid_amount']),
                     round_off = round_off
                 )
             
-                supplieraccountdata = supplieraccount_estimate.objects.get(id=request.POST['supplier-name'])
+                supplieraccountdata = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']).id)
 
                 supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
                 supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
@@ -1776,7 +1776,7 @@ def customerpayment(request):
 @login_required(login_url='login')
 def supplier_dueamount_estimate(request):
     sid = request.GET['sid']
-    supplierdata = supplieraccount_estimate.objects.get(id = supplieraccount_estimate.objects.get(id=sid).id)
+    supplierdata = supplieraccount_estimate.objects.get(id = supplieraccount_estimate.objects.get(supplier_name = sid).id)
     pendingamount = supplierdata.amount
 
     return HttpResponse(pendingamount)
