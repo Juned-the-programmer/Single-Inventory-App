@@ -98,7 +98,7 @@ DATABASES = {
             'NAME': 'Inventory_sahara_2022',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
-                'host': 'mongodb+srv://Banas:wVU9x3fFItZQmjFG@banaswater.8a7bb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+                'host': 'mongodb+srv://Inventory:V97TVPdRkBZFdE21@inventory.k1qq6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
             }  
         }
 }
