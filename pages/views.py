@@ -150,7 +150,6 @@ def dashboard(request):
             #Today Estimate Sale
             today_sale = 0
             now = date.today()
-            print(now)
             month = now.month
             year = now.year
             day = now.day
@@ -195,10 +194,9 @@ def dashboard(request):
             current_month_sale = 0
             if total_sale_record > 0:
                 try:
-                    if Estimate_sales.objects.filter(date=now).count() > 0:
-                        current_month_sale = Estimate_sales.objects.filter(date=now).count()
-                        current_total = Estimate_sales.objects.filter(date=now).aggregate(Sum('Total_amount'))
-                        current_roundoff = Estimate_sales.objects.filter(date=now).aggregate(Sum('Round_off'))
+                    if Estimate_sales.objects.filter(date__month=month , date__year=year).count() > 0:
+                        current_total = Estimate_sales.objects.filter(date__month=month,date__year=year).aggregate(Sum('Total_amount'))
+                        current_roundoff = Estimate_sales.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
                         current_total_sale = current_total['Total_amount__sum']
                         current_roundoff_sale = current_roundoff['Round_off__sum']
                         if current_month_sale == 0:
@@ -209,7 +207,7 @@ def dashboard(request):
                     else:
                         current_month_sale = 0
                 except Exception:
-                    print("Current Month Estimate Sale")
+                    print("Current Month Estimate")
 
             #Previous Month Estimate Sale  
             today = datetime.date.today()
