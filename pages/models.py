@@ -24,6 +24,9 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        indexes = [models.Index(fields=['user' , 'id'])]
+
 def create_profile_estimate(sender,instance,created,**Kwargs):
     if created:
         Profile.objects.create(user=instance)

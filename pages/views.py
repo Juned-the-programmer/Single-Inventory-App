@@ -28,6 +28,8 @@ def signup_gst(request):
             user_signup = User.objects.create_user(username=request.POST['username'],password=request.POST['password'],email=request.POST['email'])
             user_signup.save()
 
+            add_group = Group.objects.get_or_create(name='GST')
+            add_group = Group.objects.get_or_create(name='Estimate')
             add_group = Group.objects.get(name='GST')
             add_group.user_set.add(user_signup)
 
@@ -63,6 +65,8 @@ def signup_estimate(request):
             user_signup = User.objects.create_user(username=request.POST['username'],password=request.POST['password'],email=request.POST['email'])
             user_signup.save()
             
+            add_group = Group.objects.get_or_create(name='GST')
+            add_group = Group.objects.get_or_create(name='Estimate')
             add_group = Group.objects.get(name='Estimate')
             add_group.user_set.add(user_signup)
 
