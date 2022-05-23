@@ -15,6 +15,9 @@ class Customer_estimate(models.Model):
     def __str__(self):
         return self.fullname
 
+    class Meta:
+        indexes = [models.Index(fields = ['customerid' , 'id' , 'fullname'])]
+
 class customeraccount_estimate(models.Model):
     customer_name = models.ForeignKey(Customer_estimate,on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
@@ -22,6 +25,9 @@ class customeraccount_estimate(models.Model):
 
     def __str__(self):
         return str(self.customer_name.fullname)
+
+    class Meta:
+        indexes = [models.Index(fields=['id' , 'customer_name'])]
 
 class customerpay_estimate(models.Model):
     customer_name = models.ForeignKey(Customer_estimate , on_delete=models.CASCADE)
@@ -34,6 +40,9 @@ class customerpay_estimate(models.Model):
 
     def __str__(self):
         return str(self.customer_name.fullname)
+
+    class Meta:
+        indexes = [models.Index(fields=['customer_name' , 'id'])]
 
 class Customer_gst(models.Model):
     customerid = models.IntegerField()
@@ -81,6 +90,9 @@ class Supplier_estimate(models.Model):
     def __str__(self):
         return self.fullname
 
+    class Meta:
+        indexes = [models.Index(fields=['supplierid' , 'id'])]
+
 class supplieraccount_estimate(models.Model):
     supplier_name = models.ForeignKey(Supplier_estimate,on_delete=models.CASCADE)
     amount = models.FloatField(default=0,null=True,blank=True)
@@ -88,6 +100,9 @@ class supplieraccount_estimate(models.Model):
 
     def __str__(self):
         return str(self.supplier_name.fullname)
+    
+    class Meta:
+        indexes = [models.Index(fields=['supplier_name' , 'id'])]
 
 class supplierpay_estimate(models.Model):
     supplier_name = models.ForeignKey(Supplier_estimate,on_delete=models.CASCADE)
@@ -99,6 +114,9 @@ class supplierpay_estimate(models.Model):
 
     def __str__(self):
         return str(self.supplier_name.fullname)
+
+    class Meta:
+        indexes = [models.Index(fields=['supplier_name' , 'id'])]
 
 class Supplier_gst(models.Model):
     supplierid = models.IntegerField()
@@ -146,6 +164,9 @@ class Product_estimate(models.Model):
     def __str__(self):
         return self.product_name
 
+    class Meta:
+        indexes = [models.Index(fields=('product_name' , 'id' , 'supplier'))]
+
 class Stock_estimate(models.Model):
     product = models.OneToOneField(Product_estimate,on_delete=models.CASCADE)    
     quantity = models.IntegerField(null=True,blank=True,default=0)
@@ -154,6 +175,9 @@ class Stock_estimate(models.Model):
 
     def __str__(self):
         return str(self.product.product_name)
+
+    class Meta:
+        indexes = [models.Index(fields=('product' , 'id'))]
 
 class Product_gst(models.Model):
     product_name = models.CharField(max_length=100)
@@ -190,6 +214,9 @@ class Estimate_Purchase(models.Model):
     def __str__(self):
         return str(self.Bill_no)
 
+    class Meta:
+        indexes = [models.Index(fields=('Bill_no' , 'id' , 'supplier'))]
+
 class estimatepurchase_Product(models.Model):
     Bill_no = models.IntegerField()
     # product_name = models.ForeignKey(Product,on_delete=models.CASCADE)
@@ -205,6 +232,9 @@ class estimatepurchase_Product(models.Model):
 
     def __str__(self):
         return str(self.Bill_no)
+
+    class Meta:
+        indexes = [models.Index(fields=('Bill_no' , 'id' , 'product_name'))]
 
 class GST_Purchase(models.Model):
     Bill_no = models.IntegerField()
@@ -249,6 +279,9 @@ class Estimate_sales(models.Model):
 
     def __str__(self):
         return str(self.Bill_no)
+
+    class Meta:
+        indexes = [models.Index(fields=['Bill_no' , 'customer' , 'id'])]
     
 class estimatesales_Product(models.Model):
     Bill_no = models.IntegerField()
@@ -264,6 +297,9 @@ class estimatesales_Product(models.Model):
 
     def __str__(self):
         return str(self.Bill_no)
+
+    class Meta:
+        indexes = [models.Index(fields=['Bill_no' , 'id' , 'product_name'])]
 
 class gstsale(models.Model):
     Bill_no = models.IntegerField()
