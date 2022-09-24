@@ -45,14 +45,14 @@ def addcustomer(request):
 
             if Estimate_group in user.groups.all():
                 if Customer_estimate.objects.all().exists():
-                    customerdata_estimate = Customer_estimate.objects.last().customerid
+                    customerdata_estimate = Customer_estimate.objects.all().count()
                     customer_id = customerdata_estimate + 1
                 else:
                     customer_id = 1
 
             if GST_group in user.groups.all():
                 if Customer_gst.objects.all().exists():
-                    customerdata_gst = Customer_gst.objects.last().customerid
+                    customerdata_gst = Customer_gst.objects.all().count()
                     customer_id = customerdata_gst + 1
                 else:
                     customer_id = 1
@@ -125,19 +125,6 @@ def updatecustomer(request,pk):
                     customer.save()
                     messages.success(request, "Update Customer Successfully ! ")
 
-            # if user.groups.filter(name=Estimate_group):
-            #     print("Estimate")
-            #     customerdata_estimate = Customer_estimate.objects.get(pk=pk)
-            # else:
-            #     print("No Estimate data")
-
-            # if user.groups.filter(name=GST_group):
-            #     print("GST")
-            #     customerdata_gst = Customer_gst.objects.get(pk=pk)
-            # else:
-            #     print("No GST data")
-            # customerdata_gst =  Customer_gst.objects.get(pk=pk) 
-
             if Estimate_group in user.groups.all():
                 customer_data = Customer_estimate.objects.get(pk=pk)
 
@@ -186,13 +173,13 @@ def addsupplier(request):
                     messages.success(request, "Added Supplier Successfully ! ")
 
             if Supplier_estimate.objects.all().exists():
-                supplierdata_estimate = Supplier_estimate.objects.last().supplierid
+                supplierdata_estimate = Supplier_estimate.objects.all().count()
                 supplierid_estimate = supplierdata_estimate + 1
             else:
                 supplierid_estimate = 1
 
             if Supplier_gst.objects.all().exists():
-                supplierdata_gst = Supplier_gst.objects.last().supplierid
+                supplierdata_gst = Supplier_gst.objects.all().count()
                 supplierid_gst = supplierdata_gst + 1
             else:
                 supplierid_gst = 1
@@ -264,19 +251,6 @@ def updatesupplier(request,pk):
 
                     supplier.save()
                     messages.success(request, "Update Supplier Successfully ! ")
-
-            # if user.groups.filter(name=Estimate_group):
-            #     print("Estimate")
-            #     customerdata_estimate = Customer_estimate.objects.get(pk=pk)
-            # else:
-            #     print("No Estimate data")
-
-            # if user.groups.filter(name=GST_group):
-            #     print("GST")
-            #     customerdata_gst = Customer_gst.objects.get(pk=pk)
-            # else:
-            #     print("No GST data")
-            # customerdata_gst =  Customer_gst.objects.get(pk=pk) 
 
             if Estimate_group in user.groups.all():
                 supplier_data = Supplier_estimate.objects.get(pk=pk)
