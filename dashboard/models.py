@@ -4,7 +4,6 @@ import uuid
 
 # Create your models here.
 class Customer_estimate(models.Model):
-    customerid = models.IntegerField()
     fullname = models.CharField(max_length=50)
     contactno = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -16,7 +15,7 @@ class Customer_estimate(models.Model):
         return self.fullname
 
     class Meta:
-        indexes = [models.Index(fields = ['customerid' , 'id' , 'fullname'])]
+        indexes = [models.Index(fields = [ 'id' , 'fullname'])]
 
 class customeraccount_estimate(models.Model):
     customer_name = models.ForeignKey(Customer_estimate,on_delete=models.CASCADE)
@@ -79,7 +78,6 @@ class customerpay_gst(models.Model):
         return str(self.customer_name.fullname)
 
 class Supplier_estimate(models.Model):
-    supplierid = models.IntegerField()
     fullname = models.CharField(max_length=50)
     contactno = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -91,7 +89,7 @@ class Supplier_estimate(models.Model):
         return self.fullname
 
     class Meta:
-        indexes = [models.Index(fields=['supplierid' , 'id'])]
+        indexes = [models.Index(fields=['id' , 'fullname'])]
 
 class supplieraccount_estimate(models.Model):
     supplier_name = models.ForeignKey(Supplier_estimate,on_delete=models.CASCADE)
@@ -219,7 +217,6 @@ class Estimate_Purchase(models.Model):
 
 class estimatepurchase_Product(models.Model):
     Bill_no = models.IntegerField()
-    # product_name = models.ForeignKey(Product,on_delete=models.CASCADE)
     product_name = models.CharField(max_length=100,null=True,blank=True)
     unit = models.CharField(max_length=10)
     rate = models.FloatField()

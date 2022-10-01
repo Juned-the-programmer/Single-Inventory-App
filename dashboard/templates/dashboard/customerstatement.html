@@ -30,10 +30,10 @@ View Customer
                         <tbody>
                         {% for i in customer_data %}
                             <tr>
-                                <td>{{i.customerid}}</td>
+                                <td>{{forloop.counter}}</td>
                                 <td>{{i.fullname}}</td>
                                 <td>
-                                    <a href="/dashboard/customer_statement_view/{{i.customerid}}">View</a>
+                                    <a href="/dashboard/customer_statement_view/{{i.id}}">View</a>
                                 </td>
                             </tr>
                         {% endfor %}

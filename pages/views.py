@@ -203,13 +203,8 @@ def dashboard(request):
                         current_roundoff = Estimate_sales.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
                         current_total_sale = current_total['Total_amount__sum']
                         current_roundoff_sale = current_roundoff['Round_off__sum']
-                        if current_month_sale == 0:
-                            print("Current Month Estimate Sale")
-                        else:
-                            current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
-                            current_month_sale = round(current_month_sale , 2)
-                    else:
-                        current_month_sale = 0
+                        current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
+                        current_month_sale = round(current_month_sale , 2)
                 except Exception:
                     print("Current Month Estimate")
 

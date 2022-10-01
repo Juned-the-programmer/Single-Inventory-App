@@ -20,7 +20,6 @@ def addcustomer(request):
             if request.method == 'POST':
                 if 'Estimate' in request.POST:
                     customer = Customer_estimate(
-                        customerid = request.POST['customerid'],
                         fullname = request.POST['fullname'],
                         contactno = request.POST['mobile'],
                         city = request.POST['city'],
@@ -31,7 +30,6 @@ def addcustomer(request):
                     messages.success(request , "Added Customer Successfully ! ")
                 else:
                     customer = Customer_gst(
-                        customerid = request.POST['customerid'],
                         fullname = request.POST['fullname'],
                         email = request.POST['email'],
                         contactno = request.POST['mobile'],
@@ -149,7 +147,6 @@ def addsupplier(request):
             if request.method == 'POST':
                 if 'Estimate' in request.POST:
                     supplier = Supplier_estimate(
-                        supplierid = request.POST['supplierid'],
                         fullname = request.POST['fullname'],
                         contactno = request.POST['mobile'],
                         city = request.POST['city'],
@@ -160,7 +157,6 @@ def addsupplier(request):
                     messages.success(request , "Added Supplier Successfully ! ")
                 else:
                     supplier = Supplier_gst(
-                        supplierid = request.POST['supplierid'],
                         fullname = request.POST['fullname'],
                         email = request.POST['email'],
                         contactno = request.POST['mobile'],
