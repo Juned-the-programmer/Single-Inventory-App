@@ -2026,7 +2026,7 @@ def customer_statement_view(request,pk):
     if user.is_authenticated:
         if request.method == "POST":
             if "Estimate" in request.POST:
-                sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+                sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer = Customer_estimate.objects.get(pk=pk))
                 
                 sale_data_total_filter =  Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('Total_amount'))
                 sale_data_total = sale_data_total_filter['Total_amount__sum']
