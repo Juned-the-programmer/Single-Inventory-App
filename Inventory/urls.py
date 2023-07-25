@@ -21,4 +21,5 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('',include('pages.urls')),
     path('dashboard/',include('dashboard.urls')),
+    path('customer/', include('customer.urls')),
 ]

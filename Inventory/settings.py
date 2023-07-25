@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'dashboard',
     'mathfilters',
     'authentication',
+    'customer',
 ]
 
 MIDDLEWARE = [

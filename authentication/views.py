@@ -54,7 +54,7 @@ def signup_gst(request):
             print("Success")
             return redirect('dashboard')
 
-    return render(request,"pages/signup_gst.html")
+    return render(request,"authentication/signup_gst.html")
 
 def signup_estimate(request):
     if request.method == 'POST':
@@ -85,7 +85,7 @@ def signup_estimate(request):
             data.save()
             print("success")
             return redirect('dashboard')
-    return render(request,"pages/signup-estimate.html")
+    return render(request,"authentication/signup-estimate.html")
 
 def logout(request):
     auth.logout(request)
