@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'mathfilters',
     'authentication',
     'customer',
+    'supplier',
 ]
 
 MIDDLEWARE = [

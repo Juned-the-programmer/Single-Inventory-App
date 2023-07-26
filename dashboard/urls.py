@@ -2,14 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('addcustomer/',views.addcustomer,name="addcustomer"),
-    path('viewcustomer/',views.viewcustomer,name="viewcustomer"),
-    path('updatecustomer/<pk>',views.updatecustomer,name="updatecustomer"),
-
-    path('addsupplier/',views.addsupplier,name="addsupplier"),
-    path('viewsupplier/',views.viewsupplier,name="viewsupplier"),
-    path('updatesupplier/<pk>',views.updatesupplier,name="updatesupplier"),
-
     path('addproduct/',views.addproduct,name="addproduct"),
     path('viewproduct/',views.viewproduct,name="viewproduct"),
     path('updateproduct/<pk>',views.updateproduct,name="updateproduct"),

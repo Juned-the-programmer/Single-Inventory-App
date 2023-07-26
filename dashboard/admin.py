@@ -1,21 +1,12 @@
 from django.contrib import admin
 from .models import *
 # Register your models here.
-admin.site.register(Customer_estimate)
-admin.site.register(customeraccount_estimate)
 admin.site.register(customerpay_estimate)
 admin.site.register(customerpay_gst)
-#GST
-admin.site.register(Customer_gst)
-admin.site.register(customeraccount_gst)
 
-admin.site.register(Supplier_estimate)
-admin.site.register(supplieraccount_estimate)
+
 admin.site.register(supplierpay_estimate)
 admin.site.register(supplierpay_gst)
-#GST
-admin.site.register(Supplier_gst)
-admin.site.register(supplieraccount_gst)
 
 admin.site.register(Product_estimate)
 admin.site.register(Product_gst)
