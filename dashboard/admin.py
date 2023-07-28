@@ -8,11 +8,6 @@ admin.site.register(customerpay_gst)
 admin.site.register(supplierpay_estimate)
 admin.site.register(supplierpay_gst)
 
-admin.site.register(Product_estimate)
-admin.site.register(Product_gst)
-admin.site.register(Stock_estimate)
-admin.site.register(Stock_gst)
-
 admin.site.register(Estimate_Purchase)
 admin.site.register(estimatepurchase_Product)
 admin.site.register(GST_Purchase)

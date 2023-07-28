@@ -2,7 +2,7 @@
 {% load static %}
 {% load user_auth %}
 {% block title %}
-View Customer
+View Product
 {% endblock title %}
 
 {% block content %}
@@ -41,7 +41,7 @@ View Customer
                                 <td>{{i.store_location}}</td>
                                 <td>{{i.minimum_stock}}</td>
                                 <td>
-                                    <a href="/dashboard/updateproduct/{{i.id}}">Update</a>
+                                    <a href="/product/updateproduct/{{i.id}}">Update</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -81,7 +81,7 @@ View Customer
                                 <td>{{i.store_location}}</td>
                                 <td>{{i.minimum_stock}}</td>
                                 <td>
-                                    <a href="/dashboard/updateproduct/{{i.id}}">Update</a>
+                                    <a href="/product/updateproduct/{{i.id}}">Update</a>
                                 </td>
                             </tr>
                         {% endfor %}
