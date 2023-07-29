@@ -10,6 +10,7 @@ from django.shortcuts import HttpResponse, redirect, render
 from dashboard.models import *
 
 from .models import *
+from purchase.models import *
 
 # Create your views here.
 
