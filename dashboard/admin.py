@@ -8,11 +8,6 @@ admin.site.register(customerpay_gst)
 admin.site.register(supplierpay_estimate)
 admin.site.register(supplierpay_gst)
 
-admin.site.register(Estimate_sales)
-admin.site.register(estimatesales_Product)
-admin.site.register(gstsale)
-admin.site.register(gstsales_Product)
-
 admin.site.register(dailyincome_estimate)
 admin.site.register(dailyincome_gst)
 admin.site.register(dailyexpense_estimate)

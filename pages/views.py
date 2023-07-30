@@ -11,6 +11,7 @@ from dashboard.models import *
 
 from .models import *
 from purchase.models import *
+from sales.models import *
 
 # Create your views here.
 
