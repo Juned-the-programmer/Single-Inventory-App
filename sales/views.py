@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect
+from datetime import date
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
-from .models import *
-from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
-from datetime import date
-from .models import *
-from products.models import *
+from django.shortcuts import redirect, render
+
 from dashboard.models import *
+from products.models import *
+
+from .models import *
+
 
 # Create your views here.
 def estimatesalec(request):

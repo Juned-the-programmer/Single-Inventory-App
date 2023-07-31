@@ -1,422 +1,395 @@
-from django.shortcuts import render , redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group , User
-from .models import *
-from pages.models import *
-from django.contrib import messages
-from django.http import  HttpResponse , JsonResponse
-from datetime import date
-from num2words import num2words
+import datetime
 import itertools
-from django.db.models import Sum,Min,Max,Avg
+from datetime import date
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group, User
+from django.db.models import Avg, Max, Min, Sum
+from django.shortcuts import redirect, render
+from num2words import num2words
+
+from customer.models import *
+from pages.models import *
+from products.models import *
+from purchase.models import *
+from sales.models import *
+from supplier.models import *
+
 # Create your views here
 
-# Daily Income / Expense
 @login_required(login_url='login')
-def dailyincome(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
+def dashboard(request):
+    Estimate_group = Group.objects.get(name="Estimate")
+    GST_group = Group.objects.get(name="GST")
     user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if request.method == 'POST':
-                if 'Estimate' in request.POST:
-
-                    DailyIncome = dailyincome_estimate(
-                        name=request.POST['name'],
-                        amount=request.POST['amount']
-                    )
-                    DailyIncome.save()
-                    messages.success(request,"Daily Income Added Successfully !")
-                else:
-                    DailyIncome = dailyincome_gst(
-                        name = request.POST['name'],
-                        amount=request.POST['amount']
-                    )
-                    DailyIncome.save()
-                    messages.success(request,"Daily DailyIncome Successfully ! ")
-            
-            date_ = date.today()
-            d1 = date_.strftime("%d/%m/%Y")
-            d2 = date_.strftime("%Y-%m-%d")
-
-            if Estimate_group in user.groups.all():
-                Dailyincome_data = dailyincome_estimate.objects.filter(date=d2)
-
-            if GST_group in user.groups.all():
-                Dailyincome_data = dailyincome_gst.objects.filter(date=d2)
-
-            context = {
-                'd1':d1,
-                'Dailyincome_data' : Dailyincome_data
-            }
-            return render(request, 'dashboard/dailyincome.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def dailyexpense(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if request.method == 'POST':
-                if 'GST' in request.POST:
-                    DailyExpense = dailyexpense_gst(
-                        category=request.POST['category'],
-                        amount=request.POST['amount'],
-                        name=request.POST['name']
-                    )
-                    DailyExpense.save()
-
-                elif 'addcategory_gst' in request.POST:
-                    Category = category_gst(
-                        category_name=request.POST['cat'],
-                    )
-                    Category.save()
-
-                elif 'Estimate' in request.POST:
-                    DailyExpense = dailyexpense_estimate(
-                        category=request.POST['category'],
-                        amount=request.POST['amount'],
-                        name=request.POST['name']
-                    )
-                    DailyExpense.save()
-
-                else:
-                    Category = category_estimate(
-                        category_name=request.POST['cat'],
-                    )
-                    Category.save()
-            
-            date_ = date.today()
-            d1 = date_.strftime("%d/%m/%Y")
-            d2 = date_.strftime("%Y-%m-%d")
-
-            if Estimate_group in user.groups.all():
-                DailyExpense_data = dailyexpense_estimate.objects.filter(date=d2)
-                category_data = category_estimate.objects.all()
-
-            if GST_group in user.groups.all():
-                DailyExpense_data = dailyexpense_gst.objects.filter(date=d2)
-                category_data = category_gst.objects.all()
-
-            context = {
-                'd1':d1,
-                'DailyExpense_data' : DailyExpense_data,
-                'category_data' : category_data
-            }
-            return render(request , 'dashboard/dailyexpense.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-# Statements
-@login_required(login_url='login')
-def list_stock(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:    
-        if user.is_authenticated:
-            if request.method == 'POST':
-                if 'Estimate' in request.POST:
-                    stockdata = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['product_name']))
-                    stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
-                    stockdata.save()
-
-                if 'GST' in request.POST:
-                    stockdata = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['product_name']))
-                    stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
-                    stockdata.save()
-
-            if Estimate_group in user.groups.all():
-                stock_data = Stock_estimate.objects.all()
-            else:
-                stock_data = Stock_gst.objects.all()
-
-            context = {
-                'stock_data' : stock_data
-            }
-            return render(request, 'dashboard/stock.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def customer_payment_list(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                customer_payment = customerpay_estimate.objects.all()
-            else:
-                customer_payment = customerpay_gst.objects.all()
-
-            context = {
-                'customer_payment':customer_payment
-            }
-            return render(request, 'dashboard/customerpaymentlist.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def supplier_payment_list(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                supplier_payment = supplierpay_estimate.objects.all()
-            else:
-                supplier_payment = supplierpay_gst.objects.all()
-            
-            context = {
-                'supplier_payment':supplier_payment
-            }
-            return render(request,"dashboard/supplierpaymentlist.html",context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def customer_Credit(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                customer_credit_data = customeraccount_estimate.objects.all()
-            else:
-                customer_credit_data = customeraccount_gst.objects.all()
-            
-            context = {
-                'customer_credit_data':customer_credit_data
-            }
-            return render(request, 'dashboard/customercredit.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def supplier_credit(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                supplier_credit_list = supplieraccount_estimate.objects.all()
-            else:
-                supplier_credit_list = supplieraccount_gst.objects.all()
-
-            context = {
-                'supplier_credit_list':supplier_credit_list
-            }
-            return render(request,'dashboard/suppliercredit.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def totalincome(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                daily_income_data = dailyincome_estimate.objects.all()
-                customer_income_data = customerpay_estimate.objects.all()
-            else:
-                daily_income_data = dailyincome_gst.objects.all()
-                customer_income_data = customerpay_gst.objects.all()
-
-            context = {
-                'daily_income_data':daily_income_data,
-                'customer_income_data':customer_income_data
-            }
-            return render(request,'dashboard/totalincome.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def totalexpense(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                daily_expense_data = dailyexpense_estimate.objects.all()
-                supplier_expense_data = supplierpay_estimate.objects.all()
-            else:
-                daily_expense_data = dailyexpense_gst.objects.all()
-                supplier_expense_data = supplierpay_gst.objects.all()
-            
-            context = {
-                'daily_expense_data':daily_expense_data,
-                'supplier_expense_data':supplier_expense_data
-            }
-            return render(request,'dashboard/totalexpense.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def salereport(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    try:
-        if user.is_authenticated:
-            if Estimate_group in user.groups.all():
-                if request.method == 'POST':
-                    if 'Estimate' in request.POST:
-                        searchsale = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
-
-                        context = {
-                            'searchsale' : searchsale
-                        }
-                        return render(request,'dashboard/salereport.html',context)
-
-            if GST_group in user.groups.all():
-                if request.method == 'POST':
-                    if 'GST' in request.POST:
-                        searchsale = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
-
-                        context = {
-                            'searchsale' : searchsale
-                        }
-                        return render(request,'dashboard/salereport.html',context)
-
-            total_estimate_sale = Estimate_sales.objects.all()
-            total_gst_sale = gstsale.objects.all()
-            
-            context = {
-                'total_estimate_sale' : total_estimate_sale,
-                'total_gst_sale' : total_gst_sale,
-            }
-            return render(request,'dashboard/salereport.html',context)
-        else:
-            return redirect('login')
-    except:
-        return redirect('error404')
-
-@login_required(login_url='login')
-def getsupplier(request):
-    sid = request.GET['sid']
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    if Estimate_group in user.groups.all():
-        supplier = supplieraccount_estimate.objects.get(id=1)
-        amount = supplier.amount
-        print(amount)
-    else:
-        supplier = supplieraccount_estimate.objects.get(id=1)
-        amount = supplier.amount
-        print(amount)
-    
-    return HttpResponse(amount)
-
-def outofstock(request):
-    return render(request,'dashboard/outofstock.html')
-
-def customerstatement(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    
-    if Estimate_group in user.groups.all():
-        customer_data = Customer_estimate.objects.all()
-        customer_pending_amount = customeraccount_estimate.objects.all()
-    else:
-        customer_data = Customer_gst.objects.all()
-        customer_pending_amount = customeraccount_estimate.objects.all()
-
-    context = {
-        'customer_data' : customer_data
-    }
-    return render(request,'dashboard/customerstatement.html',context)
-
-def customer_statement_view(request,pk):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-
     if user.is_authenticated:
-        if request.method == "POST":
-            if "Estimate" in request.POST:
-                sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer = Customer_estimate.objects.get(pk=pk))
-                
-                sale_data_total_filter =  Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('Total_amount'))
-                sale_data_total = sale_data_total_filter['Total_amount__sum']
-                sale_data_round_off_filter = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('Round_off')) 
-                sale_data_round_off = sale_data_round_off_filter['Round_off__sum']
+        if Estimate_group in user.groups.all():
+            sale = 0
+            Customer_data = Customer_estimate.objects.all().count()
+            Supplier_data = Supplier_estimate.objects.all().count()
+            Product_data = Product_estimate.objects.all().count()
 
-                if sale_data.count() == 0:
-                    sale_data_money = 0
+            #Today Estimate Sale
+            today_sale = 0
+            now = date.today()
+            month = now.month
+            year = now.year
+            day = now.day
+            total_sale_record = Estimate_sales.objects.all().count()
+            if total_sale_record > 0:
+                try:
+                    if Estimate_sales.objects.filter(date=now).count() > 0: 
+                        totalsale = Estimate_sales.objects.filter(date=now).aggregate(Sum('Total_amount'))
+                        round_off = Estimate_sales.objects.filter(date=now).aggregate(Sum('Round_off'))
+                        total_sale = totalsale['Total_amount__sum']
+                        roundoff = round_off['Round_off__sum']
+                        today_sale = float(total_sale) - float(roundoff)
+                        today_sale = round(today_sale , 2)
+                        print(today_sale)
+                    else:
+                        today_sale = 0
+                        print(today_sale)
+                except Exception:
+                    print("Data is not there")
+
+            # Total Estimate Sale
+            try:
+                total_sale_records = Estimate_sales.objects.all().count()
+            except total_sale_records.DoesNotExist:
+                print("Data is not there")
+
+            if Estimate_sales.objects.all().count() > 0:    
+                totalsale = Estimate_sales.objects.aggregate(Sum('Total_amount'))
+                round_off = Estimate_sales.objects.aggregate(Sum('Round_off'))
+                total_sale = totalsale['Total_amount__sum']
+                roundoff = round_off['Round_off__sum']
+                if total_sale_records == 0:
+                    print("Total Estimate Sale")
                 else:
-                    sale_data_money = sale_data_total - sale_data_round_off
-                    sale_data_money = round(sale_data_money , 2)
-                    print(sale_data_money)
-
-                payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
-                payment_data_total_money = 0
-                payment_data_round_off_money = 0
-                if customerpay_estimate.objects.all().count() >= 0 and payment_data.count() >= 0:
-                    payment_data_total_filter = customerpay_estimate.objects.filter(date__gte=request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('paid_amount'))
-                    payment_data_total = payment_data_total_filter['paid_amount__sum']
-                    payment_data_round_off_filter = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('round_off'))
-                    payment_data_round_off = payment_data_round_off_filter['round_off__sum']
-                else:
-                    payment_data_total = 0
-                    payment_data_round_off = 0
-
-                if payment_data.count() == 0:
-                    payment_data_money = 0
-                else:
-                    payment_data_total_money = round(payment_data_total , 2)
-                    payment_data_round_off_money = round(payment_data_round_off , 2)
-
-                total_data = itertools.zip_longest(payment_data,sale_data)
-                print(total_data)
-
-                context = {
-                    'sale_data_money' : sale_data_money,
-                    'total_data' : total_data,
-                    'payment_data_total_money' : payment_data_total_money,
-                    'payment_data_round_off_money' : payment_data_round_off_money
-                }
-                return render(request , 'dashboard/customer_statement_view.html',context)
+                    sale = float(total_sale) - float(roundoff)
+                    sale = round(sale , 2)
+                    print(sale)
             else:
-                sale_data = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
-                payment_data = customerpay_gst.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+                sale = 0
 
-                context = {
-                    'sale_data' : sale_data,
-                    'payment_data' : payment_data
-                }
-                return render(request , 'dashboard/customer_statement_view.html',context)
+            #Current Month Estimate Sale
+            current_month_sale = 0
+            if total_sale_record > 0:
+                try:
+                    if Estimate_sales.objects.filter(date__month=month , date__year=year).count() > 0:
+                        current_total = Estimate_sales.objects.filter(date__month=month,date__year=year).aggregate(Sum('Total_amount'))
+                        current_roundoff = Estimate_sales.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
+                        current_total_sale = current_total['Total_amount__sum']
+                        current_roundoff_sale = current_roundoff['Round_off__sum']
+                        current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
+                        current_month_sale = round(current_month_sale , 2)
+                except Exception:
+                    print("Current Month Estimate")
+
+            #Previous Month Estimate Sale  
+            today = datetime.date.today()
+            first = today.replace(day=1)
+            lastMonth = first - datetime.timedelta(days=1)
+            lastyear = lastMonth.strftime("%Y")
+            lastmonth = lastMonth.strftime("%m")
+            previous_month_sale = 0
+            if total_sale_record > 0:
+                try:
+                    if Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear).count() > 0:
+                        previous_total = Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Total_amount'))
+                        previous_roundoff = Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Round_off'))
+                        previous_total_sale = previous_total['Total_amount__sum']
+                        previous_roundoff_sale = previous_roundoff['Round_off__sum']
+                        previous_month_sale = float(previous_total_sale) - float(previous_roundoff_sale)    
+                        previous_month_sale = round(previous_month_sale , 2)   
+                    else:
+                        print("Previous Month Sale")
+                except Exception:
+                    print("Previous Month Sale")
+
+            #Today Estimate Purchase
+            today_purchase = 0
+            now = date.today()
+            month = now.month
+            year = now.year
+            day = now.day
+            total_purchase_record = Estimate_Purchase.objects.all().count()
+
+            if total_purchase_record > 0:            
+                try:
+                    if  Estimate_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).count() > 0:
+                        # total_today_sale = Estimate_Purchase.objects.filter(date=date.today()).aggregate(Sum('Total_amount'))
+                        totalpurchase = Estimate_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Total_amount'))
+                        purchase_round_off = Estimate_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
+                        total_purchase = totalpurchase['Total_amount__sum']
+                        purchaseroundoff = purchase_round_off['Round_off__sum']
+                        today_purchase = float(total_purchase) - float(purchaseroundoff)
+                        today_purchase = round(today_purchase , 2)
+                except Exception:
+                    print("Data is not there")
+
+
+            #Current Month Estimate Purchase
+            current_month_purchase = 0
+            if total_purchase_record > 0:
+                try:
+                    if Estimate_Purchase.objects.filter(date__month=month,date__year=year).count() > 0:
+                        current_month_purchase_record = Estimate_Purchase.objects.filter(date__month=month,date__year=year).count()
+                        current_total_purchase = Estimate_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Total_amount'))
+                        current_roundoff_purchase = Estimate_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
+                        current_total_eatimate_purchase = current_total_purchase['Total_amount__sum']
+                        current_roundoff_estimate_purchase = current_roundoff_purchase['Round_off__sum']
+                        current_month_purchase = float(current_total_eatimate_purchase) - float(current_roundoff_estimate_purchase)
+                        current_month_purchase = round(current_month_purchase , 2)
+                except Exception:
+                    print("Database Error")
+
+            # Previous Month Estimate Purchase
+            previous_month_total_purchase = 0
+      
+            if total_purchase_record > 0:
+                try:
+                    if Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).count() > 0:
+                        previous_purchase_total = Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Total_amount'))
+                        previous_purchase_roundoff = Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Round_off'))
+                        previous_total_purchase = previous_purchase_total['Total_amount__sum']
+                        previous_roundoff_purchase = previous_purchase_roundoff['Round_off__sum']
+                        previous_month_total_purchase = float(previous_total_purchase) - float(previous_roundoff_purchase)
+                        previous_month_total_purchase = round(previous_month_total_purchase , 2)
+                except Exception:
+                    print("Data is not available")
+
+            #Total Estimate Purchase
+            Total_Eatimate_Purchase = 0
+            if total_purchase_record > 0:
+                total_estimate_purchase = Estimate_Purchase.objects.all().aggregate(Sum('Total_amount'))
+                roundoff_estimate_purchase = Estimate_Purchase.objects.all().aggregate(Sum('Round_off'))
+                estimate_purchase = total_estimate_purchase['Total_amount__sum']
+                estimate_roundoff = roundoff_estimate_purchase['Round_off__sum']
+                Total_Eatimate_Purchase = float(estimate_purchase) - float(estimate_roundoff)
+                Total_Eatimate_Purchase = round(Total_Eatimate_Purchase , 2)
+
+            #Stock
+            # count = 0
+            # productdata = Product.objects.all().count()
+            # pcount = int(productdata)
+            # print(pcount)
+
+            # for i in range(1,pcount+1):
+            #     Product_name = Product.objects.get(id=i).product_name
+            #     Product_Minimum_Stock = Product.objects.get(id=i).minimum_stock
+            #     Stock_Name = Stock.objects.get(id=i).product
+            #     Stock_qty = Stock.objects.get(id=i).quantity
+
+            #     if Stock_qty <= Product_Minimum_Stock:
+            #         count += 1
+            #         print(count)
+
+            # outstock = count
+            # instock = pcount - count
+            # print(outstock)
+            # print(instock)      
+
+            #Current Month Profit
+            current_month_profit = current_month_sale - current_month_purchase
+            current_month_profit = round(current_month_profit , 2)
+
+            #Previous Month Profit
+            previous_month_profit = previous_month_sale - previous_month_total_purchase
+            previous_month_profit = round(previous_month_profit , 2)
+
+            #Total
+            total_profit = sale - Total_Eatimate_Purchase
+            total_profit = round(total_profit , 2)
+            
+            context = {
+                'customerdata':Customer_data,
+                'supplierdata':Supplier_data,
+                'productdata':Product_data,
+                # 'outstock':outstock,
+                # 'instock':instock,
+                'today_sale': today_sale,
+                'current_month_sale':current_month_sale,
+                'previous_month_sale':previous_month_sale,
+                'today_purchase':today_purchase,
+                'current_month_purchase':current_month_purchase,
+                'previous_month_total_purchase':previous_month_total_purchase,
+                'Total_Eatimate_Purchase':Total_Eatimate_Purchase,
+                'current_month_profit' : current_month_profit,
+                'previous_month_profit' : previous_month_profit,
+                'total_profit' : total_profit
+            }
+            return render(request,"pages/dashboard.html",context)
+        
+        if GST_group in user.groups.all():
+            sale = 0
+            Customer_data = Customer_gst.objects.all().count()
+            print(Customer_data)
+            Supplier_data = Supplier_gst.objects.all().count()
+            print(Supplier_data)
+            Product_data = Product_gst.objects.all().count()
+            print(Product_data)
+
+            #Today GST Sale
+            today_sale = 0
+            now = date.today()
+            month = now.month
+            year = now.year
+            day = now.day
+            total_sale_record = gstsale.objects.all().count()
+            today_sale_record = gstsale.objects.filter(date__day=day,date__month=month,date__year=year).count()
+            totalsale = gstsale.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Grand_total'))
+            round_off = gstsale.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
+            total_sale = totalsale['Grand_total__sum']
+            roundoff = round_off['Round_off__sum']
+            if today_sale_record == 0:
+                print("Estimate Sale Total")
+            else:
+                today_sale = float(total_sale) - float(roundoff)
+                print("Today_Sale")
+
+            # Total GST Sale
+            totalsale = gstsale.objects.aggregate(Sum('Grand_total'))
+            round_off = gstsale.objects.aggregate(Sum('Round_off'))
+            total_sale = totalsale['Grand_total__sum']
+            roundoff = round_off['Round_off__sum']
+            if total_sale_record == 0:
+                print("Total Estimate Sale")
+            else:
+                sale = float(total_sale) - float(roundoff)
+
+            #Current Month GST Sale
+            current_month_sale = 0
+            current_total = gstsale.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Grand_total'))
+            current_roundoff = gstsale.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
+            current_total_sale = current_total['Grand_total__sum']
+            current_roundoff_sale = current_roundoff['Round_off__sum']
+            if total_sale_record == 0:
+                print("Current Month Estimate Sale")
+            else:
+                current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
+
+            #Previous Month GST Sale  
+            today = datetime.date.today()
+            first = today.replace(day=1)
+            lastMonth = first - datetime.timedelta(days=1)
+            lastyear = lastMonth.strftime("%Y")
+            lastmonth = lastMonth.strftime("%m")
+            previous_month_sale = 0
+            previous_total_count = gstsale.objects.filter(date__month=lastmonth,date__year=lastyear).count()
+            if previous_total_count == 0:
+                print("Previous Month Estimate Sale")
+            else:
+                previous_total = gstsale.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Grand_total'))
+                previous_roundoff = gstsale.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Round_off'))
+                previous_total_sale = previous_total['Grand_total__sum']
+                previous_roundoff_sale = previous_roundoff['Round_off__sum']
+                previous_month_sale = float(previous_total_sale) - float(previous_roundoff_sale)          
+
+            #Today GST Purchase
+            today_purchase = 0
+            now = date.today()
+            month = now.month
+            year = now.year
+            day = now.day
+            total_purchase_record = GST_Purchase.objects.all().count()
+            today_purchase_record = GST_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).count()
+            # total_today_sale = GST_Purchase.objects.filter(date=date.today()).aggregate(Sum('Total_amount'))
+            totalpurchase = GST_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Grand_total'))
+            purchase_round_off = GST_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
+            total_purchase = totalpurchase['Grand_total__sum']
+            purchaseroundoff = purchase_round_off['Round_off__sum']
+            if total_purchase_record == 0:
+                print("Estimate Sale Total")
+            elif today_purchase_record == 0:
+                print("Estimate Today Sale")
+            else:
+                today_purchase = float(total_purchase) - float(purchaseroundoff)
+
+            #Current Month Estimate Purchase
+            total_purchase_record = GST_Purchase.objects.all().count()
+            current_month_purchase = 0
+            current_total_purchase = GST_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Grand_total'))
+            current_roundoff_purchase = GST_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
+            current_total_eatimate_purchase = current_total_purchase['Grand_total__sum']
+            current_roundoff_estimate_purchase = current_roundoff_purchase['Round_off__sum']
+            if total_purchase_record == 0:
+                print("Current Month Estimate Purchase")
+            elif today_purchase_record == 0:
+                print("Current Month Estimate Purchase")
+            else:
+                current_month_purchase = float(current_total_eatimate_purchase) - float(current_roundoff_estimate_purchase)
+
+            # Previous Month Estimate Purchase
+            previous_month_total_purchase = 0
+            previous_total_purchase_count = GST_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).count()
+            if previous_total_purchase_count == 0:
+                print("Previous Month Estimate Purchase")
+            else:
+                previous_purchase_total = GST_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Grand_total'))
+                previous_purchase_roundoff = GST_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Round_off'))
+                previous_total_purchase = previous_purchase_total['Grand_total__sum']
+                previous_roundoff_purchase = previous_purchase_roundoff['Round_off__sum']
+                previous_month_total_purchase = float(previous_total_purchase) - float(previous_roundoff_purchase)
+
+            #Total Estimate Purchase
+            Total_Eatimate_Purchase = 0
+            if total_purchase_record == 0:
+                print("Total Estimate Purchase")
+            else:
+                total_estimate_purchase = GST_Purchase.objects.all().aggregate(Sum('Grand_total'))
+                roundoff_estimate_purchase = GST_Purchase.objects.all().aggregate(Sum('Round_off'))
+                estimate_purchase = total_estimate_purchase['Grand_total__sum']
+                estimate_roundoff = roundoff_estimate_purchase['Round_off__sum']
+                Total_Eatimate_Purchase = float(estimate_purchase) - float(estimate_roundoff)
+
+            #Stock
+            # count = 0
+            # productdata = Product.objects.all().count()
+            # pcount = int(productdata)
+            # print(pcount)
+
+            # for i in range(1,pcount+1):
+            #     Product_name = Product.objects.get(id=i).product_name
+            #     Product_Minimum_Stock = Product.objects.get(id=i).minimum_stock
+            #     Stock_Name = Stock.objects.get(id=i).product
+            #     Stock_qty = Stock.objects.get(id=i).quantity
+
+            #     if Stock_qty <= Product_Minimum_Stock:
+            #         count += 1
+            #         print(count)
+
+            # outstock = count
+            # instock = pcount - count
+            # print(outstock)
+            # print(instock)      
+
+            #Current Month Profit
+            current_month_profit = current_month_sale - current_month_purchase
+
+            #Previous Month Profit
+            previous_month_profit = previous_month_sale - previous_month_total_purchase
+
+            #Total
+            total_profit = sale - Total_Eatimate_Purchase
+            
+            context = {
+                'customerdata':Customer_data,
+                'supplierdata':Supplier_data,
+                'productdata':Product_data,
+                # 'outstock':outstock,
+                # 'instock':instock,
+                'today_sale': today_sale,
+                'current_month_sale':current_month_sale,
+                'previous_month_sale':previous_month_sale,
+                'today_purchase':today_purchase,
+                'current_month_purchase':current_month_purchase,
+                'previous_month_total_purchase':previous_month_total_purchase,
+                'Total_Eatimate_Purchase':Total_Eatimate_Purchase,
+                'current_month_profit' : current_month_profit,
+                'previous_month_profit' : previous_month_profit,
+                'total_profit' : total_profit
+            }
+            return render(request,"pages/dashboard.html",context)
     else:
         return redirect('login')
-
-    return render(request , 'dashboard/customer_statement_view.html')

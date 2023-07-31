@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
-from .models import *
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
+from django.shortcuts import redirect, render
+
+from .models import *
+
 
 # Create your views here.
 @login_required(login_url='login')

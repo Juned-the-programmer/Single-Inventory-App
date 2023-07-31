@@ -1,12 +1,16 @@
-from django.shortcuts import render, redirect
-from .models import *
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.decorators import login_required
+from datetime import date
+
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group, User
 from django.http import HttpResponse, JsonResponse
-from supplier.models import *
+from django.shortcuts import redirect, render
+
 from customer.models import *
-from datetime import date 
+from supplier.models import *
+
+from .models import *
+
 
 # Create your views here.
 @login_required(login_url='login')
