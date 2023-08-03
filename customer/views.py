@@ -1,11 +1,12 @@
+import random
+import string
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect, render
 
 from .models import *
-import random
-import string
 
 # Create your views here.
 

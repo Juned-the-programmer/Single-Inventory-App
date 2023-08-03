@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 
 # Create your models here.
 class Supplier_estimate(models.Model):
+    supplier_id = models.CharField(max_length=10, null=True, blank=True)
     fullname = models.CharField(max_length=50)
     contactno = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -29,7 +30,7 @@ class supplieraccount_estimate(models.Model):
         indexes = [models.Index(fields=['supplier_name' , 'id'])]
         
 class Supplier_gst(models.Model):
-    supplierid = models.IntegerField()
+    supplierid = models.CharField(max_length=10, null=True, blank=True)
     fullname = models.CharField(max_length=50)
     email = models.EmailField(max_length=254)
     contactno = models.CharField(max_length=50)
