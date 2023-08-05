@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'payments',
     'daybook',
     'statements',
+    'import_export',
 ]
 
 MIDDLEWARE = [

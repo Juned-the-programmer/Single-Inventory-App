@@ -1,0 +1,15 @@
+<!-- backup.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Backup</title>
+</head>
+<body>
+    <h1>Database Backup</h1>
+    <form action="{% url 'export_backup' %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Backup Database">
+    </form>
+</body>
+</html>

@@ -7,7 +7,6 @@ from django.shortcuts import redirect, render
 
 from .models import *
 
-
 # Create your views here.
 @login_required(login_url='login')
 def dailyincome(request):
