@@ -7,4 +7,5 @@ urlpatterns = [
     path('user_name',views.user_name,name="user_name"),
     path('export_backup/', views.export_backup, name='export_backup'),
     path('backup/', views.backup_page, name='backup_page'),
+    path('restore/', views.import_backup, name='import_backup'),
 ]

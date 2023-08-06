@@ -1,17 +1,19 @@
 import datetime
+import os
+import zipfile
 from datetime import date
+import tablib
 
+from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User, auth
+from django.core.files.storage import default_storage
 from django.db.models import Avg, Max, Min, Sum
 from django.shortcuts import HttpResponse, redirect, render
-
-from import_export import resources
+from import_export import fields, resources, results, widgets
 from import_export.fields import Field
 from import_export.widgets import ForeignKeyWidget
-from django.apps import apps
-import zipfile
 
 from dashboard.models import *
 from products.models import *
@@ -104,3 +106,34 @@ def export_backup(request):
 
 def backup_page(request):
     return render(request, 'pages/backup.html')
+
+def import_backup(request):
+    if request.method == 'POST' and request.FILES.get('backup_file'):
+        backup_file = request.FILES['backup_file']
+
+        # Save the uploaded file to a temporary location
+        file_path = default_storage.save(backup_file.name, backup_file)
+
+        # Extract the ZIP file and read the CSVs
+        with zipfile.ZipFile(file_path, 'r') as zip_file:
+            for filename in zip_file.namelist():
+                with zip_file.open(filename) as csv_file:
+                    # Identify the model based on the filename
+                    app_label, model_name = os.path.splitext(filename)[0].split('_', 1)
+                    model = apps.get_model(app_label, model_name)
+
+                    # Define a resource class for each model dynamically
+                    class_name = f"{model.__name__}Resource"
+                    ModelResource = type(class_name, (resources.ModelResource,), {'Meta': type('Meta', (), {'model': model})})
+
+                    # Read the CSV data and create a dataset
+                    dataset = tablib.Dataset().load(csv_file.read().decode())
+
+                    # Import data from the dataset to the model
+                    model_resource = ModelResource()
+                    result = model_resource.import_data(dataset, dry_run=False)
+
+        # Delete the temporary file
+        os.remove(file_path)
+        
+    return render(request, 'pages/restore.html')
