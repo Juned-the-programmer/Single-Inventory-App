@@ -165,27 +165,6 @@ def dashboard(request):
             Total_Eatimate_Purchase = float(estimate_purchase) - float(estimate_roundoff)
             Total_Eatimate_Purchase = round(Total_Eatimate_Purchase , 2)
 
-        #Stock
-        # count = 0
-        # productdata = Product.objects.all().count()
-        # pcount = int(productdata)
-        # print(pcount)
-
-        # for i in range(1,pcount+1):
-        #     Product_name = Product.objects.get(id=i).product_name
-        #     Product_Minimum_Stock = Product.objects.get(id=i).minimum_stock
-        #     Stock_Name = Stock.objects.get(id=i).product
-        #     Stock_qty = Stock.objects.get(id=i).quantity
-
-        #     if Stock_qty <= Product_Minimum_Stock:
-        #         count += 1
-        #         print(count)
-
-        # outstock = count
-        # instock = pcount - count
-        # print(outstock)
-        # print(instock)      
-
         #Current Month Profit
         current_month_profit = current_month_sale - current_month_purchase
         current_month_profit = round(current_month_profit , 2)
@@ -202,8 +181,6 @@ def dashboard(request):
             'customerdata':Customer_data,
             'supplierdata':Supplier_data,
             'productdata':Product_data,
-            # 'outstock':outstock,
-            # 'instock':instock,
             'today_sale': today_sale,
             'current_month_sale':current_month_sale,
             'previous_month_sale':previous_month_sale,
@@ -290,7 +267,6 @@ def dashboard(request):
         day = now.day
         total_purchase_record = GST_Purchase.objects.all().count()
         today_purchase_record = GST_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).count()
-        # total_today_sale = GST_Purchase.objects.filter(date=date.today()).aggregate(Sum('Total_amount'))
         totalpurchase = GST_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Grand_total'))
         purchase_round_off = GST_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
         total_purchase = totalpurchase['Grand_total__sum']
@@ -339,27 +315,6 @@ def dashboard(request):
             estimate_roundoff = roundoff_estimate_purchase['Round_off__sum']
             Total_Eatimate_Purchase = float(estimate_purchase) - float(estimate_roundoff)
 
-        #Stock
-        # count = 0
-        # productdata = Product.objects.all().count()
-        # pcount = int(productdata)
-        # print(pcount)
-
-        # for i in range(1,pcount+1):
-        #     Product_name = Product.objects.get(id=i).product_name
-        #     Product_Minimum_Stock = Product.objects.get(id=i).minimum_stock
-        #     Stock_Name = Stock.objects.get(id=i).product
-        #     Stock_qty = Stock.objects.get(id=i).quantity
-
-        #     if Stock_qty <= Product_Minimum_Stock:
-        #         count += 1
-        #         print(count)
-
-        # outstock = count
-        # instock = pcount - count
-        # print(outstock)
-        # print(instock)      
-
         #Current Month Profit
         current_month_profit = current_month_sale - current_month_purchase
 
@@ -373,8 +328,6 @@ def dashboard(request):
             'customerdata':Customer_data,
             'supplierdata':Supplier_data,
             'productdata':Product_data,
-            # 'outstock':outstock,
-            # 'instock':instock,
             'today_sale': today_sale,
             'current_month_sale':current_month_sale,
             'previous_month_sale':previous_month_sale,

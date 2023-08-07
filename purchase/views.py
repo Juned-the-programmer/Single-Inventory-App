@@ -397,18 +397,10 @@ def purchaseprice_estimate(request):
     last_price = 0
     last_rate = 0
     pk_id = 0
-    # cname = Estimate_sales.objects.filter(customer = Customer.objects.get(fullname=cname)).last()
-    # product = estimatesales_Product.objects.filter(Bill_no=cname.Bill_no)
-    # product_rate = estimatesales_Product.objects.get(Bill_no=product,product_name=pname).rate
-
-    # if product_rate:
-    #     product_rate = product_rate
-    # else:
-    #     product_rate = Product.objects.get(product_name=pname).selling_price 
+    
     if Estimate_Purchase.objects.filter(supplier = Supplier_estimate.objects.get(fullname=sname)).count() >= 1:
         customer_id = Estimate_Purchase.objects.filter(supplier = Supplier_estimate.objects.get(fullname=sname)).last()
         pk_id = customer_id.Bill_no
-        # products = estimatesales_Product.objects.filter(Bill_no=pk_id).last()
 
     if estimatepurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
         product_rate = estimatepurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).last()
@@ -424,9 +416,6 @@ def purchaseprice_estimate(request):
     else:
         last_rate = last_price
         print(last_rate)
-
-    # rate_product = estimatesales_Product.objects.get(product_name=product_rate).rate
-    # selling_price = Product.objects.get(product_name=pname).selling_price
 
     return HttpResponse(last_rate)
 
@@ -469,18 +458,10 @@ def purchaseprice_gst(request):
     last_price = 0
     last_rate = 0
     pk_id = 0
-    # cname = Estimate_sales.objects.filter(customer = Customer.objects.get(fullname=cname)).last()
-    # product = estimatesales_Product.objects.filter(Bill_no=cname.Bill_no)
-    # product_rate = estimatesales_Product.objects.get(Bill_no=product,product_name=pname).rate
-
-    # if product_rate:
-    #     product_rate = product_rate
-    # else:
-    #     product_rate = Product.objects.get(product_name=pname).selling_price 
+    
     if GST_Purchase.objects.filter(supplier_name = Supplier_gst.objects.get(fullname=sname)).count() >= 1:
         customer_id = GST_Purchase.objects.filter(supplier_name = Supplier_gst.objects.get(fullname=sname)).last()
         pk_id = customer_id.Bill_no
-        # products = estimatesales_Product.objects.filter(Bill_no=pk_id).last()
 
     if gstpurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
         product_rate = gstpurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).last()
@@ -496,8 +477,5 @@ def purchaseprice_gst(request):
     else:
         last_rate = last_price
         print(last_rate)
-
-    # rate_product = estimatesales_Product.objects.get(product_name=product_rate).rate
-    # selling_price = Product.objects.get(product_name=pname).selling_price
 
     return HttpResponse(last_rate)
