@@ -31,56 +31,40 @@ def dashboard(request):
         month = now.month
         year = now.year
         day = now.day
-        total_sale_record = Estimate_sales.objects.all().count()
-        if total_sale_record > 0:
-            try:
-                if Estimate_sales.objects.filter(date=now).count() > 0: 
-                    totalsale = Estimate_sales.objects.filter(date=now).aggregate(Sum('Total_amount'))
-                    round_off = Estimate_sales.objects.filter(date=now).aggregate(Sum('Round_off'))
-                    total_sale = totalsale['Total_amount__sum']
-                    roundoff = round_off['Round_off__sum']
-                    today_sale = float(total_sale) - float(roundoff)
-                    today_sale = round(today_sale , 2)
-                    print(today_sale)
-                else:
-                    today_sale = 0
-                    print(today_sale)
-            except Exception:
-                print("Data is not there")
-
-        # Total Estimate Sale
-        try:
-            total_sale_records = Estimate_sales.objects.all().count()
-        except total_sale_records.DoesNotExist:
-            print("Data is not there")
-
-        if Estimate_sales.objects.all().count() > 0:    
-            totalsale = Estimate_sales.objects.aggregate(Sum('Total_amount'))
-            round_off = Estimate_sales.objects.aggregate(Sum('Round_off'))
+        today_sale_record_estimate = Estimate_sales.objects.filter(date=now)
+        if today_sale_record_estimate.count() > 0:
+            totalsale = today_sale_record_estimate.aggregate(Sum('Total_amount'))
+            round_off = today_sale_record_estimate.aggregate(Sum('Round_off'))
             total_sale = totalsale['Total_amount__sum']
             roundoff = round_off['Round_off__sum']
-            if total_sale_records == 0:
-                print("Total Estimate Sale")
-            else:
-                sale = float(total_sale) - float(roundoff)
-                sale = round(sale , 2)
-                print(sale)
+            today_sale = float(total_sale) - float(roundoff)
+            today_sale = round(today_sale , 2)
+        else:
+            today_sale = 0
+
+        # Total Estimate Sale
+        total_sale_records_estimate = Estimate_sales.objects.all()
+        if total_sale_records_estimate.count() > 0:    
+            totalsale = total_sale_records_estimate.aggregate(Sum('Total_amount'))
+            round_off = total_sale_records_estimate.aggregate(Sum('Round_off'))
+            total_sale = totalsale['Total_amount__sum']
+            roundoff = round_off['Round_off__sum']
+            sale = float(total_sale) - float(roundoff)
+            sale = round(sale , 2)
         else:
             sale = 0
 
         #Current Month Estimate Sale
-        current_month_sale = 0
-        if total_sale_record > 0:
-            try:
-                if Estimate_sales.objects.filter(date__month=month , date__year=year).count() > 0:
-                    current_total = Estimate_sales.objects.filter(date__month=month,date__year=year).aggregate(Sum('Total_amount'))
-                    current_roundoff = Estimate_sales.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
-                    current_total_sale = current_total['Total_amount__sum']
-                    current_roundoff_sale = current_roundoff['Round_off__sum']
-                    current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
-                    current_month_sale = round(current_month_sale , 2)
-            except Exception:
-                print("Current Month Estimate")
+        current_month_records_estmate = Estimate_sales.objects.filter(date__month=month , date__year=year)
+        if current_month_records_estmate.count() > 0:
+                current_total = current_month_records_estmate.aggregate(Sum('Total_amount'))
+                current_roundoff = current_month_records_estmate.aggregate(Sum('Round_off'))
+                current_total_sale = current_total['Total_amount__sum']
+                current_roundoff_sale = current_roundoff['Round_off__sum']
+                current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
+                current_month_sale = round(current_month_sale , 2)
+        else:
+            current_month_sale = 0
 
         #Previous Month Estimate Sale  
         today = datetime.date.today()
@@ -88,20 +72,16 @@ def dashboard(request):
         lastMonth = first - datetime.timedelta(days=1)
         lastyear = lastMonth.strftime("%Y")
         lastmonth = lastMonth.strftime("%m")
-        previous_month_sale = 0
-        if total_sale_record > 0:
-            try:
-                if Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear).count() > 0:
-                    previous_total = Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Total_amount'))
-                    previous_roundoff = Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Round_off'))
-                    previous_total_sale = previous_total['Total_amount__sum']
-                    previous_roundoff_sale = previous_roundoff['Round_off__sum']
-                    previous_month_sale = float(previous_total_sale) - float(previous_roundoff_sale)    
-                    previous_month_sale = round(previous_month_sale , 2)   
-                else:
-                    print("Previous Month Sale")
-            except Exception:
-                print("Previous Month Sale")
+        previous_month_sale_records_estimate = Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear)
+        if previous_month_sale_records_estimate.count() > 0:
+            previous_total = previous_month_sale_records_estimate.aggregate(Sum('Total_amount'))
+            previous_roundoff = previous_month_sale_records_estimate.aggregate(Sum('Round_off'))
+            previous_total_sale = previous_total['Total_amount__sum']
+            previous_roundoff_sale = previous_roundoff['Round_off__sum']
+            previous_month_sale = float(previous_total_sale) - float(previous_roundoff_sale)    
+            previous_month_sale = round(previous_month_sale , 2)
+        else:
+            previous_month_sale = 0
 
         #Today Estimate Purchase
         today_purchase = 0
@@ -109,61 +89,55 @@ def dashboard(request):
         month = now.month
         year = now.year
         day = now.day
-        total_purchase_record = Estimate_Purchase.objects.all().count()
+        total_purchase_records_estimate = Estimate_Purchase.objects.filter(date=now)
 
-        if total_purchase_record > 0:            
-            try:
-                if  Estimate_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).count() > 0:
-                    # total_today_sale = Estimate_Purchase.objects.filter(date=date.today()).aggregate(Sum('Total_amount'))
-                    totalpurchase = Estimate_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Total_amount'))
-                    purchase_round_off = Estimate_Purchase.objects.filter(date__day=day,date__month=month,date__year=year).aggregate(Sum('Round_off'))
-                    total_purchase = totalpurchase['Total_amount__sum']
-                    purchaseroundoff = purchase_round_off['Round_off__sum']
-                    today_purchase = float(total_purchase) - float(purchaseroundoff)
-                    today_purchase = round(today_purchase , 2)
-            except Exception:
-                print("Data is not there")
+        if total_purchase_records_estimate.count() > 0:            
+            totalpurchase = total_purchase_records_estimate.aggregate(Sum('Total_amount'))
+            purchase_round_off = total_purchase_records_estimate.aggregate(Sum('Round_off'))
+            total_purchase = totalpurchase['Total_amount__sum']
+            purchaseroundoff = purchase_round_off['Round_off__sum']
+            today_purchase = float(total_purchase) - float(purchaseroundoff)
+            today_purchase = round(today_purchase , 2)
+        else:
+            today_purchase = 0
 
 
         #Current Month Estimate Purchase
-        current_month_purchase = 0
-        if total_purchase_record > 0:
-            try:
-                if Estimate_Purchase.objects.filter(date__month=month,date__year=year).count() > 0:
-                    current_month_purchase_record = Estimate_Purchase.objects.filter(date__month=month,date__year=year).count()
-                    current_total_purchase = Estimate_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Total_amount'))
-                    current_roundoff_purchase = Estimate_Purchase.objects.filter(date__month=month,date__year=year).aggregate(Sum('Round_off'))
-                    current_total_eatimate_purchase = current_total_purchase['Total_amount__sum']
-                    current_roundoff_estimate_purchase = current_roundoff_purchase['Round_off__sum']
-                    current_month_purchase = float(current_total_eatimate_purchase) - float(current_roundoff_estimate_purchase)
-                    current_month_purchase = round(current_month_purchase , 2)
-            except Exception:
-                print("Database Error")
+        current_month_purchase_records_estimate = Estimate_Purchase.objects.filter(date__month=month,date__year=year)
+        if current_month_purchase_records_estimate.count() > 0:
+            current_total_purchase = current_month_purchase_records_estimate.aggregate(Sum('Total_amount'))
+            current_roundoff_purchase = current_month_purchase_records_estimate.aggregate(Sum('Round_off'))
+            current_total_eatimate_purchase = current_total_purchase['Total_amount__sum']
+            current_roundoff_estimate_purchase = current_roundoff_purchase['Round_off__sum']
+            current_month_purchase = float(current_total_eatimate_purchase) - float(current_roundoff_estimate_purchase)
+            current_month_purchase = round(current_month_purchase , 2)
+        else:
+            current_month_purchase = 0
 
         # Previous Month Estimate Purchase
-        previous_month_total_purchase = 0
+        previous_month_purchase_records_estimate = Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear)
     
-        if total_purchase_record > 0:
-            try:
-                if Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).count() > 0:
-                    previous_purchase_total = Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Total_amount'))
-                    previous_purchase_roundoff = Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear).aggregate(Sum('Round_off'))
-                    previous_total_purchase = previous_purchase_total['Total_amount__sum']
-                    previous_roundoff_purchase = previous_purchase_roundoff['Round_off__sum']
-                    previous_month_total_purchase = float(previous_total_purchase) - float(previous_roundoff_purchase)
-                    previous_month_total_purchase = round(previous_month_total_purchase , 2)
-            except Exception:
-                print("Data is not available")
+        if previous_month_purchase_records_estimate.count() > 0:
+            previous_purchase_total = previous_month_purchase_records_estimate.aggregate(Sum('Total_amount'))
+            previous_purchase_roundoff = previous_month_purchase_records_estimate.aggregate(Sum('Round_off'))
+            previous_total_purchase = previous_purchase_total['Total_amount__sum']
+            previous_roundoff_purchase = previous_purchase_roundoff['Round_off__sum']
+            previous_month_total_purchase = float(previous_total_purchase) - float(previous_roundoff_purchase)
+            previous_month_total_purchase = round(previous_month_total_purchase , 2)
+        else:
+            previous_month_total_purchase = 0
 
         #Total Estimate Purchase
-        Total_Eatimate_Purchase = 0
-        if total_purchase_record > 0:
-            total_estimate_purchase = Estimate_Purchase.objects.all().aggregate(Sum('Total_amount'))
-            roundoff_estimate_purchase = Estimate_Purchase.objects.all().aggregate(Sum('Round_off'))
+        total_purchase_records_estimate = Estimate_Purchase.objects.all()
+        if total_purchase_records_estimate.count() > 0:
+            total_estimate_purchase = total_purchase_records_estimate.aggregate(Sum('Total_amount'))
+            roundoff_estimate_purchase = total_purchase_records_estimate.aggregate(Sum('Round_off'))
             estimate_purchase = total_estimate_purchase['Total_amount__sum']
             estimate_roundoff = roundoff_estimate_purchase['Round_off__sum']
             Total_Eatimate_Purchase = float(estimate_purchase) - float(estimate_roundoff)
             Total_Eatimate_Purchase = round(Total_Eatimate_Purchase , 2)
+        else:
+            Total_Eatimate_Purchase = 0
 
         #Current Month Profit
         current_month_profit = current_month_sale - current_month_purchase

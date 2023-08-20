@@ -15,144 +15,130 @@ from .models import *
 # Create your views here.
 @login_required(login_url='login')
 def supplierpayment(request):
-    Estimate_group = Group.objects.get(name='Estimate')
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    if user.is_authenticated:
-        if request.method == 'POST':
-            if 'Estimate' in request.POST:
-                
-                if len(request.POST['round_off']) >= 1:
-                    round_off = request.POST['round_off']
-                else:
-                    round_off = 0
-
-                SupplierPay = supplierpay_estimate(
-                    supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']),
-                    pending_amount = float(request.POST['pending_amount']),
-                    paid_amount = float(request.POST['paid_amount']),
-                    round_off = round_off
-                )
-            
-                supplieraccountdata = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']).id)
-
-                supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
-                supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
-
-                supplieraccountdata.save()
-                SupplierPay.save()
-                messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
-
+    if request.method == 'POST':
+        if request.user.groups.filter(name='Estimate').exists():
+            if len(request.POST['round_off']) >= 1:
+                round_off = request.POST['round_off']
             else:
-                
-                if len(request.POST['round_off']) >= 1:
-                    round_off = request.POST['round_off']
-                else:
-                    round_off = 0
+                round_off = 0
 
-                SupplierPay = supplierpay_gst(
-                    supplier_name = supplieraccount_gst.objects.get(id=request.POST['supplier-name']).supplier_name,
-                    pending_amount = float(request.POST['pending_amount']),
-                    paid_amount = float(request.POST['paid_amount']),
-                    round_off = round_off
-                )
+            SupplierPay = supplierpay_estimate(
+                supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']),
+                pending_amount = float(request.POST['pending_amount']),
+                paid_amount = float(request.POST['paid_amount']),
+                round_off = round_off
+            )
+        
+            supplieraccountdata = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']).id)
+
+            supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+            supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
+
+            supplieraccountdata.save()
+            SupplierPay.save()
+            messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
+
+        else:
             
-                supplieraccountdata = supplieraccount_gst.objects.get(id=request.POST['supplier-name'])
+            if len(request.POST['round_off']) >= 1:
+                round_off = request.POST['round_off']
+            else:
+                round_off = 0
 
-                supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
-                supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
+            SupplierPay = supplierpay_gst(
+                supplier_name = supplieraccount_gst.objects.get(id=request.POST['supplier-name']).supplier_name,
+                pending_amount = float(request.POST['pending_amount']),
+                paid_amount = float(request.POST['paid_amount']),
+                round_off = round_off
+            )
+        
+            supplieraccountdata = supplieraccount_gst.objects.get(id=request.POST['supplier-name'])
 
-                supplieraccountdata.save()
-                SupplierPay.save()
-                messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
+            supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+            supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
 
-        if Estimate_group in user.groups.all():
-            supplier_data = Supplier_estimate.objects.all()
+            supplieraccountdata.save()
+            SupplierPay.save()
+            messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
-        if GST_group in user.groups.all():
-            supplier_data = Supplier_gst.objects.all()
+    if request.user.groups.filter(name='Estimate').exists():
+        supplier_data = Supplier_estimate.objects.all()
 
-        date_ = date.today()
-        d1 = date_.strftime("%d/%m/%Y")
-        context = {
-            'd1':d1,
-            'supplier_data':supplier_data
-        }
-        return render(request, 'payments/supplierpayment.html',context)
-    else:
-        return redirect('login')
+    if request.user.groups.filter(name='GST').exists():
+        supplier_data = Supplier_gst.objects.all()
+
+    date_ = date.today()
+    d1 = date_.strftime("%d/%m/%Y")
+    context = {
+        'd1':d1,
+        'supplier_data':supplier_data
+    }
+    return render(request, 'payments/supplierpayment.html',context)
 
 @login_required(login_url='login')
 def customerpayment(request):
-    Estimate_group = Group.objects.get(name="Estimate")
-    GST_group = Group.objects.get(name='GST')
-    user = User.objects.get(username=request.user.username)
-    if user.is_authenticated:
-        if request.method == 'POST':
-            if 'Estimate' in request.POST:
-
-                if len(request.POST['round_off']) >= 1:
-                    round_off = request.POST['round_off']
-                else:
-                    round_off = 0
-
-                CustomerPay = customerpay_estimate (
-                    customer_name = customeraccount_estimate.objects.get(id=request.POST['customer']).customer_name,
-                    pending_amount = request.POST['pending_amount'],
-                    paid_amount = request.POST['paid_amount'],
-                    round_off = round_off,
-                    Description = request.POST['Description']
-                )
-                CustomerPay.save()
-
-                customerdata = customeraccount_estimate.objects.get(id=request.POST['customer'])
-
-                customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
-                customerdata.amount = customerdata.amount - float(round_off)
-
-                customerdata.save()
-                messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
-
+    if request.method == 'POST':
+        if request.user.groups.filter(name='Estimate').exists():
+            if len(request.POST['round_off']) >= 1:
+                round_off = request.POST['round_off']
             else:
+                round_off = 0
 
-                if len(request.POST['round_off']) >= 1:
-                    round_off = request.POST['round_off']
-                else:
-                    round_off = 0
+            CustomerPay = customerpay_estimate (
+                customer_name = customeraccount_estimate.objects.get(id=request.POST['customer']).customer_name,
+                pending_amount = request.POST['pending_amount'],
+                paid_amount = request.POST['paid_amount'],
+                round_off = round_off,
+                Description = request.POST['Description']
+            )
+            customerdata = customeraccount_estimate.objects.get(id=request.POST['customer'])
 
-                CustomerPay = customerpay_gst (
-                    customer_name = customeraccount_gst.objects.get(id=request.POST['customer']).customer_name,
-                    pending_amount = request.POST['pending_amount'],
-                    paid_amount = request.POST['paid_amount'],
-                    round_off = round_off,
-                    Description = request.POST['Description']
-                )
-                CustomerPay.save()
+            customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount']) 
+            customerdata.amount = customerdata.amount - float(round_off)
 
-                customerdata = customeraccount_gst.objects.get(id=request.POST['customer'])
+            CustomerPay.save()
+            customerdata.save()
+            messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
-                customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
-                customerdata.amount = customerdata.amount - float(round_off)
+        else:
 
-                customerdata.save()
-                messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
-        
+            if len(request.POST['round_off']) >= 1:
+                round_off = request.POST['round_off']
+            else:
+                round_off = 0
 
-        date_ = date.today()
-        d1 = date_.strftime("%d/%m/%Y")
-        if Estimate_group in user.groups.all():
-            customer_data = customeraccount_estimate.objects.all()
-        
-        if GST_group in user.groups.all():
-            customer_data = customeraccount_gst.objects.all()
+            CustomerPay = customerpay_gst (
+                customer_name = customeraccount_gst.objects.get(id=request.POST['customer']).customer_name,
+                pending_amount = request.POST['pending_amount'],
+                paid_amount = request.POST['paid_amount'],
+                round_off = round_off,
+                Description = request.POST['Description']
+            )
+            CustomerPay.save()
 
-        context = {
-            'd1':d1,
-            'customer_data':customer_data
-        }
-        return render(request, 'payments/customerpayment.html',context)
-    else:
-        return redirect('login')
+            customerdata = customeraccount_gst.objects.get(id=request.POST['customer'])
+
+            customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
+            customerdata.amount = customerdata.amount - float(round_off)
+
+            customerdata.save()
+            messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
+    
+
+    date_ = date.today()
+    d1 = date_.strftime("%d/%m/%Y")
+
+    if request.user.groups.filter(name='Estimate').exists():
+        customer_data = customeraccount_estimate.objects.all()
+    
+    if request.user.groups.filter(name='GST').exists():
+        customer_data = customeraccount_gst.objects.all()
+
+    context = {
+        'd1':d1,
+        'customer_data':customer_data
+    }
+    return render(request, 'payments/customerpayment.html',context)
 
 @login_required(login_url='login')
 def supplier_dueamount_estimate(request):

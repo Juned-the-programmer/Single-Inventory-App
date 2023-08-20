@@ -216,10 +216,15 @@ def customer_statement_view(request,pk):
         if request.user.groups.filter(name='Estimate').exists():
             sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer = Customer_estimate.objects.get(pk=pk))
             
-            sale_data_total_filter =  Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('Total_amount'))
-            sale_data_total = sale_data_total_filter['Total_amount__sum']
-            sale_data_round_off_filter = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('Round_off')) 
-            sale_data_round_off = sale_data_round_off_filter['Round_off__sum']
+            if sale_data.count() > 0:
+                sale_data_total_filter =  sale_data.aggregate(Sum('Total_amount'))
+                sale_data_total = sale_data_total_filter['Total_amount__sum']
+                sale_data_round_off_filter = sale_data.aggregate(Sum('Round_off')) 
+                sale_data_round_off = sale_data_round_off_filter['Round_off__sum']
+            else:
+                sale_data_total = 0
+                sale_data_round_off = 0
+
 
             if sale_data.count() == 0:
                 sale_data_money = 0
@@ -228,14 +233,15 @@ def customer_statement_view(request,pk):
                 sale_data_money = round(sale_data_money , 2)
                 print(sale_data_money)
 
-            payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+            payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer_name = Customer_estimate.objects.get(pk=pk))
             payment_data_total_money = 0
             payment_data_round_off_money = 0
-            if customerpay_estimate.objects.all().count() >= 0 and payment_data.count() >= 0:
-                payment_data_total_filter = customerpay_estimate.objects.filter(date__gte=request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('paid_amount'))
+            if payment_data.count() > 0:
+                payment_data_total_filter = payment_data.aggregate(Sum('paid_amount'))
                 payment_data_total = payment_data_total_filter['paid_amount__sum']
-                payment_data_round_off_filter = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).aggregate(Sum('round_off'))
+                payment_data_round_off_filter = payment_data.aggregate(Sum('round_off'))
                 payment_data_round_off = payment_data_round_off_filter['round_off__sum']
+                payment_data_total_plus_round_off = float(payment_data_total) + float(payment_data_round_off)
             else:
                 payment_data_total = 0
                 payment_data_round_off = 0
@@ -243,17 +249,19 @@ def customer_statement_view(request,pk):
             if payment_data.count() == 0:
                 payment_data_money = 0
             else:
-                payment_data_total_money = round(payment_data_total , 2)
+                payment_data_total_money = round(payment_data_total_plus_round_off , 2)
                 payment_data_round_off_money = round(payment_data_round_off , 2)
 
             total_data = itertools.zip_longest(payment_data,sale_data)
-            print(total_data)
 
             context = {
+                'sale_data_total' : sale_data_total,
                 'sale_data_money' : sale_data_money,
                 'total_data' : total_data,
+                'payment_data_total' : payment_data_total,
                 'payment_data_total_money' : payment_data_total_money,
-                'payment_data_round_off_money' : payment_data_round_off_money
+                'payment_data_round_off_money' : payment_data_round_off_money,
+                'sale_date_round_off' : sale_data_round_off
             }
             return render(request , 'statements/customer_statement_view.html',context)
         

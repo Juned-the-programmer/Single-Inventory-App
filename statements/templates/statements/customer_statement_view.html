@@ -97,19 +97,28 @@ tbody{
                     </tbody>
                     <tfoot style="border: 2px solid black;" class="thead-dark">
                         <tr style="border: 2px solid black;">
-                            <th>Round off :</th>
                             <th>Balance (Baki) : </th>
-                            <th>{{ sale_data_money|sub:payment_data_total_money|floatformat:2}}</th>
+                            <th>Total : </th>
+                            <th>{{payment_data_total}}</th>
                             <th></th>
-                            <th></th>
-                            <th></th>
+                            <th>Total : </th>
+                            <th>{{sale_data_total}}</th>
                         </tr>
                         <tr style="border: 2px solid black;">
+                            <th>{{ sale_data_money|sub:payment_data_total_money|floatformat:2}}</th>
+                            <th>Round off :</th>
                             <th>{{payment_data_round_off_money}}</th>
-                            <th>Total : </th>
+                            <th></th>
+                            <th>Round Off : </th>
+                            <th>- {{sale_date_round_off}}</th>
+                            
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>Grand Total : </th>
                             <th>{{payment_data_total_money}}</th>
                             <th></th>
-                            <th>Total : </th>
+                            <th>Grand Total : </th>
                             <th>{{sale_data_money}}</th>
                         </tr>
                     </tfoot>
