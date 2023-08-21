@@ -125,21 +125,4 @@ From to Where
 <script src="{% static 'vendor/datatables/js/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'vendor/datatables/js/buttons.bootstrap4.min.js' %}"></script> 
 
-<script>
-    $(document).ready(function(){
-         $('#example').DataTable();
-        $('.suppliername').on("change",function(){
-            var id=$(this).val();
-            // alert(id)
-            $.ajax({
-                url: "{% url 'getsupplier' %}",
-                data : { 'sid' : id },
-                success : function(data){
-                   $('.card .pending-amount').val(data)
-                }
-            });
-        });
-    });
-</script>
-
 {% endblock content %}

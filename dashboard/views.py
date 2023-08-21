@@ -7,6 +7,7 @@ from django.contrib.auth.models import Group, User
 from django.db.models import Avg, Max, Min, Sum
 from django.shortcuts import redirect, render
 from num2words import num2words
+from django.db.models import F
 
 from customer.models import *
 from pages.models import *
@@ -20,10 +21,13 @@ from supplier.models import *
 @login_required(login_url='login')
 def dashboard(request):
     if request.user.groups.filter(name='Estimate').exists():
-        sale = 0
         Customer_data = Customer_estimate.objects.all().count()
         Supplier_data = Supplier_estimate.objects.all().count()
         Product_data = Product_estimate.objects.all().count()
+
+        #Get All the sales Data and Purchase Data.
+        total_sale_data = Estimate_sales.objects.all()
+        total_purhcase_data = Estimate_Purchase.objects.all()
 
         #Today Estimate Sale
         today_sale = 0
@@ -31,7 +35,7 @@ def dashboard(request):
         month = now.month
         year = now.year
         day = now.day
-        today_sale_record_estimate = Estimate_sales.objects.filter(date=now)
+        today_sale_record_estimate = total_sale_data.filter(date=now)
         if today_sale_record_estimate.count() > 0:
             totalsale = today_sale_record_estimate.aggregate(Sum('Total_amount'))
             round_off = today_sale_record_estimate.aggregate(Sum('Round_off'))
@@ -43,7 +47,7 @@ def dashboard(request):
             today_sale = 0
 
         # Total Estimate Sale
-        total_sale_records_estimate = Estimate_sales.objects.all()
+        total_sale_records_estimate = total_sale_data
         if total_sale_records_estimate.count() > 0:    
             totalsale = total_sale_records_estimate.aggregate(Sum('Total_amount'))
             round_off = total_sale_records_estimate.aggregate(Sum('Round_off'))
@@ -55,7 +59,7 @@ def dashboard(request):
             sale = 0
 
         #Current Month Estimate Sale
-        current_month_records_estmate = Estimate_sales.objects.filter(date__month=month , date__year=year)
+        current_month_records_estmate = total_sale_data.filter(date__month=month , date__year=year)
         if current_month_records_estmate.count() > 0:
                 current_total = current_month_records_estmate.aggregate(Sum('Total_amount'))
                 current_roundoff = current_month_records_estmate.aggregate(Sum('Round_off'))
@@ -72,7 +76,7 @@ def dashboard(request):
         lastMonth = first - datetime.timedelta(days=1)
         lastyear = lastMonth.strftime("%Y")
         lastmonth = lastMonth.strftime("%m")
-        previous_month_sale_records_estimate = Estimate_sales.objects.filter(date__month=lastmonth,date__year=lastyear)
+        previous_month_sale_records_estimate = total_sale_data.filter(date__month=lastmonth,date__year=lastyear)
         if previous_month_sale_records_estimate.count() > 0:
             previous_total = previous_month_sale_records_estimate.aggregate(Sum('Total_amount'))
             previous_roundoff = previous_month_sale_records_estimate.aggregate(Sum('Round_off'))
@@ -89,7 +93,7 @@ def dashboard(request):
         month = now.month
         year = now.year
         day = now.day
-        total_purchase_records_estimate = Estimate_Purchase.objects.filter(date=now)
+        total_purchase_records_estimate = total_purhcase_data.filter(date=now)
 
         if total_purchase_records_estimate.count() > 0:            
             totalpurchase = total_purchase_records_estimate.aggregate(Sum('Total_amount'))
@@ -103,7 +107,7 @@ def dashboard(request):
 
 
         #Current Month Estimate Purchase
-        current_month_purchase_records_estimate = Estimate_Purchase.objects.filter(date__month=month,date__year=year)
+        current_month_purchase_records_estimate = total_purhcase_data.filter(date__month=month,date__year=year)
         if current_month_purchase_records_estimate.count() > 0:
             current_total_purchase = current_month_purchase_records_estimate.aggregate(Sum('Total_amount'))
             current_roundoff_purchase = current_month_purchase_records_estimate.aggregate(Sum('Round_off'))
@@ -115,7 +119,7 @@ def dashboard(request):
             current_month_purchase = 0
 
         # Previous Month Estimate Purchase
-        previous_month_purchase_records_estimate = Estimate_Purchase.objects.filter(date__month=lastmonth,date__year=lastyear)
+        previous_month_purchase_records_estimate = total_purhcase_data.filter(date__month=lastmonth,date__year=lastyear)
     
         if previous_month_purchase_records_estimate.count() > 0:
             previous_purchase_total = previous_month_purchase_records_estimate.aggregate(Sum('Total_amount'))
@@ -128,7 +132,7 @@ def dashboard(request):
             previous_month_total_purchase = 0
 
         #Total Estimate Purchase
-        total_purchase_records_estimate = Estimate_Purchase.objects.all()
+        total_purchase_records_estimate = total_purhcase_data
         if total_purchase_records_estimate.count() > 0:
             total_estimate_purchase = total_purchase_records_estimate.aggregate(Sum('Total_amount'))
             roundoff_estimate_purchase = total_purchase_records_estimate.aggregate(Sum('Round_off'))
@@ -150,6 +154,14 @@ def dashboard(request):
         #Total
         total_profit = sale - Total_Eatimate_Purchase
         total_profit = round(total_profit , 2)
+
+        #OutofStock
+        stocks_with_min_quantity = Stock_estimate.objects.annotate(min_stock=F('product__minimum_stock')).filter(quantity__lte=F('min_stock'))
+        out_of_stock = stocks_with_min_quantity.count()
+
+        #In stock data
+        stock_data = Stock_estimate.objects.all().count()
+        stock_data = int(stock_data) - int(out_of_stock)
         
         context = {
             'customerdata':Customer_data,
@@ -164,7 +176,9 @@ def dashboard(request):
             'Total_Eatimate_Purchase':Total_Eatimate_Purchase,
             'current_month_profit' : current_month_profit,
             'previous_month_profit' : previous_month_profit,
-            'total_profit' : total_profit
+            'total_profit' : total_profit,
+            'out_of_stock' : out_of_stock,
+            'remaining_stock_data' : stock_data
         }
         return render(request,"pages/dashboard.html",context)
     

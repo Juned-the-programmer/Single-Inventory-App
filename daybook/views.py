@@ -48,7 +48,7 @@ def dailyincome(request):
 def dailyexpense(request):
     try:
         if request.method == 'POST':
-            if request.user.groups.filter(name='GST').exists():
+            if request.user.groups.filter(name='Estimate').exists():
                 DailyExpense = dailyexpense_gst(
                     category=request.POST['category'],
                     amount=request.POST['amount'],

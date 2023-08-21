@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group, User
 from django.db.models import Avg, Max, Min, Sum
 from django.shortcuts import redirect, render
 from num2words import num2words
+from django.db.models import F
 
 from customer.models import *
 from daybook.models import *
@@ -175,28 +176,17 @@ def salereport(request):
         return redirect('error404')
 
 @login_required(login_url='login')
-def getsupplier(request):
-    sid = request.GET['sid']
-    
-    if request.user.groups.filter(name='Estimate').exists():
-        supplier = supplieraccount_estimate.objects.get(id=1)
-        amount = supplier.amount
-        print(amount)
-    
-    if request.user.groups.filter(name='GST').exists():
-        supplier = supplieraccount_estimate.objects.get(id=1)
-        amount = supplier.amount
-        print(amount)
-    
-    return HttpResponse(amount)
-
-@login_required(login_url='login')
 def outofstock(request):
-    return render(request,'statements/outofstock.html')
+    if request.user.groups.filter(name='Estimate').exists():
+        if request.method=='GET':
+            stocks_with_min_quantity = Stock_estimate.objects.annotate(min_stock=F('product__minimum_stock')).filter(quantity__lte=F('min_stock'))
+            context = {
+                'stocks_with_min_quantity': stocks_with_min_quantity
+            }
+            return render(request, 'statements/outofstock.html', context)
 
 @login_required(login_url='login')
 def customerstatement(request):
-    
     if request.user.groups.filter(name='Estimate').exists():
         customer_data = Customer_estimate.objects.all()
         customer_pending_amount = customeraccount_estimate.objects.all()

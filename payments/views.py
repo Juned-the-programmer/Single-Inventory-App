@@ -29,7 +29,7 @@ def supplierpayment(request):
                 round_off = round_off
             )
         
-            supplieraccountdata = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']).id)
+            supplieraccountdata = supplieraccount_estimate.objects.get(supplier_name = request.POST['supplier-name'])
 
             supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
             supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
@@ -85,13 +85,13 @@ def customerpayment(request):
                 round_off = 0
 
             CustomerPay = customerpay_estimate (
-                customer_name = customeraccount_estimate.objects.get(id=request.POST['customer']).customer_name,
+                customer_name = Customer_estimate.objects.get(id=request.POST['customer']),
                 pending_amount = request.POST['pending_amount'],
                 paid_amount = request.POST['paid_amount'],
                 round_off = round_off,
                 Description = request.POST['Description']
             )
-            customerdata = customeraccount_estimate.objects.get(id=request.POST['customer'])
+            customerdata = customeraccount_estimate.objects.get(customer_name=request.POST['customer'])
 
             customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount']) 
             customerdata.amount = customerdata.amount - float(round_off)
@@ -129,10 +129,10 @@ def customerpayment(request):
     d1 = date_.strftime("%d/%m/%Y")
 
     if request.user.groups.filter(name='Estimate').exists():
-        customer_data = customeraccount_estimate.objects.all()
+        customer_data = Customer_estimate.objects.all()
     
     if request.user.groups.filter(name='GST').exists():
-        customer_data = customeraccount_gst.objects.all()
+        customer_data = Customer_gst.objects.all()
 
     context = {
         'd1':d1,
@@ -143,7 +143,7 @@ def customerpayment(request):
 @login_required(login_url='login')
 def supplier_dueamount_estimate(request):
     sid = request.GET['sid']
-    supplierdata = supplieraccount_estimate.objects.get(id = supplieraccount_estimate.objects.get(supplier_name = sid).id)
+    supplierdata = supplieraccount_estimate.objects.get(supplier_name = sid)
     pendingamount = supplierdata.amount
 
     return HttpResponse(pendingamount)
@@ -151,7 +151,7 @@ def supplier_dueamount_estimate(request):
 @login_required(login_url='login')
 def customer_dueamount_estimate(request):
     cid = request.GET['cid']
-    customerdata = customeraccount_estimate.objects.get(id = customeraccount_estimate.objects.get(id=cid).id)
+    customerdata = customeraccount_estimate.objects.get(customer_name = cid)
     pendingamount = customerdata.amount
 
     return HttpResponse(pendingamount)

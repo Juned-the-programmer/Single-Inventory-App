@@ -41,32 +41,26 @@ def addsale(request):
         
             Estimatesale = Estimate_sales(
                 Bill_no=request.POST['bill_no'],
-                customer = Customer_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id),
+                customer = Customer_estimate.objects.get(id=request.POST['customer']),
                 Total_amount=request.POST['total'],
                 Due_amount=request.POST['oldamt'],
                 Round_off=Round_off,
                 Grand_total=request.POST['gtot']
             )
-
-            customerAccount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']))
+            customerAccount = customeraccount_estimate.objects.get(customer_name = request.POST['customer'])
             customerAccount.amount = float(Grand_total)
-            customerAccount.save()
             
             if cash_on_hand == 0:
                 print("Customer Payment")
             else:
                 CustomerPay = customerpay_estimate (
-                    customer_name = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']).id).customer_name,
+                    customer_name = request.POST['customer'],
                     pending_amount = Grand_total,
                     paid_amount = cash_on_hand,
                     round_off = 0
                 )
                 CustomerPay.save()
-
-            customerdata = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']).id)
-            pendingamount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']).id).amount
-            customerdata.amount  = float(pendingamount) - float(cash_on_hand)
-            
+                customerAccount.amount  = float(customerAccount.amount) - float(cash_on_hand)
 
             for i in range(0,esc):
                 if len(request.POST['dis'+str(i)]) >= 1:
@@ -93,8 +87,8 @@ def addsale(request):
 
                 estimate.save()
 
+            customerAccount.save()
             Estimatesale.save()
-            customerdata.save()
 
         if request.user.groups.filter(name='GST').exists():
             if len(request.POST['roff']) >= 1:
@@ -416,8 +410,8 @@ def sellingprice_estimate(request):
     last_rate = 0
     pk_id = 0
     
-    if Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(fullname=cname)).count() >= 1:
-        customer_id = Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(fullname=cname)).last()
+    if Estimate_sales.objects.filter(customer = cname).count() >= 1:
+        customer_id = Estimate_sales.objects.filter(customer = cname).last()
         pk_id = customer_id.Bill_no
 
     if estimatesales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:

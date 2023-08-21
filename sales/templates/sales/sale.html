@@ -37,7 +37,7 @@ Add Sales
                         <!-- style="margin-left: 150px; margin-right: 100px;" -->
                         <option selected>------------------------------------------Select Customer---------------------------------------------</option>
                             {% for i in Customer_data %}
-                                <option value="{{i.fullname}}">{{i.fullname}}</option>
+                                <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                     </select>
                 <br>
