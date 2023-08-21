@@ -140,7 +140,7 @@ def addpurchase(request):
         Supplier_data = Supplier_estimate.objects.all()
 
         if Estimate_Purchase.objects.all().exists():
-            new_bill = Estimate_Purchase.objects.last().Bill_no
+            new_bill = Estimate_Purchase.objects.all().count()
             new_bill = new_bill + 1
         else:
             new_bill = 1

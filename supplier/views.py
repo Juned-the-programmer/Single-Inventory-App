@@ -4,7 +4,7 @@ import string
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from .models import *
 
@@ -13,12 +13,12 @@ from .models import *
 def is_unique_id_unique(unique_id, request):
     #Check for the Unique ID
     if request.user.groups.filter(name='Estimate').exists():
-        from .models import Customer_estimate
-        return not Customer_estimate.objects.filter(customer_id=unique_id).exists()
+        from .models import Supplier_estimate
+        return not Supplier_estimate.objects.filter(supplier_id=unique_id).exists()
     
     if request.user.groups.filter(name='GST').exists():
-        from .models import Customer_gst
-        return not Customer_gst.objects.filter(customerid=unique_id).exists()
+        from .models import Supplier_gst
+        return not Supplier_gst.objects.filter(supplierid=unique_id).exists()
 
 def generate_unique_id(full_name, request):
     # Extract first letter of first name and last name from the full name
@@ -42,55 +42,51 @@ def generate_unique_id(full_name, request):
 
 @login_required(login_url='login')
 def addsupplier(request):
-    try:
-        if request.method == 'POST':
-            if request.user.groups.filter(name='Estimate').exists():
-                supplier = Supplier_estimate(
-                    supplier_id=generate_unique_id(request.POST['fullname'], request),
-                    fullname = request.POST['fullname'],
-                    contactno = request.POST['mobile'],
-                    city = request.POST['city'],
-                    state = request.POST['state'],
-                    landmark = request.POST['landmark']
-                )
-                supplier.save()
-                messages.success(request , "Added Supplier Successfully ! ")
-           
-            if request.user.groups.filter(name='GST').exists():
-                supplier = Supplier_gst(
-                    supplierid=generate_unique_id(request.POST['fullname'], request),
-                    fullname = request.POST['fullname'],
-                    email = request.POST['email'],
-                    contactno = request.POST['mobile'],
-                    gst = request.POST['gstno'],
-                    city = request.POST['city'],
-                    state = request.POST['state'],
-                    landmark = request.POST['landmark']
-                )
-                supplier.save()
-                messages.success(request, "Added Supplier Successfully ! ")
-                
+    if request.method == 'POST':
         if request.user.groups.filter(name='Estimate').exists():
-            if Supplier_estimate.objects.all().exists():
-                supplierdata_estimate = Supplier_estimate.objects.all().count()
-                supplierid_estimate = supplierdata_estimate + 1
-            else:
-                supplierid_estimate = 1
-
-        if request.user.groups.filter(name='GST').exists():
-            if Supplier_gst.objects.all().exists():
-                supplierdata_gst = Supplier_gst.objects.all().count()
-                supplierid_gst = supplierdata_gst + 1
-            else:
-                supplierid_gst = 1
+            supplier = Supplier_estimate(
+                supplier_id=generate_unique_id(request.POST['fullname'], request),
+                fullname = request.POST['fullname'],
+                contactno = request.POST['mobile'],
+                city = request.POST['city'],
+                state = request.POST['state'],
+                landmark = request.POST['landmark']
+            )
+            supplier.save()
+            messages.success(request , "Added Supplier Successfully ! ")
         
-        context = {
-            'supplierid_estimate' : supplierid_estimate,
-            'supplierid_gst' : supplierid_gst
-        }
-        return render(request,"supplier/addsupplier.html",context)
-    except:
-        return redirect('error404')
+        if request.user.groups.filter(name='GST').exists():
+            supplier = Supplier_gst(
+                supplierid=generate_unique_id(request.POST['fullname'], request),
+                fullname = request.POST['fullname'],
+                email = request.POST['email'],
+                contactno = request.POST['mobile'],
+                gst = request.POST['gstno'],
+                city = request.POST['city'],
+                state = request.POST['state'],
+                landmark = request.POST['landmark']
+            )
+            supplier.save()
+            messages.success(request, "Added Supplier Successfully ! ")
+            
+    if request.user.groups.filter(name='Estimate').exists():
+        if Supplier_estimate.objects.all().exists():
+            supplierdata_estimate = Supplier_estimate.objects.all().count()
+            supplier_id = supplierdata_estimate + 1
+        else:
+            supplier_id = 1
+
+    if request.user.groups.filter(name='GST').exists():
+        if Supplier_gst.objects.all().exists():
+            supplierdata_gst = Supplier_gst.objects.all().count()
+            supplier_id = supplierdata_gst + 1
+        else:
+            supplier_id = 1
+    
+    context = {
+        'supplier_id' : supplier_id
+    }
+    return render(request,"supplier/addsupplier.html",context)
 
 
 @login_required(login_url='login')

@@ -162,7 +162,7 @@ def addsale(request):
         Customer_data = Customer_estimate.objects.all()
 
         if Estimate_sales.objects.all().exists():
-            new_billno = Estimate_sales.objects.last().Bill_no
+            new_billno = Estimate_sales.objects.all().count()
             new_billno = new_billno + 1
         else:
             new_billno = 1
@@ -440,8 +440,8 @@ def previous_discount_estimate(request):
     last_discount = 0
     pk_id = 0
     
-    if Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(fullname=cname)).count() >= 1:
-        customer_id = Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(fullname=cname)).last()
+    if Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(id=cname)).count() >= 1:
+        customer_id = Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(id=cname)).last()
         pk_id = customer_id.Bill_no
 
     if estimatesales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
@@ -464,7 +464,7 @@ def previous_discount_estimate(request):
 @login_required(login_url='login')
 def customerdue_estimate(request):
     cname = request.GET['cname']
-    camount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=cname).id)
+    camount = customeraccount_estimate.objects.get(id = cname)
     due_amount = camount.amount
 
     return HttpResponse(due_amount)
