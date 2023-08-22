@@ -48,31 +48,29 @@ def dailyincome(request):
 def dailyexpense(request):
     if request.method == 'POST':
         if request.user.groups.filter(name='Estimate').exists():
-            if 'addcategory_estimate' in request.POST:
-                Category = category_gst(
-                    category_name=request.POST['cat'],
+            if 'Estimate' in request.POST:
+                DailyExpense = dailyexpense_estimate(
+                        category=request.POST['category'],
+                        amount=request.POST['amount'],
+                        name=request.POST['name']
                 )
-                Category.save()
+                DailyExpense.save()
             else:
+                Category = category_estimate(category_name=request.POST['cat'])
+                Category.save()
+
+        if request.user.groups.filter(name='GST').exists():
+            if 'GST' in request.POST:
                 DailyExpense = dailyexpense_gst(
                     category=request.POST['category'],
                     amount=request.POST['amount'],
                     name=request.POST['name']
                 )
                 DailyExpense.save()
-
-        if request.user.groups.filter(name='GST').exists():
-            DailyExpense = dailyexpense_estimate(
-                category=request.POST['category'],
-                amount=request.POST['amount'],
-                name=request.POST['name']
-            )
-            DailyExpense.save()
-        else:
-            Category = category_estimate(
-                category_name=request.POST['cat'],
-            )
-            Category.save()
+            else:
+                Category = category_estimate(category_name=request.POST['cat'])
+                Category.save()
+            
     
     date_ = date.today()
     d1 = date_.strftime("%d/%m/%Y")
