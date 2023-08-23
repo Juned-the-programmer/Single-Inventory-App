@@ -9,14 +9,24 @@ $(document).ready(function () {
   });
 
   var product_data =[]
-    $.ajax({
-      type:"GET",
-      url: $('.product_data_estimate').attr('data-href'),
-      async : false,
-      success: function(response){
-        product_data = response
-      },
-    })
+    $('.supplier_estimate').on("change", function() {
+      $.ajax({
+          type : "GET",
+          url: $('.supplier_product').attr('data-href'),
+          data : {'supplier_name': $('#supplier_estimate').val()},
+          success : function (data) {
+              console.log(data)
+              product_data = data
+              console.log(product_data)
+              $('#prod0').html('<option value="-1">-----------------Select Product-----------------</option>');
+
+              // Add new options based on the data
+              for (var i = 0; i < data.Product_data.length; i++) {
+                  $('#prod0').append('<option value="' + data.Product_data[i].product_name + '">' + data.Product_data[i].product_name + '</option>');
+              }
+          }
+      })
+  });
 
   var counter = 1;
   $(document).on('focus', "tr td", function (e) {
@@ -38,7 +48,7 @@ $(document).ready(function () {
 
               $.ajax({
                 type:"GET",
-                url: $('#c').attr('data-href'),
+                url: $('#purchase_product_count').attr('data-href'),
                 data:{'c':counter},
                 success: function(response){
                   console.log(response)
@@ -55,8 +65,8 @@ $(document).ready(function () {
               newRow.appendTo('#itemtable')
   
               $('.product-select').select2();
-                for(var i=0;i<product_data.productdata.length;i++){
-                  $('#prod'+counter).append('<option value="'+product_data.productdata[i].product_name+'">'+product_data.productdata[i].product_name+'</option>')
+                for(var i=0;i<product_data.Product_data.length;i++){
+                  $('#prod'+counter).append('<option value="'+product_data.Product_data[i].product_name+'">'+product_data.Product_data[i].product_name+'</option>')
                 }
 
           }
@@ -78,9 +88,9 @@ $(document).ready(function () {
           }
         })
         
-        for(var i=0;i<product_data.productdata.length;i++){
-          if(product_data.productdata[i].product_name === pname){
-            $('#unit'+counter).val(product_data.productdata[i].unit)
+        for(var i=0;i<product_data.Product_data.length;i++){
+          if(product_data.Product_data[i].product_name === pname){
+            $('#unit'+counter).val(product_data.Product_data[i].unit)
           }
         }
 

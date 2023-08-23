@@ -29,7 +29,7 @@ def addpurchase(request):
 
             Estimate = Estimate_Purchase(
                 Bill_no = request.POST['bill_no'],
-                supplier = Supplier_estimate.objects.get(fullname=request.POST['supplier']),
+                supplier = Supplier_estimate.objects.get(id=request.POST['supplier']),
                 Total_amount = request.POST['total'],
                 Due_amount = Due_amount,
                 Round_off = Round_off,
@@ -37,7 +37,7 @@ def addpurchase(request):
             )
             
 
-            supplierAccount = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(fullname=request.POST['supplier']))
+            supplierAccount = supplieraccount_estimate.objects.get(supplier_name = request.POST['supplier'])
             supplierAccount.amount = float(request.POST['gtot'])
             
 
@@ -156,7 +156,7 @@ def addpurchase(request):
             new_bill = 1
 
     context = {
-        'Product_data' : Product_data,
+        # 'Product_data' : Product_data,
         'Supplier_data' : Supplier_data,
         'new_bill' : new_bill,
         'd1' : d1,
@@ -384,7 +384,7 @@ def purchaseinvoice(request,pk):
 @login_required(login_url='login')
 def supplierdueamount_estimate(request):
     cname = request.GET['cname']
-    camount = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(fullname=cname).id)
+    camount = supplieraccount_estimate.objects.get(supplier_name = cname)
     due_amount = camount.amount
 
     return HttpResponse(due_amount)
@@ -398,8 +398,8 @@ def purchaseprice_estimate(request):
     last_rate = 0
     pk_id = 0
     
-    if Estimate_Purchase.objects.filter(supplier = Supplier_estimate.objects.get(fullname=sname)).count() >= 1:
-        customer_id = Estimate_Purchase.objects.filter(supplier = Supplier_estimate.objects.get(fullname=sname)).last()
+    if Estimate_Purchase.objects.filter(supplier = sname).count() >= 1:
+        customer_id = Estimate_Purchase.objects.filter(supplier = sname).last()
         pk_id = customer_id.Bill_no
 
     if estimatepurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
@@ -436,6 +436,12 @@ def gstpurchasec(request):
 def getproducts_estimate(request):
     productdata = Product_estimate.objects.all()
     return JsonResponse({"productdata":list(productdata.values())})
+
+@login_required(login_url='login')
+def supplier_products(request):
+    product_data = Product_estimate.objects.filter(supplier=request.GET['supplier_name'])
+    print(product_data)
+    return JsonResponse({"Product_data":list(product_data.values())})
 
 # GST Start Here
 def supplier_state_gst(request):

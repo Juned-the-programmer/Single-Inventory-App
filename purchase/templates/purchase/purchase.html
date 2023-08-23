@@ -41,7 +41,7 @@ Estimate Purchase
                         <select name="supplier" id="supplier_estimate" class="form-control supplier_estimate">
                             <option selected>-----------------------Select Supplier-----------------------</option>
                             {% for i in Supplier_data %}
-                                <option value="{{i.fullname}}">{{i.fullname}}</option>
+                                <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                         </select>
                         <br>
@@ -71,9 +71,6 @@ Estimate Purchase
                                 <div class="combo0">
                                     <select name="prod0" id="prod0" placeholder="Select Product" class="product-select form-control">
                                         <option value="-1" selected>-----------------Select Product-----------------</option>
-                                        {% for i in Product_data %}
-                                            <option value="{{i.product_name}}">{{i.product_name}}</option>
-                                        {% endfor %}
                                     </select>
                                 </div>
                             </td>
@@ -136,8 +133,8 @@ Estimate Purchase
 </div>
 
 <div class="purchaseprice" data-href="{% url 'purchaseprice_estimate' %}"></div>
-<div class="product_data_estimate" data-href="{% url 'product_data_estimate' %}"></div>
-<div id="c" data-href="{% url 'estimatepurchasec' %}"></div>
+<div class="supplier_product" data-href="{% url 'supplier_product' %}"></div>
+<div id="purchase_product_count" data-href="{% url 'estimatepurchasec' %}"></div>
 
 {% else %}
 <div class="row">
