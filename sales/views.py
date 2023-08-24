@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.db.models import Max
+from django.core.cache import cache
 
 from dashboard.models import *
 from products.models import *
@@ -405,77 +407,81 @@ def saleinvoice(request,pk):
 def sellingprice_estimate(request):
     pname = request.GET['pname']
     cname = request.GET['cname']
-    rate_ = 0
-    last_price = 0
-    last_rate = 0
-    pk_id = 0
     
-    if Estimate_sales.objects.filter(customer = cname).count() >= 1:
-        customer_id = Estimate_sales.objects.filter(customer = cname).last()
-        pk_id = customer_id.Bill_no
+    # Get the latest Bill_no for the customer
+    last_bill_no = Estimate_sales.objects.filter(customer=cname).aggregate(Max('Bill_no'))['Bill_no__max']
+    
+    if last_bill_no:
+        # Get the latest product rate for the customer and product
+        last_rate = estimatesales_Product.objects.filter(Bill_no=last_bill_no, product_name=pname).last()
+        if last_rate:
+            return HttpResponse(last_rate.rate)
+    
+    # If no relevant records found, fallback to product estimate
+    last_price = Product_estimate.objects.get(product_name=pname).selling_price
+    return HttpResponse(last_price)
 
-    if estimatesales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
-        product_rate = estimatesales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).last()
-        rate_ = product_rate.rate
-        print(rate_)
-    else:
-        last_price = Product_estimate.objects.get(product_name=pname).selling_price
-
-
-    if len(str(rate_)) > 1:
-        last_rate = rate_
-        print(last_rate)
-    else:
-        last_rate = last_price
-        print(last_rate)
-        
-    return HttpResponse(last_rate)
 
 @login_required(login_url='login')
 def previous_discount_estimate(request):
     pname = request.GET['pname']
     cname = request.GET['cname']
-    rate_ = 0
-    last_price = 0
-    last_discount = 0
-    pk_id = 0
     
-    if Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(id=cname)).count() >= 1:
-        customer_id = Estimate_sales.objects.filter(customer = Customer_estimate.objects.get(id=cname)).last()
-        pk_id = customer_id.Bill_no
-
-    if estimatesales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
-        product_rate = estimatesales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).last()
-        rate_ = product_rate.dis
-        print(rate_)
-    else:
-        last_price = 0.0
-
-
-    if len(str(rate_)) > 1:
-        last_discount = rate_
-        print(last_discount)
-    else:
-        last_discount = last_price
-        print(last_discount)
-
-    return HttpResponse(last_discount)
+    # Get the latest Bill_no for the customer
+    last_bill_no = Estimate_sales.objects.filter(customer=cname).aggregate(Max('Bill_no'))['Bill_no__max']
+    
+    if last_bill_no:
+        # Get the latest product discount for the customer and product
+        last_discount = estimatesales_Product.objects.filter(Bill_no=last_bill_no, product_name=pname).last()
+        if last_discount:
+            return HttpResponse(last_discount.dis)
+    
+    # If no relevant records found, return 0.0 as default
+    return HttpResponse(0.0)
 
 @login_required(login_url='login')
 def customerdue_estimate(request):
     cname = request.GET['cname']
-    camount = customeraccount_estimate.objects.get(id = cname)
+    camount = customeraccount_estimate.objects.get(customer_name = cname)
     due_amount = camount.amount
 
     return HttpResponse(due_amount)
 
+@login_required(login_url='login')
 def product_data_estimate(request):
-    productdata = Product_estimate.objects.all()
-    return JsonResponse({"productdata":list(productdata.values())})
+    cache_key = "product_data_estimate_cache" 
+    cached_productdata = cache.get(cache_key)
 
-def stock_data_estimate(request):
-    stock_data = Stock_estimate.objects.all()
-    return JsonResponse({"stock_data":list(stock_data.values())})
+    # Check for caching data weather that is there or not.
+    if cached_productdata is None:
+        productdata = list(Product_estimate.objects.values())
+        cache.set(cache_key, productdata, timeout=None)
+        print("Non Cached Data")
+    else:
+        productdata = cached_productdata
+        print("cached Data")
+
+    return JsonResponse({"productdata": productdata})
+
+@login_required(login_url='login')
+def selected_product(request):
+    productname = request.GET['product_name']
+    product_data = Product_estimate.objects.get(product_name= productname)
+    stock_data = Stock_estimate.objects.get(product = product_data.id)
+    print(stock_data.quantity)
+
+    if (stock_data.quantity == 0):
+        quantity = 0
+    else:
+        quantity = stock_data.quantity
+
+    product_data_values = {
+        'product_name' : product_data.product_name,
+        'product_unit' : product_data.unit,
+        'quantity' : quantity
+    }
+
+    return JsonResponse({"product_data" : product_data_values})
 
 def stock_data_gst(request):
     stock_data = Stock_gst.objects.objects.all()

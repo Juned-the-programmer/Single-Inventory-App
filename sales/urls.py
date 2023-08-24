@@ -12,7 +12,7 @@ urlpatterns = [
     path('previous_discount_estimate/',views.previous_discount_estimate,name="previous_discount_estimate"),
     path('customerdue_estimate/',views.customerdue_estimate,name="customerdue_estimate"),
     path('product_data_estimate/',views.product_data_estimate,name="product_data_estimate"),
-    path('stock_data_estimate/',views.stock_data_estimate,name="stock_data_estimate"),
+    path('selected_product/',views.selected_product, name="selected_product"),
     # Ajax Call for GST Sale Start here
     path('gstsalec/',views.gstsalec,name="gstsalec"),
     path('product_data_gst/',views.product_data_gst,name="product_data_gst"),

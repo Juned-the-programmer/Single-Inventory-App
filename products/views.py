@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect, render
+from django.core.cache import cache
 
 from .models import *
 
@@ -23,6 +24,10 @@ def addproduct(request):
                 )
                 product.save()
                 messages.success(request, "Product Addedd Successfully ! ")
+
+                # Populate the new value to caching by refreshing the entire chache
+                cache_product_data()
+                
             
             if request.user.groups.filter(name='GST').exists():
                 product = Product_gst(
@@ -111,3 +116,8 @@ def updateproduct(request,pk):
         return render(request,"products/updateproduct.html",context)
     except:
         return redirect('error404')
+
+def cache_product_data():
+    cache_key = "product_data_estimate_cache"
+    product_data = list(Product_estimate.objects.values())
+    cache.set(cache_key, product_data, timeout=None)

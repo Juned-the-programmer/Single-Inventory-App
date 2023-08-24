@@ -1,0 +1,12 @@
+Install memchached in local or production server.
+
+sudo dnf install memcached
+
+sudo systemctl start memcached
+
+sudo systemctl enable memcached
+
+sudo systemctl status memcached
+
+
+Other than this code is already in the codebase for caching.

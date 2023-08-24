@@ -9,7 +9,6 @@ $(document).ready(function () {
   });
 
   var product_data =[]
-    var stock = []
     $.ajax({
       type:"GET",
       url: $('.product_data_estimate').attr('data-href'),
@@ -18,17 +17,6 @@ $(document).ready(function () {
         product_data = response
       },
     })
-
-    $.ajax({
-      type:"GET",
-      url: $('.stock_data_estimate').attr('data-href'),
-      async : false,
-      success: function(response){ 
-        stock = response
-      },
-    })
-    console.log(product_data);
-    console.log(stock);
 
   var counter = 1;
   $(document).on('focus', "tr td", function (e) {
@@ -104,55 +92,22 @@ $(document).ready(function () {
           }
         })
 
-        for(var i=0;i<product_data.productdata.length;i++){
-          if(product_data.productdata[i].product_name === pname){
-            $('#unit'+counter).val(product_data.productdata[i].unit)
-          }
-          if(product_data.productdata[i].product_name === pname){
-            var id = product_data.productdata[i].id;
-            if(stock.stock_data[i].product_id === id){
-                var stock_check = stock.stock_data[i]
-                if (stock_check.quantity <= 0){
-                  $('#qty'+counter).prop('disabled',true)
-                  alert("you don't have enough stock")
-                }
-                else{
-                  $('#qty'+counter).prop('disabled',false)
-                  $('#qty'+counter).attr('max',stock_check.quantity)
-                }
+        $.ajax({
+          type: "GET",
+          url : $('.selected_product').attr('data-href'),
+          data : {'product_name' : pname},
+          success : function(data) {
+            var product_data = data.product_data
+            $('#unit'+counter).val(product_data.product_unit)
+            if(product_data.quantity == 0){
+              $('#qty'+counter).prop('disabled',true)
+              alert("you don't have enough stock")
+            } else {
+              $('#qty'+counter).prop('disabled',false)
+              $('#qty'+counter).attr('max', product_data.quantity)
             }
           }
-        }
-
-
-        // $.ajax({
-        //   type:"GET",
-        //   url: $('.punit').attr('data-href'),
-        //   data:{'pname':pname},
-        //   success: function(response){
-        //     $('#unit'+counter).val(response)
-        //   },
-        //   error: function(response){
-        //     console.log("error not data found")
-        //   }
-        // })
-        
-        // $.ajax({
-        //   type:"GET",
-        //   url: $('#check_stock_estimate').attr('data-href'),
-        //   data:{'pname':pname},
-        //   success: function(response){
-        //     if(response <= 0){
-        //       $('#qty'+counter).prop('disabled',true)
-        //       alert("you don't have enough stock")
-        //     }
-        //     else{
-        //       $('#qty'+counter).prop('disabled',false)
-        //       $('#qty'+counter).attr('max',response)
-        //       console.log(response);    
-        //     }
-        //   }
-        // })
+        })
 
       })
       var id = $(this).closest('tr').attr('itemid');

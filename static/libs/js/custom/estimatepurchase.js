@@ -15,9 +15,7 @@ $(document).ready(function () {
           url: $('.supplier_product').attr('data-href'),
           data : {'supplier_name': $('#supplier_estimate').val()},
           success : function (data) {
-              console.log(data)
               product_data = data
-              console.log(product_data)
               $('#prod0').html('<option value="-1">-----------------Select Product-----------------</option>');
 
               // Add new options based on the data
