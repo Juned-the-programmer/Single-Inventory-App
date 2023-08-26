@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.db.models import Max
 
 from products.models import *
 
@@ -41,7 +42,7 @@ def addpurchase(request):
             supplierAccount.amount = float(request.POST['gtot'])
             
 
-            for i in range(0,epc):
+            for i in range(0,estimate_purchase_product_list_count):
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:
@@ -136,7 +137,6 @@ def addpurchase(request):
     d1 = date_.strftime("%d/%m/%Y")
 
     if request.user.groups.filter(name='Estimate').exists():
-        Product_data = Product_estimate.objects.all()
         Supplier_data = Supplier_estimate.objects.all()
 
         if Estimate_Purchase.objects.all().exists():
@@ -146,7 +146,6 @@ def addpurchase(request):
             new_bill = 1
 
     if request.user.groups.filter(name='GST').exists():
-        Product_data = Product_gst.objects.all()
         Supplier_data = Supplier_gst.objects.all()
 
         if GST_Purchase.objects.all().exists():
@@ -156,7 +155,6 @@ def addpurchase(request):
             new_bill = 1
 
     context = {
-        # 'Product_data' : Product_data,
         'Supplier_data' : Supplier_data,
         'new_bill' : new_bill,
         'd1' : d1,
@@ -391,51 +389,41 @@ def supplierdueamount_estimate(request):
 
 @login_required(login_url='login')
 def purchaseprice_estimate(request):
-    pname = request.GET['pname']
-    sname = request.GET['sname']
-    rate_ = 0
-    last_price = 0
-    last_rate = 0
-    pk_id = 0
+    product_name = request.GET['pname']
+    supplier_name = request.GET['sname']
     
-    if Estimate_Purchase.objects.filter(supplier = sname).count() >= 1:
-        customer_id = Estimate_Purchase.objects.filter(supplier = sname).last()
-        pk_id = customer_id.Bill_no
+    # Get the latest Bill_no for the customer
+    last_bill_no = Estimate_Purchase.objects.filter(supplier=supplier_name).aggregate(Max('Bill_no'))['Bill_no__max']
+    
+    if last_bill_no:
+        # Get the latest product rate for the customer and product
+        last_rate = estimatepurchase_Product.objects.filter(Bill_no=last_bill_no, product_name=product_name).last()
 
-    if estimatepurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
-        product_rate = estimatepurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).last()
-        rate_ = product_rate.rate
-        print(rate_)
-    else:
-        last_price = Product_estimate.objects.get(product_name=pname).selling_price
+        product_unit = Product_estimate.objects.get(product_name=product_name).unit
+        if last_rate:
+            response_data = {
+                "last_price" : last_rate.rate,
+                "product_unit" : product_unit
+            }
+            return JsonResponse(response_data)
+    
+    # If no relevant records found, fallback to product estimate
+    last_price = Product_estimate.objects.get(product_name=product_name).selling_price
 
+    # Unit of Product
+    product_unit = Product_estimate.objects.get(product_name=product_name).unit
 
-    if len(str(rate_)) > 1:
-        last_rate = rate_
-        print(last_rate)
-    else:
-        last_rate = last_price
-        print(last_rate)
-
-    return HttpResponse(last_rate)
-
-@login_required(login_url='login')
-def estimatepurchasec(request):
-    global epc
-    epc=int(request.GET['c'])
-    print(epc)
-    return HttpResponse(epc)
-
-@login_required(login_url='login')
-def gstpurchasec(request):
-    global gstp
-    gstp=int(request.GET['c'])
-    return HttpResponse(gstp)
+    response_data = {
+        "last_price" : last_price,
+        "product_unit" : product_unit
+    }
+    return JsonResponse(response_data)
 
 @login_required(login_url='login')
-def getproducts_estimate(request):
-    productdata = Product_estimate.objects.all()
-    return JsonResponse({"productdata":list(productdata.values())})
+def estimate_purchase_count(request):
+    global estimate_purchase_product_list_count
+    estimate_purchase_product_list_count=int(request.GET['estimate_purchase_product_count'])
+    return HttpResponse(estimate_purchase_product_list_count)
 
 @login_required(login_url='login')
 def supplier_products(request):
@@ -444,6 +432,12 @@ def supplier_products(request):
     return JsonResponse({"Product_data":list(product_data.values())})
 
 # GST Start Here
+@login_required(login_url='login')
+def gstpurchasec(request):
+    global gstp
+    gstp=int(request.GET['c'])
+    return HttpResponse(gstp)
+
 def supplier_state_gst(request):
     sname = request.GET['sname'] 
     supplier = Supplier_gst.objects.get(id=Supplier_gst.objects.get(fullname=sname).id)

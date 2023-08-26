@@ -47,7 +47,7 @@ $(document).ready(function () {
               $.ajax({
                 type:"GET",
                 url: $('#purchase_product_count').attr('data-href'),
-                data:{'c':counter},
+                data:{'estimate_purchase_product_count':counter},
                 success: function(response){
                   console.log(response)
                 },
@@ -79,30 +79,14 @@ $(document).ready(function () {
           url: $('.purchaseprice').attr('data-href'),
           data:{'pname':pname , 'sname':sname},
           success: function(response){
-            $('#rate'+counter).val(response)
+            console.log(response)
+            $('#rate'+counter).val(response.last_price)
+            $('#unit'+counter).val(response.product_unit)
           },
           error: function(response){
             console.log("error data not found")
           }
         })
-        
-        for(var i=0;i<product_data.Product_data.length;i++){
-          if(product_data.Product_data[i].product_name === pname){
-            $('#unit'+counter).val(product_data.Product_data[i].unit)
-          }
-        }
-
-        // $.ajax({
-        //   type:"GET",
-        //   url: $('.punit').attr('data-href'),
-        //   data:{'pname':pname},
-        //   success: function(response){
-        //     $('#unit'+counter).val(response)
-        //   },
-        //   error: function(response){
-        //     console.log("error not data found")
-        //   }
-        // })
 
       })
 
@@ -226,19 +210,4 @@ $(document).ready(function () {
       })
       
   });
-  
-  // $('.addpurchase').submit(function (){
-  //   var c=$('tbody').find('tr:last').attr('itemid')
-  //       $.ajax({
-  //         type:"GET",
-  //         url: $('#c').attr('data-href'),
-  //         data:{'c':c},
-  //         success: function(response){
-  //           console.log(response)
-  //         },
-  //         error: function(response){
-  //           alert("error c")
-  //         }
-  //       })
-  // })
 });

@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.signals import post_save
 import uuid
 from supplier.models import *
 
@@ -53,14 +52,3 @@ class Stock_gst(models.Model):
 
     def __str__(self):
         return str(self.product.product_name)
-    
-def create_stock_estimate(sender,instance,created,**kwargs):
-    if created:
-        Stock_estimate.objects.create(product=instance)
-
-def create_stock_gst(sender,instance,created,**kwargs):
-    if created:
-        Stock_gst.objects.create(product=instance)
-    
-post_save.connect(create_stock_estimate,sender=Product_estimate)
-post_save.connect(create_stock_gst,sender=Product_gst)

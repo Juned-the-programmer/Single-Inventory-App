@@ -1,12 +1,16 @@
 from django.db import models
 import uuid
-from django.db.models.signals import post_save
+from django.core.validators import RegexValidator
 
 # Create your models here.
 class Customer_estimate(models.Model):
+    phone_regex = RegexValidator(
+        regex=r'^[789]\d{9}$',
+        message="Invalid phone number"
+    )
     customer_id = models.CharField(max_length=10, null=True, blank=True)
     fullname = models.CharField(max_length=50)
-    contactno = models.CharField(max_length=50)
+    contactno = models.CharField(max_length=10, validators=[phone_regex], null=True, blank=True)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     landmark = models.CharField(max_length=50)
@@ -50,14 +54,3 @@ class customeraccount_gst(models.Model):
 
     def __str__(self):
         return str(self.customer_name.fullname)
-    
-def create_customer_account_estimate(sender,instance,created,**kwargs):
-    if created:
-        customeraccount_estimate.objects.create(customer_name=instance)
-
-def create_customer_account_gst(sender,instance,created,**kwargs):
-    if created:
-        customeraccount_gst.objects.create(customer_name=instance)
-        
-post_save.connect(create_customer_account_estimate,sender=Customer_estimate)
-post_save.connect(create_customer_account_gst,sender=Customer_gst)

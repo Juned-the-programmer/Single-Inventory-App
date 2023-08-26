@@ -180,7 +180,7 @@ def dashboard(request):
             'out_of_stock' : out_of_stock,
             'remaining_stock_data' : stock_data
         }
-        return render(request,"pages/dashboard.html",context)
+        return render(request,"dashboard/dashboard.html",context)
     
     if request.user.groups.filter(name='GST').exists():
         sale = 0
@@ -327,4 +327,4 @@ def dashboard(request):
             'previous_month_profit' : previous_month_profit,
             'total_profit' : total_profit
         }
-        return render(request,"pages/dashboard.html",context)
+        return render(request,"dashboard/dashboard.html",context)

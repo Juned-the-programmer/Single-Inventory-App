@@ -15,18 +15,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from . import settings
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('auth/', include('authentication.urls')),
-    path('pages/',include('pages.urls')),
-    path('',include('dashboard.urls')),
-    path('customer/', include('customer.urls')),
-    path('supplier/', include('supplier.urls')),
-    path('product/', include('products.urls')),
-    path('purchase/', include('purchase.urls')),
-    path('sale/', include('sales.urls')),
-    path('payment/', include('payments.urls')),
-    path('daybook/', include('daybook.urls')),
-    path('statement/',include('statements.urls')),
-]
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+        path('admin/', admin.site.urls),
+        path('auth/', include('authentication.urls')),
+        path('pages/',include('pages.urls')),
+        path('',include('dashboard.urls')),
+        path('customer/', include('customer.urls')),
+        path('supplier/', include('supplier.urls')),
+        path('product/', include('products.urls')),
+        path('purchase/', include('purchase.urls')),
+        path('sale/', include('sales.urls')),
+        path('payment/', include('payments.urls')),
+        path('daybook/', include('daybook.urls')),
+        path('statement/',include('statements.urls')),
+    ]
