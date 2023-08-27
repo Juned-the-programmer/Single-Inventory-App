@@ -57,12 +57,12 @@ INSTALLED_APPS = [
     'statements',
     'import_export',
     'debug_toolbar',
+    'celery_task',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -108,7 +108,7 @@ DATABASES = {
 # Caching
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',  # Choose your backend
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',  # Choose your backend
         'LOCATION': '127.0.0.1:11211',  # Memcached server address
     }
 }
@@ -137,6 +137,13 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: True,
 }
 
+# Setup celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -186,4 +193,3 @@ STATICFILES_DIRS=(
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, "live-static-files","static-root")
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

@@ -1,3 +1,5 @@
+# To setup Cache
+
 Install memchached in local or production server.
 
 sudo dnf install memcached
@@ -44,3 +46,10 @@ Profile your database queries to identify slow queries and optimize them. Django
 
 Database Scaling: 
 If your dataset is continually growing and you're experiencing performance issues, consider horizontal scaling by adding read replicas or using a database cluster.
+
+
+# To setup celery
+
+sudo dnf install python3-devel
+
+sudo dnf install redis

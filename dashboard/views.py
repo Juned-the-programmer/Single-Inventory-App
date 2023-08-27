@@ -15,6 +15,7 @@ from products.models import *
 from purchase.models import *
 from sales.models import *
 from supplier.models import *
+from .models import *
 
 # Create your views here
 
@@ -25,135 +26,35 @@ def dashboard(request):
         Supplier_data = Supplier_estimate.objects.all().count()
         Product_data = Product_estimate.objects.all().count()
 
-        #Get All the sales Data and Purchase Data.
-        total_sale_data = Estimate_sales.objects.all()
-        total_purhcase_data = Estimate_Purchase.objects.all()
+        # Loaded dashboard data 
+        dashboard_data = dashborad_data_estimate.objects.get(model_name="Dashboard Estimate Data")
 
-        #Today Estimate Sale
-        today_sale = 0
-        now = date.today()
-        month = now.month
-        year = now.year
-        day = now.day
-        today_sale_record_estimate = total_sale_data.filter(date=now)
-        if today_sale_record_estimate.count() > 0:
-            totalsale = today_sale_record_estimate.aggregate(Sum('Total_amount'))
-            round_off = today_sale_record_estimate.aggregate(Sum('Round_off'))
-            total_sale = totalsale['Total_amount__sum']
-            roundoff = round_off['Round_off__sum']
-            today_sale = float(total_sale) - float(roundoff)
-            today_sale = round(today_sale , 2)
-        else:
-            today_sale = 0
+        # Today sale
+        today_sale = dashboard_data.today_estimate_sale
 
-        # Total Estimate Sale
-        total_sale_records_estimate = total_sale_data
-        if total_sale_records_estimate.count() > 0:    
-            totalsale = total_sale_records_estimate.aggregate(Sum('Total_amount'))
-            round_off = total_sale_records_estimate.aggregate(Sum('Round_off'))
-            total_sale = totalsale['Total_amount__sum']
-            roundoff = round_off['Round_off__sum']
-            sale = float(total_sale) - float(roundoff)
-            sale = round(sale , 2)
-        else:
-            sale = 0
+        # Current Month Sale
+        current_month_sale = dashboard_data.current_month_estimate_sale
 
-        #Current Month Estimate Sale
-        current_month_records_estmate = total_sale_data.filter(date__month=month , date__year=year)
-        if current_month_records_estmate.count() > 0:
-                current_total = current_month_records_estmate.aggregate(Sum('Total_amount'))
-                current_roundoff = current_month_records_estmate.aggregate(Sum('Round_off'))
-                current_total_sale = current_total['Total_amount__sum']
-                current_roundoff_sale = current_roundoff['Round_off__sum']
-                current_month_sale = float(current_total_sale) - float(current_roundoff_sale)
-                current_month_sale = round(current_month_sale , 2)
-        else:
-            current_month_sale = 0
+        # Previous Month Sale
+        previous_month_sale = dashboard_data.previous_month_estimate_sale
 
-        #Previous Month Estimate Sale  
-        today = datetime.date.today()
-        first = today.replace(day=1)
-        lastMonth = first - datetime.timedelta(days=1)
-        lastyear = lastMonth.strftime("%Y")
-        lastmonth = lastMonth.strftime("%m")
-        previous_month_sale_records_estimate = total_sale_data.filter(date__month=lastmonth,date__year=lastyear)
-        if previous_month_sale_records_estimate.count() > 0:
-            previous_total = previous_month_sale_records_estimate.aggregate(Sum('Total_amount'))
-            previous_roundoff = previous_month_sale_records_estimate.aggregate(Sum('Round_off'))
-            previous_total_sale = previous_total['Total_amount__sum']
-            previous_roundoff_sale = previous_roundoff['Round_off__sum']
-            previous_month_sale = float(previous_total_sale) - float(previous_roundoff_sale)    
-            previous_month_sale = round(previous_month_sale , 2)
-        else:
-            previous_month_sale = 0
+        # Today Purchase
+        today_purchase = dashboard_data.today_estimate_purchase
 
-        #Today Estimate Purchase
-        today_purchase = 0
-        now = date.today()
-        month = now.month
-        year = now.year
-        day = now.day
-        total_purchase_records_estimate = total_purhcase_data.filter(date=now)
+        # Current Month Purchase
+        current_month_purchase = dashboard_data.current_month_estimate_purchase
 
-        if total_purchase_records_estimate.count() > 0:            
-            totalpurchase = total_purchase_records_estimate.aggregate(Sum('Total_amount'))
-            purchase_round_off = total_purchase_records_estimate.aggregate(Sum('Round_off'))
-            total_purchase = totalpurchase['Total_amount__sum']
-            purchaseroundoff = purchase_round_off['Round_off__sum']
-            today_purchase = float(total_purchase) - float(purchaseroundoff)
-            today_purchase = round(today_purchase , 2)
-        else:
-            today_purchase = 0
-
-
-        #Current Month Estimate Purchase
-        current_month_purchase_records_estimate = total_purhcase_data.filter(date__month=month,date__year=year)
-        if current_month_purchase_records_estimate.count() > 0:
-            current_total_purchase = current_month_purchase_records_estimate.aggregate(Sum('Total_amount'))
-            current_roundoff_purchase = current_month_purchase_records_estimate.aggregate(Sum('Round_off'))
-            current_total_eatimate_purchase = current_total_purchase['Total_amount__sum']
-            current_roundoff_estimate_purchase = current_roundoff_purchase['Round_off__sum']
-            current_month_purchase = float(current_total_eatimate_purchase) - float(current_roundoff_estimate_purchase)
-            current_month_purchase = round(current_month_purchase , 2)
-        else:
-            current_month_purchase = 0
-
-        # Previous Month Estimate Purchase
-        previous_month_purchase_records_estimate = total_purhcase_data.filter(date__month=lastmonth,date__year=lastyear)
-    
-        if previous_month_purchase_records_estimate.count() > 0:
-            previous_purchase_total = previous_month_purchase_records_estimate.aggregate(Sum('Total_amount'))
-            previous_purchase_roundoff = previous_month_purchase_records_estimate.aggregate(Sum('Round_off'))
-            previous_total_purchase = previous_purchase_total['Total_amount__sum']
-            previous_roundoff_purchase = previous_purchase_roundoff['Round_off__sum']
-            previous_month_total_purchase = float(previous_total_purchase) - float(previous_roundoff_purchase)
-            previous_month_total_purchase = round(previous_month_total_purchase , 2)
-        else:
-            previous_month_total_purchase = 0
-
-        #Total Estimate Purchase
-        total_purchase_records_estimate = total_purhcase_data
-        if total_purchase_records_estimate.count() > 0:
-            total_estimate_purchase = total_purchase_records_estimate.aggregate(Sum('Total_amount'))
-            roundoff_estimate_purchase = total_purchase_records_estimate.aggregate(Sum('Round_off'))
-            estimate_purchase = total_estimate_purchase['Total_amount__sum']
-            estimate_roundoff = roundoff_estimate_purchase['Round_off__sum']
-            Total_Eatimate_Purchase = float(estimate_purchase) - float(estimate_roundoff)
-            Total_Eatimate_Purchase = round(Total_Eatimate_Purchase , 2)
-        else:
-            Total_Eatimate_Purchase = 0
+        # Previous Month Purchase
+        previous_month_total_purchase = dashboard_data.previous_month_estimate_purchase
 
         #Current Month Profit
-        current_month_profit = current_month_sale - current_month_purchase
-        current_month_profit = round(current_month_profit , 2)
+        current_month_profit = dashboard_data.current_month_profit
 
         #Previous Month Profit
-        previous_month_profit = previous_month_sale - previous_month_total_purchase
-        previous_month_profit = round(previous_month_profit , 2)
+        previous_month_profit = dashboard_data.previous_month_profit
 
         #Total
-        total_profit = sale - Total_Eatimate_Purchase
-        total_profit = round(total_profit , 2)
+        total_profit = dashboard_data.total_profit
 
         #OutofStock
         stocks_with_min_quantity = Stock_estimate.objects.annotate(min_stock=F('product__minimum_stock')).filter(quantity__lte=F('min_stock'))
@@ -173,7 +74,6 @@ def dashboard(request):
             'today_purchase':today_purchase,
             'current_month_purchase':current_month_purchase,
             'previous_month_total_purchase':previous_month_total_purchase,
-            'Total_Eatimate_Purchase':Total_Eatimate_Purchase,
             'current_month_profit' : current_month_profit,
             'previous_month_profit' : previous_month_profit,
             'total_profit' : total_profit,
