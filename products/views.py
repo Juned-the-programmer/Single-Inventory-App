@@ -6,12 +6,14 @@ from django.core.cache import cache
 
 from .models import *
 
+''' To add / view and update Product details '''
 
-# Create your views here.
+# To add Product
 @login_required(login_url='login')
 def addproduct(request):
     try:
         if request.method == 'POST':
+            # Check for User Group
             if request.user.groups.filter(name='Estimate').exists():
                 product = Product_estimate(
                     product_name = request.POST['productname'],
@@ -22,13 +24,14 @@ def addproduct(request):
                     supplier = Supplier_estimate.objects.get(fullname=request.POST['supplier']),
                     minimum_stock =  request.POST['minimum_stock']
                 )
+                # save
                 product.save()
                 messages.success(request, "Product Addedd Successfully ! ")
 
                 # Populate the new value to caching by refreshing the entire chache
                 cache_product_data()
                 
-            
+            # Check for user Group
             if request.user.groups.filter(name='GST').exists():
                 product = Product_gst(
                     product_name = request.POST['productname'],
@@ -39,13 +42,18 @@ def addproduct(request):
                     supplier = Supplier_gst.objects.get(fullname=request.POST['supplier']),
                     minimum_stock =  request.POST['minimum_stock']
                 )
+                # Save
                 product.save()
                 messages.success(request , "Product Addedd Successfully ! ")
 
+        # check for user Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get all the supplier data Estimate
             Supplier_data = Supplier_estimate.objects.all()
-        
+
+        # Check for User Group        
         if request.user.groups.filter(name='GST').exists():
+            # Get all the supplier data
             Supplier_data = Supplier_gst.objects.all()
 
         context = {
@@ -55,13 +63,18 @@ def addproduct(request):
     except:
         return redirect('error404')
 
+# To view products
 @login_required(login_url='login')
 def viewproduct(request):
     try:
+        # Check for user Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get all the product data for Estimate
             Product_data = Product_estimate.objects.all()
-            
+
+        # Check for user Group            
         if request.user.groups.filter(name='GST').exists():
+            # Get all the product data for GST
             Product_data = Product_gst.objects.all()
             
         context = {
@@ -71,10 +84,12 @@ def viewproduct(request):
     except:
         return redirect('error404')
 
+# To update the product (request,pk) pk would be the Product ID
 @login_required(login_url='login')
 def updateproduct(request,pk):
     try:
         if request.method =='POST':
+            # Check for User group
             if request.user.groups.filter(name='Estimate').exists():
                 product = Product_estimate.objects.get(pk=pk)
 
@@ -85,6 +100,7 @@ def updateproduct(request,pk):
                 product.store_location = request.POST['storelocation']
                 product.supplier = Supplier_estimate.objects.get(fullname=request.POST['supplier'])
                 product.minimum_stock = request.POST['minimum_stock']
+                # Save
                 product.save()
                 messages.success(request, "Product Updated Successfully ! ")
 
@@ -117,6 +133,8 @@ def updateproduct(request,pk):
     except:
         return redirect('error404')
 
+''' This is used to update the cache detail. 
+When we add new product then it will update the cache to new details of all the product data '''
 def cache_product_data():
     cache_key = "product_data_estimate_cache"
     product_data = list(Product_estimate.objects.values())

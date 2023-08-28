@@ -34,17 +34,17 @@ Estimate Purchase
                         <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No"
                             value="{{new_bill}}" required readonly>
                     </div>
+                </div>
 
+                <div class="form-row">
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
-                        <br>
-                        <label for="validationCustom01"><strong style="color: black;">Supplier Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'addsupplier' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
+                        <label for="validationCustom01"><strong style="color: black;">Supplier Name <a href="{% url 'addsupplier' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
                         <select name="supplier" id="supplier_estimate" class="form-control supplier_estimate">
-                            <option selected>-----------------------Select Supplier-----------------------</option>
+                            <option selected>---------------------Select Supplier---------------------</option>
                             {% for i in Supplier_data %}
                                 <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                         </select>
-                        <br>
                     </div>
                 </div>
                 
@@ -135,6 +135,9 @@ Estimate Purchase
 <div class="purchaseprice" data-href="{% url 'purchaseprice_estimate' %}"></div>
 <div class="supplier_product" data-href="{% url 'supplier_product' %}"></div>
 <div id="purchase_product_count" data-href="{% url 'estimatepurchasec' %}"></div>
+
+<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
+<script src="{% static 'libs/js/custom/estimatepurchase.js' %}"></script>
 
 {% else %}
 <div class="row">
@@ -273,13 +276,8 @@ Estimate Purchase
 <div id="ownerstate_gst" data-href="{% url 'ownerstate_gst' %}"></div>
 <div class="purchaseprice_gst" data-href="{% url 'purchaseprice_gst' %}"></div>
 <div class="product_data_gst" data-href="{% url 'product_data_gst' %}"></div>
-{% endif %}
-
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
-{% if request.user|has_group:"Estimate" %}
-<script src="{% static 'libs/js/custom/estimatepurchase.js' %}"></script>
-{% else %}
 <script src="{% static 'libs/js/custom/gstpurchase.js' %}"></script>
 {% endif %}
 

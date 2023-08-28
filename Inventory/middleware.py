@@ -2,6 +2,9 @@ from django.http import HttpResponseForbidden
 from django.contrib.auth.models import Group
 from django.urls import reverse
 
+''' This will check for every request what we are making and make sure that the request is not anonymous request.
+In headers in user details the user should be in one of the group. OR else it will throw us error.
+'''
 class GroupValidationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response

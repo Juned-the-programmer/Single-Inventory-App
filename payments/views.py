@@ -11,12 +11,15 @@ from supplier.models import *
 
 from .models import *
 
+''' This is also a simple to add the customer and supplier payments to database and update the Accounts '''
 
-# Create your views here.
+# To add supplier Payments
 @login_required(login_url='login')
 def supplierpayment(request):
     if request.method == 'POST':
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Check for round off value
             if len(request.POST['round_off']) >= 1:
                 round_off = request.POST['round_off']
             else:
@@ -28,12 +31,15 @@ def supplierpayment(request):
                 paid_amount = float(request.POST['paid_amount']),
                 round_off = round_off
             )
-        
+
+            # Get the supplier Account details based on the supplier_name
             supplieraccountdata = supplieraccount_estimate.objects.get(supplier_name = request.POST['supplier-name'])
 
+            # Update the amount for that Supplier Account accordingly
             supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
             supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
 
+            # Save
             supplieraccountdata.save()
             SupplierPay.save()
             messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
@@ -61,10 +67,14 @@ def supplierpayment(request):
             SupplierPay.save()
             messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
+    # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
+        # Get all the supplier data
         supplier_data = Supplier_estimate.objects.all()
-
+    
+    # Check for user Group
     if request.user.groups.filter(name='GST').exists():
+        # Get all the supplier data
         supplier_data = Supplier_gst.objects.all()
 
     date_ = date.today()
@@ -75,10 +85,13 @@ def supplierpayment(request):
     }
     return render(request, 'payments/supplierpayment.html',context)
 
+# To add customer payment
 @login_required(login_url='login')
 def customerpayment(request):
     if request.method == 'POST':
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Check for round off value
             if len(request.POST['round_off']) >= 1:
                 round_off = request.POST['round_off']
             else:
@@ -91,11 +104,15 @@ def customerpayment(request):
                 round_off = round_off,
                 Description = request.POST['Description']
             )
+
+            # Get the customerData based on the customer_name
             customerdata = customeraccount_estimate.objects.get(customer_name=request.POST['customer'])
 
+            # Updating the amount value accordingly
             customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount']) 
             customerdata.amount = customerdata.amount - float(round_off)
 
+            # Save
             CustomerPay.save()
             customerdata.save()
             messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
@@ -140,6 +157,7 @@ def customerpayment(request):
     }
     return render(request, 'payments/customerpayment.html',context)
 
+# To get the supplier due amount for Estimate
 @login_required(login_url='login')
 def supplier_dueamount_estimate(request):
     sid = request.GET['sid']
@@ -148,6 +166,7 @@ def supplier_dueamount_estimate(request):
 
     return HttpResponse(pendingamount)
 
+# To get the customer due amount for Estimate
 @login_required(login_url='login')
 def customer_dueamount_estimate(request):
     cid = request.GET['cid']
