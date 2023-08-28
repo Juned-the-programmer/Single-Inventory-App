@@ -10,6 +10,8 @@ sudo systemctl enable memcached
 
 sudo systemctl status memcached
 
+pip3 install pymemcached
+
 
 Other than this code is already in the codebase for caching.
 
@@ -53,3 +55,13 @@ If your dataset is continually growing and you're experiencing performance issue
 sudo dnf install python3-devel
 
 sudo dnf install redis
+
+pip3 install celery redis
+
+export DJANGO_SETTINGS_MODULE=your_project.settings
+
+# To start celery worker
+celery -A your_project_name worker -l info
+
+# To start celery periodic task
+celery -A your_project_name beat -l info
