@@ -8,8 +8,6 @@ urlpatterns = [
     path('saleinvoice/<pk>',views.saleinvoice,name="saleinvoice"),
     #Ajax Call for Estimate Sale Start here
     path('estimatesalec/',views.estimatesalec,name="estimatesalec"),
-    # path('sellingprice_estimate/',views.sellingprice_estimate,name="sellingprice_estimate"),
-    # path('previous_discount_estimate/',views.previous_discount_estimate,name="previous_discount_estimate"),
     path('sellingprice_previous_discount_estimate/',views.sellingprice_previous_discount_estimate,name="sellingprice_previous_discount_estimate"),
     path('customerdue_estimate/',views.customerdue_estimate,name="customerdue_estimate"),
     path('product_data_estimate/',views.product_data_estimate,name="product_data_estimate"),
