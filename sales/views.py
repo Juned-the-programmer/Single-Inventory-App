@@ -403,42 +403,25 @@ def saleinvoice(request,pk):
     except:
         return redirect('error404')
 
+
 @login_required(login_url='login')
-def sellingprice_estimate(request):
-    pname = request.GET['pname']
-    cname = request.GET['cname']
-    
-    # Get the latest Bill_no for the customer
+def sellingprice_previous_discount_estimate(request):
+    pname = request.GET.get('pname')
+    cname = request.GET.get('cname')
+
     last_bill_no = Estimate_sales.objects.filter(customer=cname).aggregate(Max('Bill_no'))['Bill_no__max']
-    
-    if last_bill_no:
-        # Get the latest product rate for the customer and product
-        last_rate = estimatesales_Product.objects.filter(Bill_no=last_bill_no, product_name=pname).last()
-        if last_rate:
-            return HttpResponse(last_rate.rate)
-    
-    # If no relevant records found, fallback to product estimate
     last_price = Product_estimate.objects.get(product_name=pname).selling_price
-    return HttpResponse(last_price)
-
-
-@login_required(login_url='login')
-def previous_discount_estimate(request):
-    pname = request.GET['pname']
-    cname = request.GET['cname']
-    
-    # Get the latest Bill_no for the customer
-    last_bill_no = Estimate_sales.objects.filter(customer=cname).aggregate(Max('Bill_no'))['Bill_no__max']
-    
     if last_bill_no:
-        # Get the latest product discount for the customer and product
-        last_discount = estimatesales_Product.objects.filter(Bill_no=last_bill_no, product_name=pname).last()
-        if last_discount:
-            return HttpResponse(last_discount.dis)
-    
-    # If no relevant records found, return 0.0 as default
-    return HttpResponse(0.0)
+        product_detials = estimatesales_Product.objects.filter(Bill_no=last_bill_no, product_name=pname).last()
 
+        if product_detials:
+            return JsonResponse({"rate":product_detials.rate,"dis":product_detials.dis})
+        else:
+            return JsonResponse({"rate":last_price,"dis":float(0.0)})
+
+    return JsonResponse({"rate":last_price,"dis":float(0.0)})
+        
+        
 @login_required(login_url='login')
 def customerdue_estimate(request):
     cname = request.GET['cname']

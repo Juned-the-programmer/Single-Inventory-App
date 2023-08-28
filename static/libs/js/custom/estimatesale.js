@@ -68,24 +68,12 @@ $(document).ready(function () {
         
         $.ajax({
           type:"GET",
-          url: $('.sellingprice_estimate').attr('data-href'),
+          url: $('.sellingprice_previous_discount_estimate').attr('data-href'),
           data:{'pname':pname , 'cname':cname},
           success: function(response){
-            $('#rate'+counter).val(response)
-            // alert(response)
-          },
-          error: function(response){
-            console.log("error data not found")
-          }
-        })
-        
-        $.ajax({
-          type:"GET",
-          url: $('.previous_discount_estimate').attr('data-href'),
-          data:{'pname':pname , 'cname':cname},
-          success: function(response){
-            $('#dis'+counter).val(response)
-            // alert(response)
+            $('#rate'+counter).val(response.rate)
+            $('#dis'+counter).val(response.dis)
+            //alert(response)
           },
           error: function(response){
             console.log("error data not found")
