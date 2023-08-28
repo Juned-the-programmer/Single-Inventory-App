@@ -14,26 +14,19 @@ from products.models import *
 from .models import *
 
 
-# Create your views here.
-def estimatesalec(request):
-    global esc
-    esc=int(request.GET['c'])
-    return HttpResponse(esc)
-
-def gstsalec(request):
-    global gst
-    gst=int(request.GET['c'])
-    return HttpResponse(gst)
-
+# To add / view and update sale data
 @login_required(login_url='login')
 def addsale(request):
     if request.method == 'POST':
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Check for cash on Hand Value
             if len(request.POST['cod']):
                 cash_on_hand = request.POST['cod']
             else:
                 cash_on_hand = 0
             
+            # Check for Round off value
             if len(request.POST['roff']):
                 Round_off = request.POST['roff']
             else:
@@ -41,6 +34,7 @@ def addsale(request):
 
             Grand_total = request.POST['gtot']
         
+            # Create a Estimate sale data
             Estimatesale = Estimate_sales(
                 Bill_no=request.POST['bill_no'],
                 customer = Customer_estimate.objects.get(id=request.POST['customer']),
@@ -49,26 +43,36 @@ def addsale(request):
                 Round_off=Round_off,
                 Grand_total=request.POST['gtot']
             )
+            
+            # Get the customerAccount data based on the customer name 
             customerAccount = customeraccount_estimate.objects.get(customer_name = request.POST['customer'])
+            # Update the Grand Total
             customerAccount.amount = float(Grand_total)
             
             if cash_on_hand == 0:
                 print("Customer Payment")
             else:
+                # Create a object for Customer Pay when we have a Cash on Hand Value
                 CustomerPay = customerpay_estimate (
                     customer_name = request.POST['customer'],
                     pending_amount = Grand_total,
                     paid_amount = cash_on_hand,
                     round_off = 0
                 )
+                # Save
                 CustomerPay.save()
+                # update customer Account 
                 customerAccount.amount  = float(customerAccount.amount) - float(cash_on_hand)
 
+            # Loop through the list of prodcuts for that Sale
+            # esc : Check for declaration
             for i in range(0,esc):
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:
                     dis = 0
+
+                # Create a object
                 estimate = estimatesales_Product (
                     Bill_no = request.POST['bill_no'],
                     product_name = request.POST['prod'+str(i)],
@@ -80,15 +84,19 @@ def addsale(request):
                     total = request.POST['tot'+str(i)]
                 )
 
+                # Get the stock details based on the product_name
                 stock = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['prod'+str(i)]))
                 c = stock.quantity
                 a = int(c)
+                # Update the quantity
                 b = int(request.POST['qty'+str(i)])
                 stock.quantity = a - b
+                # save
                 stock.save()
-
+                # Save
                 estimate.save()
-
+            
+            # save
             customerAccount.save()
             Estimatesale.save()
 
@@ -159,10 +167,14 @@ def addsale(request):
     date_ = date.today()
     d1 = date_.strftime("%d/%m/%Y")
 
+    # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
+        # Get the Product Data
         Product_data = Product_estimate.objects.all()
+        # Get the customer Data
         Customer_data = Customer_estimate.objects.all()
 
+        # To get the Bill no
         if Estimate_sales.objects.all().exists():
             new_billno = Estimate_sales.objects.all().count()
             new_billno = new_billno + 1
@@ -189,10 +201,14 @@ def addsale(request):
 
 @login_required(login_url='login')
 def viewsale(request):
+    # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
+        # Get the sale data
         Sale_data = Estimate_sales.objects.all()
-
+    
+    # Check for user Group
     if request.user.groups.filter(name='GST').exists():
+        # Get the sale data
         Sale_data = gstsale.objects.all()
 
     context = {
@@ -200,9 +216,11 @@ def viewsale(request):
     }
     return render(request,"sales/viewsale.html",context)
 
+# Update the sale data
 @login_required(login_url='login')
 def updatesale(request , pk):
     if request.method == 'POST':
+        # Check for user Group
         if request.user.groups.filter(name='Estimate').exists():
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
@@ -212,18 +230,26 @@ def updatesale(request , pk):
             Grand_total = request.POST['gtot']
             old_grant_total =  request.POST['cod']
 
+            # Get the product count for that bill no
             saleproduct_count = estimatesales_Product.objects.filter(Bill_no=request.POST['bill_no']).count()
+            # Get the bill products
             bill_product = estimatesales_Product.objects.filter(Bill_no=request.POST['bill_no'])
             
+            # Iterate the loop to get update the stock data
             for j in range(0,saleproduct_count):
                 print(bill_product[j].product_name)
+                # Get the stock data
                 add_stock = Stock_estimate.objects.get(product=Product_estimate.objects.get(product_name=bill_product[j].product_name))
+                # Update the stock quantity accordingly
                 add_stock.quantity = add_stock.quantity + bill_product[j].qty
+                # save
                 add_stock.save()
 
+            # Delete the sale data
             Estimate_sales.objects.get(Bill_no=request.POST['bill_no']).delete()
             estimatesales_Product.objects.filter(Bill_no=request.POST['bill_no']).delete()
 
+            # Create a new object for sale
             Estimatesale = Estimate_sales(
                 Bill_no=request.POST['bill_no'],
                 customer = Customer_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id),
@@ -232,20 +258,23 @@ def updatesale(request , pk):
                 Round_off=request.POST['roff'],
                 Grand_total=request.POST['gtot']
             )
-            
 
+            # Creating old amount
             old_amount = float(Grand_total) - float(old_grant_total) 
 
+            # Get the customerAccount detail based on the customer
             customerAccount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']))
+            # Update the customer Account
             customerAccount.amount = float(customerAccount.amount) + float(old_amount) 
             
-
+            # Irerate loop to get add the products for that sale
             for i in range(0,esc):
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:
                     dis = 0
-                    
+                
+                # Creating a Object
                 estimate = estimatesales_Product (
                     Bill_no = request.POST['bill_no'],
                     product_name = request.POST['prod'+str(i)],
@@ -256,15 +285,19 @@ def updatesale(request , pk):
                     netrate = request.POST['nr'+str(i)],
                     total = request.POST['tot'+str(i)]
                 )
-
+                
+                # Get the stock data based on the product_name
                 stock = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['prod'+str(i)]))
                 c = stock.quantity
                 a = int(c)
                 b = int(request.POST['qty'+str(i)])
+                # Update stock quantity
                 stock.quantity = a - b
+                # Save
                 stock.save()
                 estimate.save()
 
+            # Save
             Estimatesale.save()
             customerAccount.save()
             return redirect('viewsale')
@@ -353,7 +386,9 @@ def updatesale(request , pk):
             return redirect('viewsale')
 
 
+    # Check for user Grpup
     if request.user.groups.filter(name='Estimate').exists():
+        # To get the data to get display the update page
         sale_Bill_no = Estimate_sales.objects.get(pk=pk).Bill_no
         sale_data = Estimate_sales.objects.get(Bill_no=sale_Bill_no)
         sale_product = estimatesales_Product.objects.filter(Bill_no=sale_Bill_no)
@@ -377,11 +412,15 @@ def updatesale(request , pk):
     }
     return render(request,"sales/updatesale.html",context)
 
+# To generate the Sale Invoice
 @login_required(login_url='login')
 def saleinvoice(request,pk):
     try:
+        # Check for User group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get the sale data
             sale_data = Estimate_sales.objects.get(pk=pk)
+            # Get the Product data
             product_data = estimatesales_Product.objects.filter(Bill_no = sale_data.Bill_no)
             word = 1
 
@@ -403,6 +442,10 @@ def saleinvoice(request,pk):
     except:
         return redirect('error404')
 
+# To get the selling price for that product.
+''' We will get selling price for that product. We will get that customer last bill number and check for at what price we have sold the item.
+If we don't have then we will go with the regular price. 
+This will hit on change of product name'''
 @login_required(login_url='login')
 def sellingprice_estimate(request):
     pname = request.GET['pname']
@@ -421,7 +464,10 @@ def sellingprice_estimate(request):
     last_price = Product_estimate.objects.get(product_name=pname).selling_price
     return HttpResponse(last_price)
 
-
+# To get the discount for that product.
+''' Same like selling price for this also we will get the last bill number and check for what is the discount for that customer.
+And if it is not then we will go with 0 
+This will hit on change of product name'''
 @login_required(login_url='login')
 def previous_discount_estimate(request):
     pname = request.GET['pname']
@@ -439,6 +485,9 @@ def previous_discount_estimate(request):
     # If no relevant records found, return 0.0 as default
     return HttpResponse(0.0)
 
+# To get customer Due
+''' We will get the Customer Due from the customerAccount model based on the customer name. 
+This will hit on change of customer name. '''
 @login_required(login_url='login')
 def customerdue_estimate(request):
     cname = request.GET['cname']
@@ -447,6 +496,8 @@ def customerdue_estimate(request):
 
     return HttpResponse(due_amount)
 
+# We will get the product details
+''' Here we are checking for weather we have a product details in cache or not if we have then we will go with that or else create a cache here '''
 @login_required(login_url='login')
 def product_data_estimate(request):
     cache_key = "product_data_estimate_cache" 
@@ -463,6 +514,9 @@ def product_data_estimate(request):
 
     return JsonResponse({"productdata": productdata})
 
+# To get unit and stock quantity
+''' This will hit on change of product. we will get the unit and quantity for that product, 
+As we are validating that if the stock quantity for that product is 0 then we don't allow them to change the add the quantity to sell. ''' 
 @login_required(login_url='login')
 def selected_product(request):
     productname = request.GET['product_name']
@@ -483,11 +537,19 @@ def selected_product(request):
 
     return JsonResponse({"product_data" : product_data_values})
 
-def stock_data_gst(request):
-    stock_data = Stock_gst.objects.objects.all()
-    return JsonResponse({"stock_data":list(stock_data.values())})
+# To get the count for the products what we have added in the sales.
+''' It will get the count of that how many products are there in that sale record what we are adding '''
+def estimatesalec(request):
+    global esc
+    esc=int(request.GET['c'])
+    return HttpResponse(esc)
 
 # GST sale Ajax Call
+def gstsalec(request):
+    global gst
+    gst=int(request.GET['c'])
+    return HttpResponse(gst)
+
 def product_data_gst(request):
     productdata = Product_gst.objects.all()
     return JsonResponse({"productdata":list(productdata.values())})

@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import *
 
+''' To create the stock data when we add the new product details '''
 @receiver(post_save, sender=Product_estimate)
 def create_stock_estimate(sender,instance,created,**kwargs):
     if created:

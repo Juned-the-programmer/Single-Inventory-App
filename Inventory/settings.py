@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['*']
 
 LOGOUT_REDIRECT_URL='/'
 
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app']
+
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }

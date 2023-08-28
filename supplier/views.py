@@ -8,8 +8,7 @@ from django.shortcuts import render, redirect
 
 from .models import *
 
-# Create your views here.
-
+# Method to check weather the ID what we have generated is Unique all over the database.
 def is_unique_id_unique(unique_id, request):
     #Check for the Unique ID
     if request.user.groups.filter(name='Estimate').exists():
@@ -20,6 +19,11 @@ def is_unique_id_unique(unique_id, request):
         from .models import Supplier_gst
         return not Supplier_gst.objects.filter(supplierid=unique_id).exists()
 
+# Generate the Unique ID for every customer based on the customer full name [first name and last name]
+''' Usage: 
+It will generate the Unique ID for every supplier what we are adding into the database. 
+It will extract the frrst_name and last_name from the full name and along side of that it use 4 randm number.
+Once this is assign never get change. '''
 def generate_unique_id(full_name, request):
     # Extract first letter of first name and last name from the full name
     length=6
@@ -40,10 +44,13 @@ def generate_unique_id(full_name, request):
 
     return unique_id
 
+# To add the Supplier data.
 @login_required(login_url='login')
 def addsupplier(request):
     if request.method == 'POST':
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Creating object
             supplier = Supplier_estimate(
                 supplier_id=generate_unique_id(request.POST['fullname'], request),
                 fullname = request.POST['fullname'],
@@ -52,10 +59,13 @@ def addsupplier(request):
                 state = request.POST['state'],
                 landmark = request.POST['landmark']
             )
+            # Save
             supplier.save()
             messages.success(request , "Added Supplier Successfully ! ")
         
+        # Check for User Group
         if request.user.groups.filter(name='GST').exists():
+            # Creating object
             supplier = Supplier_gst(
                 supplierid=generate_unique_id(request.POST['fullname'], request),
                 fullname = request.POST['fullname'],
@@ -66,17 +76,22 @@ def addsupplier(request):
                 state = request.POST['state'],
                 landmark = request.POST['landmark']
             )
+            # Save
             supplier.save()
             messages.success(request, "Added Supplier Successfully ! ")
-            
+    
+    # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
+        # Get the supplier data
         if Supplier_estimate.objects.all().exists():
             supplierdata_estimate = Supplier_estimate.objects.all().count()
             supplier_id = supplierdata_estimate + 1
         else:
             supplier_id = 1
 
+    # Check for User Group
     if request.user.groups.filter(name='GST').exists():
+        # Get the supplier data
         if Supplier_gst.objects.all().exists():
             supplierdata_gst = Supplier_gst.objects.all().count()
             supplier_id = supplierdata_gst + 1
@@ -89,13 +104,18 @@ def addsupplier(request):
     return render(request,"supplier/addsupplier.html",context)
 
 
+ # To view supplier
 @login_required(login_url='login')
 def viewsupplier(request):
     try:
+        # Check for user Group
         if request.user.groups.filter(name='Estimate').exists():
+            # To get all the supplier data
             supplier_data = Supplier_estimate.objects.all()
-            
+        
+        # Check for user Group
         if request.user.groups.filter(name='GST').exists():
+            # To get all the supplier data
             supplier_data = Supplier_gst.objects.all()
 
         context = {
@@ -105,14 +125,17 @@ def viewsupplier(request):
     except:
         return redirect('error404')
 
-
+# To update the supplier details.
 @login_required(login_url='login')
 def updatesupplier(request,pk):
     try:
         if request.method == 'POST':
+            # Check for user Group
             if request.user.groups.filter(name='Estimate').exists():
+                # Get the supplier details
                 supplier = Supplier_estimate.objects.get(pk=pk)
 
+                # Update the values
                 supplier.fullname = request.POST['fullname']
                 supplier.customerid = request.POST['customerid']
                 supplier.contactno = request.POST['mobile']
@@ -120,12 +143,16 @@ def updatesupplier(request,pk):
                 supplier.state = request.POST['state']
                 supplier.landmark = request.POST['landmark']
 
+                # Save
                 supplier.save()
                 messages.success(request,"Update Supplier Successfully ! ")
             
+            # Check for user Group
             if request.user.groups.filter(name='GST').exists():
+                # Get the supplier details
                 supplier = Supplier_gst.objects.get(pk=pk)
 
+                # Update the values
                 supplier.fullname = request.POST['fullname']
                 supplier.customerid = request.POST['customerid']
                 supplier.contactno = request.POST['mobile']
@@ -135,13 +162,18 @@ def updatesupplier(request,pk):
                 supplier.state = request.POST['state']
                 supplier.landmark = request.POST['landmark']
 
+                # Save
                 supplier.save()
                 messages.success(request, "Update Supplier Successfully ! ")
-
+        
+        # Check for user Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get the supplier detail
             supplier_data = Supplier_estimate.objects.get(pk=pk)
 
+        # Check for user Group
         if request.user.groups.filter(name='GST').exists():
+            # Get the supplier details
             supplier_data = Supplier_gst.objects.get(pk=pk)
             
         context = {
