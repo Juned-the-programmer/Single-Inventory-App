@@ -70,47 +70,6 @@ Out Of stock
 </div>
 
 <script src="{% static 'vendor/jquery/jquery-3.3.1.min.js' %}"></script>
-<script>
-  
-  $(document).ready(function() {
-    var minimum_stock =[]
-    var stock = []
-    $.ajax({
-      type:"GET",
-      url: "{% url 'product_data_gst' %}",
-      async : false,
-      success: function(response){
-        minimum_stock = response
-      },
-    })
-
-    $.ajax({
-      type:"GET",
-      url: "{% url 'stock_data_gst' %}",
-      async : false,
-      success: function(response){ 
-        stock = response
-      },
-    })
-    var outofstock_data = []
-    for(var i=0;i<minimum_stock.productdata.length;i++){
-      if(minimum_stock.productdata[i].minimum_stock >= stock.stock_data[i].quantity){
-        outofstock_data.push(stock.stock_data[i])
-      }
-    }
-    console.log(outofstock_data.length);
-    for(var j=0;j<outofstock_data.length;j++){
-      console.log(outofstock_data[j]);
-      // $('#example #out_of_data #id_').append(outofstock_data[j].id)
-      var newRow= $(document.createElement('tr'))
-            .attr("id", 'out_of_data')
-            newRow.html('<td>'+outofstock_data[j].id+'</td><td>'+minimum_stock.productdata[j].product_name+'</td><td>'+outofstock_data[j].quantity+'</td>')
-            newRow.appendTo('#addtr')
-    }
-    $('#example').DataTable();
-  });
-  
-    </script>
 {% endif %}
 
 <script src="{% static 'vendor/datatables/js/jquery.dataTables.min.js' %}"></script>

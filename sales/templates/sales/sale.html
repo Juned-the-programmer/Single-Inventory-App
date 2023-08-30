@@ -30,17 +30,17 @@ Add Sales
                 <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No"
                     value="{{new_billno}}" required readonly>
                 </div>
+            </div>
+
+            <div class="form-row">
                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
-                <br>
-                    <label for="validationCustom01"><strong style="color: black;">Customer Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'addcustomer' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
+                    <label for="validationCustom01"><strong style="color: black;">Customer Name <a href="{% url 'addcustomer' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
                     <select name="customer" id="cname" class="form-control customer_estimate">
-                        <!-- style="margin-left: 150px; margin-right: 100px;" -->
-                        <option selected>------------------------------------------Select Customer---------------------------------------------</option>
+                        <option selected>-------------------Select Customer---------------------</option>
                             {% for i in Customer_data %}
                                 <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                     </select>
-                <br>
                 </div>
             </div>
             <div id="c" data-href="{% url 'estimatesalec' %}"></div>

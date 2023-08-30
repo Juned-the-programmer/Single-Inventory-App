@@ -7,6 +7,12 @@ from django.db.models import Sum
 from dateutil.relativedelta import relativedelta
 from celery.schedules import crontab
 
+# Added Shared Task which we can use at multiple places.
+''' Usage : 
+    This is used to reset the values for the previous and current month sale and purchase data.
+    It will replace the value of current month sale and purchase data to previous month sale and purchase data.
+    And for the current month it will reset the value again to 0.
+'''
 @shared_task
 def reset_monthly_estimates():
     today = datetime.today()
@@ -27,6 +33,11 @@ def reset_monthly_estimates():
     
     dashboard_data.save()
 
+# Periodic Task for reseting estimate sale and Purchase.
+''' Usage : 
+    This will run every day to reset the value of today_estimate_purchase and today_estimate_sale. As this 2 data we are using in dashboard to populate the value. 
+    Check the dashboard.models file to see the model for dashboard.
+'''
 @periodic_task(run_every=timedelta(days=1), time=time(hour=0, minute=0, second=0))
 def reset_today_estimate():
     dashboard_data = dashborad_data_estimate.objects.get(model_name="Dashboard Estimate Data")
@@ -34,6 +45,7 @@ def reset_today_estimate():
     dashboard_data.today_estimate_sale = 0
     dashboard_data.save()
 
+# Periodic task to to run on every last day of month at midnight.
 @periodic_task(run_every=crontab(day_of_month='last'))
 def reset_monthly_estimates_task():
     reset_monthly_estimates.delay()

@@ -20,6 +20,5 @@ urlpatterns = [
     path('customer_state_gst/',views.customer_state_gst,name="customer_state_gst"),
     path('check_stock_gst/',views.check_stock_gst,name="check_stock_gst"),
     path('sellingprice_gst/',views.sellingprice_gst,name="sellingprice_gst"),
-    path('ownerstate_gst_sale/',views.ownerstate_gst_sale,name="ownerstate_gst_sale"),
-    path('stock_data_gst/',views.stock_data_gst,name="stock_data_gst"),
+    path('ownerstate_gst_sale/',views.ownerstate_gst_sale,name="ownerstate_gst_sale")
 ]

@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['*']
 
 LOGOUT_REDIRECT_URL='/'
 
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app']
+
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
@@ -143,7 +145,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+CELERY_TIMEZONE = 'Asia/Kolkata'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

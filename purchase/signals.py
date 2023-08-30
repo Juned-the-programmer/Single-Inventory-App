@@ -4,6 +4,8 @@ from dashboard.models import dashborad_data_estimate
 from django.dispatch import receiver
 from django.utils import timezone
 
+''' We are using this signals to update the dashboard data when we will save the purchase record. 
+Here we are upading 3 values from that named as a Total, Today and Current month Estimate purchase'''
 @receiver(post_save, sender=Estimate_Purchase)
 def update_estimate_dashboard_data(sender, instance, created, **kwargs):
     dashboard_data = dashborad_data_estimate.objects.get(model_name="Dashboard Estimate Data")

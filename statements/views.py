@@ -15,26 +15,39 @@ from products.models import *
 from sales.models import *
 from supplier.models import *
 
+# To generate the different report.
 
-# Create your views here.
+# To list the stock data for every product.
 @login_required(login_url='login')
 def list_stock(request):
     try:   
         if request.method == 'POST':
+            # Check for user Group
             if request.user.groups.filter(name='Estimate').exists():
+                # Get the stock detail for that product based on the product_name
                 stockdata = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['product_name']))
+                # Update the quantity
                 stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
+                # Save
                 stockdata.save()
-
-            if request.user.groups.filter(name='GST').exists():
-                stockdata = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['product_name']))
-                stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
-                stockdata.save()
-
-        if request.user.groups.filter(name='Estimate').exists():
-            stock_data = Stock_estimate.objects.all()
             
+            # Check for User Group
+            if request.user.groups.filter(name='GST').exists():
+                # Get the stock detail for that product based on the product_name
+                stockdata = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['product_name']))
+                # Update the stock quantity
+                stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
+                # Save
+                stockdata.save()
+
+        # Check for the user Group
+        if request.user.groups.filter(name='Estimate').exists():
+            # Get all the stock data for Estimate
+            stock_data = Stock_estimate.objects.all()
+        
+        # Check for User Group
         if request.user.groups.filter(name='GST').exists():
+            # Get all the stock data for GST
             stock_data = Stock_gst.objects.all()
 
         context = {
@@ -44,12 +57,17 @@ def list_stock(request):
     except:
         return redirect('error404')
 
+# To List the customers Payments
 @login_required(login_url='login')
 def customer_payment_list(request):
+    # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
+        # Get all the customer Payment for Estimate
         customer_payment = customerpay_estimate.objects.all()
     
+    # Check for User Group
     if request.user.groups.filter(name='GST').exists():
+        # Get all the Customer Payment for GST
         customer_payment = customerpay_gst.objects.all()
 
     context = {
@@ -57,13 +75,18 @@ def customer_payment_list(request):
     }
     return render(request, 'statements/customerpaymentlist.html',context)
 
+# To List the supplier Payments
 @login_required(login_url='login')
 def supplier_payment_list(request):
     try:
+        # Check for User GRoup
         if request.user.groups.filter(name='Estimate').exists():
+            # Get all the supplier payments for Estimate
             supplier_payment = supplierpay_estimate.objects.all()
             
+        # Check for user Group
         if request.user.groups.filter(name='GST').exists():
+            # Get all the supplier payments for GST
             supplier_payment = supplierpay_gst.objects.all()
         
         context = {
@@ -73,13 +96,18 @@ def supplier_payment_list(request):
     except:
         return redirect('error404')
 
+# To list the customer Credit [ What is the pending amount ]
 @login_required(login_url='login')
 def customer_Credit(request):
     try:
+        # Check for user group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get all the customer credit for Estimate
             customer_credit_data = customeraccount_estimate.objects.all()
         
+        # Check for User Group
         if request.user.groups.filter(name='GST').exists():
+            # Get all the customer creadit for GST
             customer_credit_data = customeraccount_gst.objects.all()
         
         context = {
@@ -89,13 +117,18 @@ def customer_Credit(request):
     except:
         return redirect('error404')
 
+# To list the supplier credit [ What is pending amount ]
 @login_required(login_url='login')
 def supplier_credit(request):
     try:
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get all the supplier credit for Estimate
             supplier_credit_list = supplieraccount_estimate.objects.all()
         
+        # Check for User Group
         if request.user.groups.filter(name='GST').exists():
+            # Get all the supplier credit for GST
             supplier_credit_list = supplieraccount_gst.objects.all()
 
         context = {
@@ -105,15 +138,22 @@ def supplier_credit(request):
     except:
         return redirect('error404')
 
+# To get the details for total Income data.
 @login_required(login_url='login')
 def totalincome(request):
     try:
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get the daily Income data
             daily_income_data = dailyincome_estimate.objects.all()
+            # Get the customer payment data
             customer_income_data = customerpay_estimate.objects.all()
         
+        # Check for User Group
         if request.user.groups.filter(name='GST').exists():
+            # Get the daily Income data
             daily_income_data = dailyincome_gst.objects.all()
+            # Get the customer payment data
             customer_income_data = customerpay_gst.objects.all()
 
         context = {
@@ -124,15 +164,22 @@ def totalincome(request):
     except:
         return redirect('error404')
 
+# To get the detail for total expense data
 @login_required(login_url='login')
 def totalexpense(request):
     try:
+        # Check for user Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get the daily Expense data
             daily_expense_data = dailyexpense_estimate.objects.all()
+            # Get the supplier payment data
             supplier_expense_data = supplierpay_estimate.objects.all()
         
+        # Check for User Group
         if request.user.groups.filter(name='GST').exists():
+            # Get the daily Expense data
             daily_expense_data = dailyexpense_gst.objects.all()
+            # Get the supplier payment data
             supplier_expense_data = supplierpay_gst.objects.all()
         
         context = {
@@ -143,11 +190,15 @@ def totalexpense(request):
     except:
         return redirect('error404')
 
+# To generate the sale report.
+''' We will accept the from data and to date and we will get all the sale data between that span of dates '''
 @login_required(login_url='login')
 def salereport(request):
     try:
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
             if request.method == 'POST':
+                # Search from the sale data between two dates.
                 searchsale = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
 
                 context = {
@@ -155,8 +206,10 @@ def salereport(request):
                 }
                 return render(request,'statements/salereport.html',context)
 
+        # Check for user Group
         if request.user.groups.filter(name='GST').exists():
             if request.method == 'POST':
+                # Serach from the sales data between two dates
                 searchsale = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
 
                 context = {
@@ -164,35 +217,41 @@ def salereport(request):
                 }
                 return render(request,'statements/salereport.html',context)
 
-        total_estimate_sale = Estimate_sales.objects.all()
-        total_gst_sale = gstsale.objects.all()
-        
-        context = {
-            'total_estimate_sale' : total_estimate_sale,
-            'total_gst_sale' : total_gst_sale,
-        }
-        return render(request,'statements/salereport.html',context)
+        return render(request,'statements/salereport.html')
     except:
         return redirect('error404')
 
+# Get the out of stock data 
+''' If we remember then while adding a product we are asking for minimum quantity 
+if the stock for that product is less than that value then we will display that records here'''
 @login_required(login_url='login')
 def outofstock(request):
+    # Check for User Group
     if request.user.groups.filter(name='Estimate').exists():
         if request.method=='GET':
+            # Get the stock data which has minimum quantity
             stocks_with_min_quantity = Stock_estimate.objects.annotate(min_stock=F('product__minimum_stock')).filter(quantity__lte=F('min_stock'))
             context = {
                 'stocks_with_min_quantity': stocks_with_min_quantity
             }
             return render(request, 'statements/outofstock.html', context)
 
+# Customer Statement for sale report. 
+''' This is the first phase of that here we are displaying all the customer data from this customer data we can select any one and generate the report '''
 @login_required(login_url='login')
 def customerstatement(request):
+    # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
+        # Get the customer data for Estimate
         customer_data = Customer_estimate.objects.all()
+        # Get the customer Pending amount for Estimate
         customer_pending_amount = customeraccount_estimate.objects.all()
     
+    # Check for User Group
     if request.user.groups.filter(name='GST').exists():
+        # Get the customer data for GST
         customer_data = Customer_gst.objects.all()
+        # Get the customer Pending amount for Estimate
         customer_pending_amount = customeraccount_estimate.objects.all()
 
     context = {
@@ -200,12 +259,17 @@ def customerstatement(request):
     }
     return render(request,'statements/customerstatement.html',context)
 
+# To view the satement for that selected customer
+''' After selecting customer we have to select the date Range and we will generate the report for that date range. '''
 @login_required(login_url='login')
 def customer_statement_view(request,pk):
     if request.method == "POST":
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
+            # Get the sale data from estimate using filter like dates and customer
             sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer = Customer_estimate.objects.get(pk=pk))
             
+            # Processing data.
             if sale_data.count() > 0:
                 sale_data_total_filter =  sale_data.aggregate(Sum('Total_amount'))
                 sale_data_total = sale_data_total_filter['Total_amount__sum']
@@ -223,9 +287,12 @@ def customer_statement_view(request,pk):
                 sale_data_money = round(sale_data_money , 2)
                 print(sale_data_money)
 
+            # Get the payment data for that customer.
             payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer_name = Customer_estimate.objects.get(pk=pk))
             payment_data_total_money = 0
             payment_data_round_off_money = 0
+
+            # Processing data
             if payment_data.count() > 0:
                 payment_data_total_filter = payment_data.aggregate(Sum('paid_amount'))
                 payment_data_total = payment_data_total_filter['paid_amount__sum']

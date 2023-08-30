@@ -19,6 +19,8 @@ from .models import *
 
 # Create your views here
 
+# Get the data which need to be diplayed at the home page dashboard.
+''' The data comes from the dashborad_data_estimate model which is continuosly updating as we are adding the records into the purchase and sale '''
 @login_required(login_url='login')
 def dashboard(request):
     if request.user.groups.filter(name='Estimate').exists():
