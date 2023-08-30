@@ -22,6 +22,10 @@ class dashborad_data_estimate(models.Model):
     previous_month_profit = models.FloatField(null=True, blank=True, default=0)
     total_profit = models.FloatField(null=True, blank=True, default=0)
 
+    total_customer_count = models.IntegerField(default=0, null=True, blank=True)
+    total_supplier_count = models.IntegerField(default=0, null=True, blank=True)
+    total_product_count = models.IntegerField(default=0, null=True, blank=True)
+
     def __str__(self):
         return self.model_name
 

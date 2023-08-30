@@ -24,12 +24,17 @@ from .models import *
 @login_required(login_url='login')
 def dashboard(request):
     if request.user.groups.filter(name='Estimate').exists():
-        Customer_data = Customer_estimate.objects.all().count()
-        Supplier_data = Supplier_estimate.objects.all().count()
-        Product_data = Product_estimate.objects.all().count()
-
         # Loaded dashboard data 
         dashboard_data = dashborad_data_estimate.objects.get(model_name="Dashboard Estimate Data")
+
+        # Customer Count
+        Customer_data = dashboard_data.total_customer_count
+
+        # Supplier Count
+        Supplier_data = dashboard_data.total_supplier_count
+
+        # Product Count
+        Product_data = dashboard_data.total_product_count
 
         # Today sale
         today_sale = dashboard_data.today_estimate_sale
