@@ -14,6 +14,7 @@ Edit Sales
             <div class="card-body">
             <form method="POST">
             {% csrf_token %}
+            <p>{{sale_data.customer_name}}<p>
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="alert alert-success" id="upt_success" style="display:none"></div>
@@ -39,9 +40,9 @@ Edit Sales
                             <label for="validationCustom01"><strong style="color: black;">Customer Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'addcustomer' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
                             <select name="customer" id="cname" class="form-control customer_estimate">
                                 <!-- style="margin-left: 150px; margin-right: 100px;" -->
-                                <option selected>{{sale_data.customer}}</option>
+                                <option selected value="{{sale_data.customer.id}}">{{sale_data.customer}}</option>
                                     {% for i in customer_data %}
-                                        <option value="{{i.fullname}}">{{i.fullname}}</option>
+                                        <option value="{{i.id}}">{{i.fullname}}</option>
                                     {% endfor %}
                             </select>
                         <br>
@@ -141,7 +142,7 @@ Edit Sales
 <div class="previous_discount_estimate" data-href="{% url 'previous_discount_estimate' %}"></div>
 
 <div class="product_data_estimate" data-href="{% url 'product_data_estimate' %}"></div>
-<div class="stock_data_estimate" data-href="{% url 'stock_data_estimate' %}"></div>
+<div class="selected_product" data-href="{% url 'selected_product' %}"></div>
 
 {% else %}
 <div class="row">
@@ -166,7 +167,7 @@ Edit Sales
                             <select name="customer" id="cname" class="form-control customer">
                             <option value="{{sale_data.customer_name}}" selected>{{sale_data.customer_name}}</option>
                             {% for i in customer_data %}
-                                <option value="{{i.fullname}}">{{i.fullname}}</option>
+                                <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                             </select>   
                         <br>
