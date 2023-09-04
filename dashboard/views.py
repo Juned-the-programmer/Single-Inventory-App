@@ -24,8 +24,13 @@ from .models import *
 @login_required(login_url='login')
 def dashboard(request):
     if request.user.groups.filter(name='Estimate').exists():
-        # Loaded dashboard data 
-        dashboard_data = dashborad_data_estimate.objects.get(model_name="Dashboard Estimate Data")
+        
+        # Added Try catch block to Validate weather we have the dashboard data or not, If we don't have then create record in model.
+        try:
+            # Loaded dashboard data 
+            dashboard_data = dashborad_data_estimate.objects.get(model_name="Dashboard Estimate Data")
+        except dashborad_data_estimate.DoesNotExist:
+            dashboard_data = dashborad_data_estimate.objects.create(model_name="Dashboard Estimate Data")
 
         # Customer Count
         Customer_data = dashboard_data.total_customer_count
