@@ -252,7 +252,7 @@ def updatesale(request , pk):
             # Create a new object for sale
             Estimatesale = Estimate_sales(
                 Bill_no=request.POST['bill_no'],
-                customer = Customer_estimate.objects.get(id = Customer_estimate.objects.get(fullname=request.POST['customer']).id),
+                customer = Customer_estimate.objects.get(id = request.POST['customer']),
                 Total_amount=request.POST['total'],
                 Due_amount=request.POST['oldamt'],
                 Round_off=request.POST['roff'],
@@ -263,7 +263,7 @@ def updatesale(request , pk):
             old_amount = float(Grand_total) - float(old_grant_total) 
 
             # Get the customerAccount detail based on the customer
-            customerAccount = customeraccount_estimate.objects.get(customer_name = Customer_estimate.objects.get(fullname=request.POST['customer']))
+            customerAccount = customeraccount_estimate.objects.get(customer_name = request.POST['customer'])
             # Update the customer Account
             customerAccount.amount = float(customerAccount.amount) + float(old_amount) 
             

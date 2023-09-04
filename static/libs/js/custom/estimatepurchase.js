@@ -8,7 +8,12 @@ $(document).ready(function () {
     $loading.hide();
   });
 
-  var product_data =[]
+  const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+  
+  var product_data = []
+  
+  var customer_id_update = $('#supplier_estimate').val()
+
     $('.supplier_estimate').on("change", function() {
       $.ajax({
           type : "GET",
@@ -25,6 +30,18 @@ $(document).ready(function () {
           }
       })
   });
+
+  if(product_data.length == 0){
+    $.ajax({
+          type : "GET",
+          url: $('.supplier_product').attr('data-href'),
+          data : {'supplier_name' : customer_id_update},
+          success : function (data) {
+            product_data = data
+            console.log(product_data)
+        }
+      })
+    }
 
   var counter = 1;
   $(document).on('focus', "tr td", function (e) {

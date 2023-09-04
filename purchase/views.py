@@ -234,7 +234,7 @@ def updatepurchase(request,pk):
             # Creating a object to save it.
             Estimate = Estimate_Purchase(
                 Bill_no = request.POST['bill_no'],
-                supplier = Supplier_estimate.objects.get(fullname=request.POST['supplier']),
+                supplier = Supplier_estimate.objects.get(id = request.POST['supplier']),
                 Total_amount = request.POST['total'],
                 Due_amount = Due_amount,
                 Round_off = Round_off,
@@ -245,12 +245,12 @@ def updatepurchase(request,pk):
             old_amount = float(request.POST['gtot']) - float(old_grant_total) 
 
             # Get the supplier account based on the supplier data
-            supplierAccount = supplieraccount_estimate.objects.get(supplier_name = Supplier_estimate.objects.get(fullname=request.POST['supplier']))
+            supplierAccount = supplieraccount_estimate.objects.get(supplier_name =request.POST['supplier'])
             # updating amount
             supplierAccount.amount = float(supplierAccount.amount) + float(old_amount)
             
             # Iterate loop to add the records
-            for i in range(0,estimate_purchase_count):
+            for i in range(0,estimate_purchase_product_list_count):
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:
