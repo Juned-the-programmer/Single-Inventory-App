@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from django.contrib import messages
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -141,11 +142,21 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # Setup celery
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+CELERY_BEAT_SCHEDULE = {
+    'reset-daily-estimates' : {
+        'task' : 'celery_task.views.reset_today_estimate',
+        'schedule' : timedelta(days=1)
+    }, 
+    'rest-monthly-estimates' : {
+        'task' : 'celery_task.views.reset_monthly_estimates_task',
+        'schedule' : timedelta(days=30)
+    }
+}
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Kolkata'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

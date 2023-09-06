@@ -58,10 +58,14 @@ sudo dnf install redis
 
 pip3 install celery redis
 
-export DJANGO_SETTINGS_MODULE=your_project.settings
 
-# To start celery worker
-celery -A your_project_name worker -l info
+# To start the celery tasks
 
-# To start celery periodic task
-celery -A your_project_name beat -l info
+# Start the redis server
+redis-server
+
+# start celery worker
+celery -A Inventory worker --loglevel=debug
+
+# start celery beat
+celery -A Inventory beat --loglevel=debug
