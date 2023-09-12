@@ -95,8 +95,9 @@ $(document).ready(function () {
           data:{'pname':pname , 'sname':sname},
           success: function(response){
             console.log(response)
-            $('#rate'+counter).val(response.last_price)
+            $('#rate'+counter).val(response.purchase_price)
             $('#unit'+counter).val(response.product_unit)
+            $('#dis'+counter).val(0.0)
           },
           error: function(response){
             console.log("error data not found")
