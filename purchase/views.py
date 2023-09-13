@@ -436,30 +436,9 @@ def purchaseprice_estimate(request):
     # Get the Product details
     prodct_data = Product_estimate.objects.get(product_name=product_name)
 
-    # Get the latest Bill_no for the Supplier 
-    last_bill_no = Estimate_Purchase.objects.filter(supplier=supplier_name).aggregate(Max('Bill_no'))['Bill_no__max']
-    
-    if last_bill_no:
-        # Get the latest product rate for the Supplier and product
-        last_rate = estimatepurchase_Product.objects.filter(Bill_no=last_bill_no, product_name=product_name).last()
-
-        product_unit = prodct_data.unit
-        if last_rate:
-            response_data = {
-                "last_price" : last_rate.rate,
-                "product_unit" : product_unit
-            }
-            return JsonResponse(response_data)
-    
-    # If no relevant records found, fallback to product estimate
-    last_price = prodct_data.selling_price
-
-    # Unit of Product
-    product_unit = prodct_data.unit
-
     response_data = {
-        "last_price" : last_price,
-        "product_unit" : product_unit
+        "purchase_price" : prodct_data.purchase_price,
+        "product_unit" : prodct_data.unit
     }
     return JsonResponse(response_data)
 

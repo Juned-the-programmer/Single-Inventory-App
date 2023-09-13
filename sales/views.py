@@ -442,49 +442,6 @@ def saleinvoice(request,pk):
     except:
         return redirect('error404')
 
-# To get the selling price for that product.
-''' We will get selling price for that product. We will get that customer last bill number and check for at what price we have sold the item.
-If we don't have then we will go with the regular price. 
-This will hit on change of product name'''
-@login_required(login_url='login')
-def sellingprice_estimate(request):
-    pname = request.GET['pname']
-    cname = request.GET['cname']
-    
-    # Get the latest Bill_no for the customer
-    last_bill_no = Estimate_sales.objects.filter(customer=cname).aggregate(Max('Bill_no'))['Bill_no__max']
-    
-    if last_bill_no:
-        # Get the latest product rate for the customer and product
-        last_rate = estimatesales_Product.objects.filter(Bill_no=last_bill_no, product_name=pname).last()
-        if last_rate:
-            return HttpResponse(last_rate.rate)
-    
-    # If no relevant records found, fallback to product estimate
-    last_price = Product_estimate.objects.get(product_name=pname).selling_price
-    return HttpResponse(last_price)
-
-# To get the discount for that product.
-''' Same like selling price for this also we will get the last bill number and check for what is the discount for that customer.
-And if it is not then we will go with 0 
-This will hit on change of product name'''
-@login_required(login_url='login')
-def previous_discount_estimate(request):
-    pname = request.GET['pname']
-    cname = request.GET['cname']
-    
-    # Get the latest Bill_no for the customer
-    last_bill_no = Estimate_sales.objects.filter(customer=cname).aggregate(Max('Bill_no'))['Bill_no__max']
-    
-    if last_bill_no:
-        # Get the latest product discount for the customer and product
-        last_discount = estimatesales_Product.objects.filter(Bill_no=last_bill_no, product_name=pname).last()
-        if last_discount:
-            return HttpResponse(last_discount.dis)
-    
-    # If no relevant records found, return 0.0 as default
-    return HttpResponse(0.0)
-
 # To get customer Due
 ''' We will get the Customer Due from the customerAccount model based on the customer name. 
 This will hit on change of customer name. '''
@@ -532,7 +489,8 @@ def selected_product(request):
     product_data_values = {
         'product_name' : product_data.product_name,
         'product_unit' : product_data.unit,
-        'quantity' : quantity
+        'quantity' : quantity,
+        'rate' : product_data.selling_price
     }
 
     return JsonResponse({"product_data" : product_data_values})

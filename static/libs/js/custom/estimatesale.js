@@ -64,33 +64,8 @@ $(document).ready(function () {
 
       $('#prod'+counter).change(function(){
         var pname=$('#prod'+counter).val()
-        var cname=$('#cname').val()
-        
-        $.ajax({
-          type:"GET",
-          url: $('.sellingprice_estimate').attr('data-href'),
-          data:{'pname':pname , 'cname':cname},
-          success: function(response){
-            $('#rate'+counter).val(response)
-            // alert(response)
-          },
-          error: function(response){
-            console.log("error data not found")
-          }
-        })
-        
-        $.ajax({
-          type:"GET",
-          url: $('.previous_discount_estimate').attr('data-href'),
-          data:{'pname':pname , 'cname':cname},
-          success: function(response){
-            $('#dis'+counter).val(response)
-            // alert(response)
-          },
-          error: function(response){
-            console.log("error data not found")
-          }
-        })
+    
+        $('#dis'+counter).val(0.0)
 
         $.ajax({
           type: "GET",
@@ -99,6 +74,7 @@ $(document).ready(function () {
           success : function(data) {
             var product_data = data.product_data
             $('#unit'+counter).val(product_data.product_unit)
+            $('#rate'+counter).val(parseFloat(product_data.rate))
             if(product_data.quantity == 0){
               $('#qty'+counter).prop('disabled',true)
               alert("you don't have enough stock")

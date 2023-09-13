@@ -8,6 +8,7 @@ class Product_estimate(models.Model):
     product_categ = models.CharField(max_length=50)
     unit = models.CharField(max_length=50)
     selling_price = models.FloatField()
+    purchase_price = models.FloatField(null=True, blank=True)
     store_location = models.CharField(max_length=50)
     supplier = models.ForeignKey(Supplier_estimate , on_delete=models.CASCADE , blank=True,null=True)
     minimum_stock=models.IntegerField()
