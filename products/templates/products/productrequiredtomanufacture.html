@@ -1,0 +1,126 @@
+{% extends 'pages/base.html' %}
+{% load user_auth %}
+{% load static %}
+{% block title %}
+Configure Manufacture Product
+{% endblock title %}
+
+{% block content %}
+
+{% include "pages/message.html" %}
+
+{% if request.user|has_group:"Estimate" %}
+<form class="needs-validation" method='POST' id="configureManufactureForm">
+{% csrf_token %}
+<div class="form-group">
+    <div class="card">
+        <h5 class="card-header">Configure Manufacture Product</h5>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="validationCustom02">Manufacture Product</label>
+                <select name="manufactured_product" id="validationCustom02" class="form-control manufactured_product">
+                <option value="-1">-------Select Product-------</option>
+                    {% for i in manufactured_product %}
+                        <option value="{{i.id}}">{{i.product_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h5 class="card-header">Description for Manufacturing Product</h5>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Description</label>
+                <textarea name="manufacture_description" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h5 class="card-header">Select Product Required to Manufacture</h5>
+        <div class="card-body">
+            <div class="form-group">
+                <div class="input-group">
+                    <select name="product" id="validationCustom02" class="form-control required_product">
+                    <option value="-1">-------Select Product-------</option>
+                        {% for i in required_products %}
+                            <option value="{{i.id}}">{{i.product_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-primary addtotable">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+<h5 class="card-header">Selected Products</h5>
+<div class="card-body">
+    <table class="table table-bordered" id="selectedProductsTable">
+    <thead>
+        <tr>
+        <th>Manufacture Product</th>
+        <th>Required Product</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Selected products will be displayed here -->
+    </tbody>
+    </table>
+</div>
+</div>
+<div class="form-row">
+    <p class="text-right pl-2 pt-3">
+        <input type="submit" class="btn btn-space btn-success rounded" name="Estimate" value="Submit">
+        <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+    </p>
+</div>
+</form>
+{% endif %}
+
+<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
+<script>
+    $(document).ready(function () {
+      $('.manufactured_product').select2();
+      $('.required_product').select2();
+  
+      // Array to store selected products
+      var selectedProducts = [];
+  
+      // When the "Go" button is clicked
+      $('.addtotable').click(function () {
+        var manufacturedProduct = $('.manufactured_product').val();
+        var requiredProduct = $('.required_product').val();
+  
+        if (manufacturedProduct != '-1' && requiredProduct != '-1') {
+          // Add selected products to the table
+          var manufacturedProductName = $('.manufactured_product option:selected').text();
+          var requiredProductName = $('.required_product option:selected').text();
+  
+          var newRow = '<tr><td>' + manufacturedProductName + '</td><td>' + requiredProductName + '</td></tr>';
+          $('#selectedProductsTable tbody').append(newRow);
+  
+          // Add selected products to the array
+          selectedProducts.push({
+            requiredProduct: requiredProduct
+          });
+  
+          // Clear the dropdown selections
+          //$('.manufactured_product').val('-1').trigger('change');
+          $('.required_product').val('-1').trigger('change');
+        }
+      });
+  
+      // When the form is submitted
+      $('#configureManufactureForm').submit(function (event) {
+        // Add the selected products data to a hidden field in JSON format
+        $('#configureManufactureForm').append('<input type="hidden" name="selected_products" value=\'' + JSON.stringify(selectedProducts) + '\' />');
+      });
+    })
+  </script>
+  
+
+{% endblock content %}

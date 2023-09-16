@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from django.core.cache import cache
 
 from .models import *
+import json
 
 ''' To add / view and update Product details '''
 
@@ -132,6 +133,49 @@ def updateproduct(request,pk):
         return render(request,"products/updateproduct.html",context)
     except:
         return redirect('error404')
+
+def manufacture_product(request):
+    context = {
+
+    }
+    return render(request, 'products/addmanufactureproduct.html', context)
+
+def product_required(request):
+    if request.method == 'POST':
+        selected_products = request.POST.get('selected_products')
+        if selected_products:
+            # Parse the JSON data from the hidden field
+            selected_products = json.loads(selected_products)
+            
+            # Intialize an Empty Array
+            required_product = []
+
+            # Loop through the selected products and create product_required_to_manufacture instances
+            for product_pair in selected_products:
+                required_product_id = product_pair['requiredProduct']
+                required_product.append(Product_estimate.objects.get(id=required_product_id))
+
+            print(required_product)
+
+            product_required_manufacture = product_required_to_manufacture(
+                manufacture_product = Product_estimate.objects.get(id=request.POST['manufactured_product']),
+                desciption = request.POST['manufacture_description']
+            )
+            product_required_manufacture.save()
+
+            product_required_manufacture.required_products.set(required_product)
+            product_required_manufacture.save()
+
+    product_data = Product_estimate.objects.all()
+    product_type = Product_type.objects.get(product_type="Manufacture")
+
+    Manufacured_products = product_data.filter(product_type=product_type)
+    Required_products = product_data.exclude(product_type=product_type)
+    context = {
+        'manufactured_product' : Manufacured_products,
+        'required_products' : Required_products
+    }
+    return render(request, 'products/productrequiredtomanufacture.html', context)
 
 ''' This is used to update the cache detail. 
 When we add new product then it will update the cache to new details of all the product data '''
