@@ -170,7 +170,11 @@ def addsale(request):
     # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
         # Get the Product Data
-        Product_data = Product_estimate.objects.all()
+        if request.user.groups.filter(name="Manufacture").exists():
+            Product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
+        else:
+            Product_data = Product_estimate.objects.all()
+        
         # Get the customer Data
         Customer_data = Customer_estimate.objects.all()
 
@@ -393,7 +397,10 @@ def updatesale(request , pk):
         sale_data = Estimate_sales.objects.get(Bill_no=sale_Bill_no)
         sale_product = estimatesales_Product.objects.filter(Bill_no=sale_Bill_no)
         customer_data = Customer_estimate.objects.all()
-        product_data = Product_estimate.objects.all()
+        if request.user.groups.filter(name="Manufacture").exists():
+            Product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
+        else:
+            Product_data = Product_estimate.objects.all()
 
 
     if request.user.groups.filter(name='GST').exists():

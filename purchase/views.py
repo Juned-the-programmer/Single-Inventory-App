@@ -368,8 +368,8 @@ def updatepurchase(request,pk):
         purchase_data = Estimate_Purchase.objects.get(Bill_no=purchase_Bill_no)
         purchase_product = estimatepurchase_Product.objects.filter(Bill_no=purchase_Bill_no)
         supplier_data = Supplier_estimate.objects.all()
-        product_data = Product_estimate.objects.all()
-
+        product_data = Product_estimate.objects.exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
+    
     if request.user.groups.filter(name='GST').exists():
         purchase_Bill_no = GST_Purchase.objects.get(pk=pk).Bill_no
         purchase_Bill_date = GST_Purchase.objects.get(pk=pk).date
@@ -456,7 +456,7 @@ def estimate_purchase_count(request):
 It will reduce the complexity and increase data maintainability '''
 @login_required(login_url='login')
 def supplier_products(request):
-    product_data = Product_estimate.objects.filter(supplier=request.GET['supplier_name'])
+    product_data = Product_estimate.objects.filter(supplier=request.GET['supplier_name']).exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
     return JsonResponse({"Product_data":list(product_data.values())})
 
 # GST Start Here
