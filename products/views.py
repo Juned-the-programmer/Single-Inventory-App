@@ -13,57 +13,72 @@ import json
 # To add Product
 @login_required(login_url='login')
 def addproduct(request):
-    try:
-        if request.method == 'POST':
-            # Check for User Group
-            if request.user.groups.filter(name='Estimate').exists():
-                product = Product_estimate(
-                    product_name = request.POST['productname'],
-                    product_categ = request.POST['productcategory'],
-                    unit = request.POST['unit'],
-                    selling_price = request.POST['sellingprice'],
-                    store_location = request.POST['storelocation'],
-                    supplier = Supplier_estimate.objects.get(fullname=request.POST['supplier']),
-                    minimum_stock =  request.POST['minimum_stock']
-                )
-                # save
-                product.save()
-                messages.success(request, "Product Addedd Successfully ! ")
-
-                # Populate the new value to caching by refreshing the entire chache
-                cache_product_data()
-                
-            # Check for user Group
-            if request.user.groups.filter(name='GST').exists():
-                product = Product_gst(
-                    product_name = request.POST['productname'],
-                    product_categ = request.POST['productcategory'],
-                    unit = request.POST['unit'],
-                    selling_price = request.POST['sellingprice'],
-                    store_location = request.POST['storelocation'],
-                    supplier = Supplier_gst.objects.get(fullname=request.POST['supplier']),
-                    minimum_stock =  request.POST['minimum_stock']
-                )
-                # Save
-                product.save()
-                messages.success(request , "Product Addedd Successfully ! ")
-
-        # check for user Group
+    if request.method == 'POST':
+        # Check for User Group
         if request.user.groups.filter(name='Estimate').exists():
-            # Get all the supplier data Estimate
-            Supplier_data = Supplier_estimate.objects.all()
+            supplier_id = request.POST.get('supplier')
+            supplier = None
+            if supplier_id:
+                supplier = Supplier_estimate.objects.get(id=supplier_id)
 
-        # Check for User Group        
+            purchase_price_str = request.POST.get('purchaseprice', 0.0)
+            purchase_price = float(purchase_price_str) if purchase_price_str else 0.0
+
+            is_manufacturing_product = request.POST['radio-inline']
+            is_manufacturing = is_manufacturing_product == "yes"
+
+            if is_manufacturing:
+                product_type = Product_type.objects.get(product_type="Manufacture")
+            else:
+                product_type = None
+
+            product = Product_estimate(
+                product_name = request.POST['productname'],
+                product_categ = request.POST['productcategory'],
+                unit = request.POST['unit'],
+                selling_price = request.POST['sellingprice'],
+                store_location = request.POST['storelocation'],
+                supplier = supplier,
+                minimum_stock =  request.POST['minimum_stock'],
+                purchase_price = purchase_price,
+                product_type = product_type
+            )
+            # save
+            product.save()
+            messages.success(request, "Product Addedd Successfully ! ")
+
+            # Populate the new value to caching by refreshing the entire chache
+            cache_product_data()
+            
+        # Check for user Group
         if request.user.groups.filter(name='GST').exists():
-            # Get all the supplier data
-            Supplier_data = Supplier_gst.objects.all()
+            product = Product_gst(
+                product_name = request.POST['productname'],
+                product_categ = request.POST['productcategory'],
+                unit = request.POST['unit'],
+                selling_price = request.POST['sellingprice'],
+                store_location = request.POST['storelocation'],
+                supplier = Supplier_gst.objects.get(fullname=request.POST['supplier']),
+                minimum_stock =  request.POST['minimum_stock']
+            )
+            # Save
+            product.save()
+            messages.success(request , "Product Addedd Successfully ! ")
 
-        context = {
-            'Supplier_data':Supplier_data
-        }
-        return render(request,"products/addproduct.html",context)
-    except:
-        return redirect('error404')
+    # check for user Group
+    if request.user.groups.filter(name='Estimate').exists():
+        # Get all the supplier data Estimate
+        Supplier_data = Supplier_estimate.objects.all()
+
+    # Check for User Group        
+    if request.user.groups.filter(name='GST').exists():
+        # Get all the supplier data
+        Supplier_data = Supplier_gst.objects.all()
+
+    context = {
+        'Supplier_data':Supplier_data
+    }
+    return render(request,"products/addproduct.html",context)
 
 # To view products
 @login_required(login_url='login')
@@ -95,13 +110,32 @@ def updateproduct(request,pk):
             if request.user.groups.filter(name='Estimate').exists():
                 product = Product_estimate.objects.get(pk=pk)
 
+                supplier_id = request.POST.get('supplier')
+                supplier = None
+                if supplier_id:
+                    supplier = Supplier_estimate.objects.get(id=request.POST['supplier'])
+
+                purchase_price_str = request.POST.get('purchaseprice', 0.0)
+                purchase_price = float(purchase_price_str) if purchase_price_str else 0.0
+
+                is_manufacturing_product = request.POST['radio-inline']
+                is_manufacturing = is_manufacturing_product == "yes"
+                
+                if is_manufacturing:
+                    product_type = Product_type.objects.get(product_type="Manufacture")
+                else:
+                    product_type = None
+
                 product.product_name = request.POST['productname']
                 product.product_categ = request.POST['productcategory']
                 product.unit  = request.POST['unit']
                 product.selling_price = request.POST['sellingprice']
                 product.store_location = request.POST['storelocation']
-                product.supplier = Supplier_estimate.objects.get(fullname=request.POST['supplier'])
+                product.supplier = supplier
+                product.purchase_price = purchase_price
                 product.minimum_stock = request.POST['minimum_stock']
+                product.product_type = product_type
+
                 # Save
                 product.save()
                 messages.success(request, "Product Updated Successfully ! ")
