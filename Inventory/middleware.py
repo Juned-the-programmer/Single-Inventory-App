@@ -13,7 +13,7 @@ class GroupValidationMiddleware:
         # Exclude Django admin URLs from group validation
         if not request.path.startswith(reverse('admin:index')):
             # Add your allowed groups here
-            allowed_groups = ["Estimate", "GST"]
+            allowed_groups = ["Estimate", "GST" , "Manufacture", "Retail"]
 
             if request.user.is_authenticated:
                 user_groups = request.user.groups.values_list("name", flat=True)

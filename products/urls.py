@@ -6,5 +6,6 @@ urlpatterns = [
     path('viewproduct/',views.viewproduct,name="viewproduct"),
     path('updateproduct/<pk>',views.updateproduct,name="updateproduct"),
     path('manufacture/required', views.product_required, name="manufactureproductrequired"),
-    path('manufacture/product',views.manufacture_product, name="manufacureproduct")
+    path('manufacture/product',views.manufacture_product, name="manufacureproduct"),
+    path('product/required/manufacture', views.product_required_manufacture, name="productrequiredmanufacture")
 ]

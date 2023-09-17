@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect, render
 from django.core.cache import cache
+from django.http import HttpResponse, JsonResponse
 
 from .models import *
 import json
@@ -134,37 +135,72 @@ def updateproduct(request,pk):
     except:
         return redirect('error404')
 
+@login_required(login_url='login')
 def manufacture_product(request):
-    context = {
+    if request.user.groups.filter(name="Manufacture").exists() and request.user.groups.filter(name="Estimate").exists():
+        if request.method == 'POST':
+            selected_products = request.POST.get('selected_product_data')
+            if selected_products:
+                # Parse JSON object
+                selected_products = json.loads(selected_products)
+                # Load Stock data
+                stock_detail = Stock_estimate.objects.all()
 
+                product_data = stock_detail.get(product=Product_estimate.objects.get(id=request.POST['manufacture_product']))
+                product_data.quantity += int(request.POST['manufacture_quantity'])
+                product_data.save()
+                
+
+                for product_pair in selected_products:
+                    stock_data = stock_detail.get(product=Product_estimate.objects.get(id=product_pair['productId']))
+                    stock_data.quantity -= int(product_pair['quantity'])
+                    stock_data.save()
+
+                messages.success(request, "Product Manufactured Successfully ! ")
+
+    product_data = Product_estimate.objects.all()
+    product_type = Product_type.objects.get(product_type="Manufacture")
+
+    product_manufacture = product_data.filter(product_type=product_type)
+
+    context = {
+        'product_manufacture' : product_manufacture
     }
     return render(request, 'products/addmanufactureproduct.html', context)
 
+@login_required(login_url='login')
+def product_required_manufacture(request):
+    product_name = request.GET['manufacture_product']
+    product_detail = product_required_to_manufacture.objects.get(manufacture_product = product_name)
+    product_data = product_detail.required_products.all()
+    return JsonResponse({"Product_data":list(product_data.values())})
+
+
+@login_required(login_url='login')
 def product_required(request):
-    if request.method == 'POST':
-        selected_products = request.POST.get('selected_products')
-        if selected_products:
-            # Parse the JSON data from the hidden field
-            selected_products = json.loads(selected_products)
-            
-            # Intialize an Empty Array
-            required_product = []
+    if request.user.groups.filter(name="Estimate").exists():
+        if request.method == 'POST':
+            selected_products = request.POST.get('selected_products')
+            if selected_products:
+                # Parse the JSON data from the hidden field
+                selected_products = json.loads(selected_products)
+                
+                # Intialize an Empty Array
+                required_product = []
 
-            # Loop through the selected products and create product_required_to_manufacture instances
-            for product_pair in selected_products:
-                required_product_id = product_pair['requiredProduct']
-                required_product.append(Product_estimate.objects.get(id=required_product_id))
+                # Loop through the selected products and create product_required_to_manufacture instances
+                for product_pair in selected_products:
+                    required_product_id = product_pair['requiredProduct']
+                    required_product.append(Product_estimate.objects.get(id=required_product_id))
 
-            print(required_product)
+                product_required_manufacture = product_required_to_manufacture(
+                    manufacture_product = Product_estimate.objects.get(id=request.POST['manufactured_product']),
+                    desciption = request.POST['manufacture_description']
+                )
+                product_required_manufacture.save()
 
-            product_required_manufacture = product_required_to_manufacture(
-                manufacture_product = Product_estimate.objects.get(id=request.POST['manufactured_product']),
-                desciption = request.POST['manufacture_description']
-            )
-            product_required_manufacture.save()
-
-            product_required_manufacture.required_products.set(required_product)
-            product_required_manufacture.save()
+                product_required_manufacture.required_products.set(required_product)
+                product_required_manufacture.save()
 
     product_data = Product_estimate.objects.all()
     product_type = Product_type.objects.get(product_type="Manufacture")
