@@ -7,6 +7,7 @@ from django.db.models import Avg, Max, Min, Sum
 from django.shortcuts import redirect, render
 from num2words import num2words
 from django.db.models import F
+from django.core.cache import cache
 
 from customer.models import *
 from daybook.models import *
@@ -43,7 +44,7 @@ def list_stock(request):
         # Check for the user Group
         if request.session['Estimate']:
             # Get all the stock data for Estimate
-            stock_data = Stock_estimate.objects.all()
+            stock_data = Stock_estimate.objects.select_related('product').all()
         
         # Check for User Group
         if request.session['GST']:
@@ -63,7 +64,7 @@ def customer_payment_list(request):
     # Check for user Group
     if request.session['Estimate']:
         # Get all the customer Payment for Estimate
-        customer_payment = customerpay_estimate.objects.all().order_by("-date")
+        customer_payment = customerpay_estimate.objects.select_related('customer_name').all().order_by("-date")
     
     # Check for User Group
     if request.session['GST']:
@@ -82,7 +83,7 @@ def supplier_payment_list(request):
         # Check for User GRoup
         if request.session['Estimate']:
             # Get all the supplier payments for Estimate
-            supplier_payment = supplierpay_estimate.objects.all().order_by("-date")
+            supplier_payment = supplierpay_estimate.objects.select_related('supplier_name').all().order_by("-date")
             
         # Check for user Group
         if request.session['GST']:
@@ -103,7 +104,7 @@ def customer_Credit(request):
         # Check for user group
         if request.session['Estimate']:
             # Get all the customer credit for Estimate
-            customer_credit_data = customeraccount_estimate.objects.all()
+            customer_credit_data = customeraccount_estimate.objects.select_related('customer_name').all()
         
         # Check for User Group
         if request.session['GST']:
@@ -124,7 +125,7 @@ def supplier_credit(request):
         # Check for User Group
         if request.session['Estimate']:
             # Get all the supplier credit for Estimate
-            supplier_credit_list = supplieraccount_estimate.objects.all()
+            supplier_credit_list = supplieraccount_estimate.objects.select_related('supplier_name').all()
         
         # Check for User Group
         if request.session['GST']:
@@ -147,7 +148,7 @@ def totalincome(request):
             # Get the daily Income data
             daily_income_data = dailyincome_estimate.objects.all()
             # Get the customer payment data
-            customer_income_data = customerpay_estimate.objects.all()
+            customer_income_data = customerpay_estimate.objects.select_related('customer_name').all().order_by("-date")
         
         # Check for User Group
         if request.session['GST']:
@@ -173,7 +174,7 @@ def totalexpense(request):
             # Get the daily Expense data
             daily_expense_data = dailyexpense_estimate.objects.all()
             # Get the supplier payment data
-            supplier_expense_data = supplierpay_estimate.objects.all()
+            supplier_expense_data = supplierpay_estimate.objects.select_related('supplier_name').all().order_by("-date")
         
         # Check for User Group
         if request.session['GST']:
@@ -199,7 +200,7 @@ def salereport(request):
         if request.session['Estimate']:
             if request.method == 'POST':
                 # Search from the sale data between two dates.
-                searchsale = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+                searchsale = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).select_related('customer')
 
                 context = {
                     'searchsale' : searchsale
@@ -243,9 +244,14 @@ def customerstatement(request):
     # Check for user Group
     if request.session['Estimate']:
         # Get the customer data for Estimate
-        customer_data = Customer_estimate.objects.all()
-        # Get the customer Pending amount for Estimate
-        customer_pending_amount = customeraccount_estimate.objects.all()
+        cache_key = "customer_data_estimate_cache"
+        cache_customer_data = cache.get(cache_key)
+
+        if cache_customer_data is None:
+            customer_data = Customer_estimate.objects.all()
+            cache.set(cache_key, customer_data , timeout = None)
+        else:
+            customer_data = cache_customer_data
     
     # Check for User Group
     if request.session['GST']:

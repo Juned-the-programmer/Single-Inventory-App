@@ -21,7 +21,7 @@ class Product_estimate(models.Model):
     product_type = models.ForeignKey(Product_type, null=True, blank=True, on_delete=models.SET_NULL)
     unit = models.CharField(max_length=50)
     selling_price = models.FloatField()
-    purchase_price = models.FloatField(null=True, blank=True)
+    purchase_price = models.FloatField(null=True, blank=True, default=0)
     store_location = models.CharField(max_length=50)
     supplier = models.ForeignKey(Supplier_estimate , on_delete=models.CASCADE , blank=True,null=True)
     minimum_stock=models.IntegerField()
