@@ -9,8 +9,6 @@ $(document).ready(function () {
   })
   
   var product_data = []
-  
-  var supplier_id_update = $('#supplier_estimate').val()
 
     $('.supplier_estimate').on("change", function() {
       $.ajax({
@@ -28,18 +26,6 @@ $(document).ready(function () {
           }
       })
   });
-
-  if(product_data.length == 0){
-    $.ajax({
-          type : "GET",
-          url: $('.supplier_product').attr('data-href'),
-          data : {'supplier_name' : supplier_id_update},
-          success : function (data) {
-            product_data = data
-            console.log(product_data)
-        }
-      })
-    }
 
   var counter = 1;
   $(document).on('focus', "tr td", function (e) {

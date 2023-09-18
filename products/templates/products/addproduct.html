@@ -9,7 +9,7 @@ Add Product
 
 {% include "pages/message.html" %}
 
-{% if request.user|has_group:"Estimate" %}
+{% if request.session.Estimate %}
 <form class="needs-validation" method='POST'>
 {% csrf_token %}
 <div class="row">
@@ -44,7 +44,7 @@ Add Product
                             />
                         </div>
                     </div>
-                    {% if request.user|has_group:"Manufacture" %}
+                    {% if request.session.Manufacture %}
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <h5>Is this Manufacturing Product ? </h5>
                         <label class="custom-control custom-radio custom-control-inline">
@@ -125,15 +125,9 @@ Add Product
                             <label for="validationCustom02">Supplier</label>
                             <select name="supplier" id="validationCustom02" class="form-control supplier">
                             <option value="-1">-------Select Supplier-------</option>
-                            {% if request.user|has_group:"Estimate" %}
                                 {% for i in Supplier_data %}
                                     <option value="{{i.id}}">{{i.fullname}}</option>
                                 {% endfor %}
-                            {% else %}
-                                {% for i in supplierdata_gst %}
-                                    <option value="{{i.id}}">{{i.fullname}}</option>
-                                {% endfor %}
-                            {% endif %}
                             </select>
                         </div>
                     </div>

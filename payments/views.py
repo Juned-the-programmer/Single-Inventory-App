@@ -19,22 +19,32 @@ from .models import *
 def supplierpayment(request):
     if request.method == 'POST':
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Check for round off value
             if len(request.POST['round_off']) >= 1:
                 round_off = request.POST['round_off']
             else:
                 round_off = 0
 
+            # Get all the supplier data
+            cache_key = "supplier_data_estimate_cache"
+            cache_supplier_data = cache.get(cache_key)
+
+            if cache_supplier_data is None:
+                supplier_data = Supplier_estimate.objects.all()
+                cache.set(cache_key, supplier_data , timeout=None)
+            else:
+                supplier_data = cache_supplier_data
+
             SupplierPay = supplierpay_estimate(
-                supplier_name = Supplier_estimate.objects.get(id=request.POST['supplier-name']),
+                supplier_name = supplier_data.get(id=request.POST['supplier-name']),
                 pending_amount = float(request.POST['pending_amount']),
                 paid_amount = float(request.POST['paid_amount']),
                 round_off = round_off
             )
 
             # Get the supplier Account details based on the supplier_name
-            supplieraccountdata = supplieraccount_estimate.objects.get(supplier_name = request.POST['supplier-name'])
+            supplieraccountdata = supplier_data.get(id=request.POST['supplier-name']).supplieraccount_estimate
 
             # Update the amount for that Supplier Account accordingly
             supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
@@ -69,7 +79,7 @@ def supplierpayment(request):
             messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
     # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # Get all the supplier data
         cache_key = "supplier_data_estimate_cache"
         cache_supplier_data = cache.get(cache_key)
@@ -81,7 +91,7 @@ def supplierpayment(request):
             supplier_data = cache_supplier_data
     
     # Check for user Group
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         # Get all the supplier data
         supplier_data = Supplier_gst.objects.all()
 
@@ -98,15 +108,26 @@ def supplierpayment(request):
 def customerpayment(request):
     if request.method == 'POST':
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Check for round off value
             if len(request.POST['round_off']) >= 1:
                 round_off = request.POST['round_off']
             else:
                 round_off = 0
 
+            cache_key = "customer_data_estimate_cache"
+            cache_customer_data = cache.get(cache_key)
+
+            if cache_customer_data is None:
+                customer_data = Customer_estimate.objects.all()
+                cache.set(cache_key, customer_data , timeout = None)
+                print("Not Cached Data")
+            else:
+                customer_data = cache_customer_data
+                print("Cached Data")
+
             CustomerPay = customerpay_estimate (
-                customer_name = Customer_estimate.objects.get(id=request.POST['customer']),
+                customer_name = customer_data.get(id=request.POST['customer']),
                 pending_amount = request.POST['pending_amount'],
                 paid_amount = request.POST['paid_amount'],
                 round_off = round_off,
@@ -114,7 +135,7 @@ def customerpayment(request):
             )
 
             # Get the customerData based on the customer_name
-            customerdata = customeraccount_estimate.objects.get(customer_name=request.POST['customer'])
+            customerdata = customer_data.get(id=request.POST['customer']).customeraccount_estimate
 
             # Updating the amount value accordingly
             customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount']) 
@@ -153,7 +174,7 @@ def customerpayment(request):
     date_ = date.today()
     d1 = date_.strftime("%d/%m/%Y")
 
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         cache_key = "customer_data_estimate_cache"
         cache_customer_data = cache.get(cache_key)
 
@@ -165,7 +186,7 @@ def customerpayment(request):
             customer_data = cache_customer_data
             print("Cached Data")
     
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         customer_data = Customer_gst.objects.all()
 
     context = {

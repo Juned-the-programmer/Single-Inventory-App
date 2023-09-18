@@ -7,7 +7,7 @@ Estimate Purchase
 {% block content %}
 {% include "pages/message.html" %}
 
-{% if request.user|has_group:"Estimate" %}
+{% if request.session.Estimate %}
 
 <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -137,6 +137,20 @@ Estimate Purchase
 <div class="supplier_product" data-href="{% url 'supplier_product' %}"></div>
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script src="{% static 'libs/js/custom/estimatepurchase.js' %}"></script>  
+<script> 
+    var supplier_id_update = $('#supplier_estimate').val()
+    $(document).ready(function () {
+        $.ajax({
+         type : "GET",
+         url: $('.supplier_product').attr('data-href'),
+         data : {'supplier_name' : supplier_id_update},
+         success : function (data) {
+           product_data = data
+           console.log(product_data)
+       }
+    })
+})
+</script>
 
 {% else %}
 <div class="row">

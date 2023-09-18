@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group, User
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.db.models import Max
+from django.core.cache import cache
 
 from products.models import *
 
@@ -18,7 +19,7 @@ from .models import *
 def addpurchase(request):
     if request.method == 'POST':
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session["Estimate"]:
             # Check for round off values
             Round_off = request.POST['roff']
             if len(Round_off) >= 1 :
@@ -81,7 +82,7 @@ def addpurchase(request):
             supplierAccount.save()
             messages.success(request,"Purchase Added Successfully ! ")
 
-        if request.user.groups.filter(name='GST').exists():
+        if request.session["GST"]:
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
             else:
@@ -145,8 +146,16 @@ def addpurchase(request):
     date_ = date.today()
     d1 = date_.strftime("%d/%m/%Y")
 
-    if request.user.groups.filter(name='Estimate').exists():
-        Supplier_data = Supplier_estimate.objects.all()
+    if request.session["Estimate"]:
+
+        cache_key = "supplier_data_estimate_cache"
+        cache_supplier_data = cache.get(cache_key)
+
+        if cache_supplier_data is None:
+            Supplier_data = Supplier_estimate.objects.all()
+            cache.set(cache_key, supplier_data , timeout=None)
+        else:
+            Supplier_data = cache_supplier_data
 
         if Estimate_Purchase.objects.exists():
             new_bill = Estimate_Purchase.objects.all().count()
@@ -154,7 +163,7 @@ def addpurchase(request):
         else:
             new_bill = 1
 
-    if request.user.groups.filter(name='GST').exists():
+    if request.session["GST"]:
         Supplier_data = Supplier_gst.objects.all()
 
         if GST_Purchase.objects.exists():
@@ -175,12 +184,12 @@ def addpurchase(request):
 def viewpurchase(request):
     try:
         # Check for user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session["Estimate"]:
             # Get the product data
-            Purchase_data = Estimate_Purchase.objects.all()
+            Purchase_data = Estimate_Purchase.objects.all().order_by("-date")
         
         # Check for user Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session["GST"]:
             # Get the product data
             Purchase_data = GST_Purchase.objects.all()
 
@@ -196,7 +205,7 @@ def viewpurchase(request):
 def updatepurchase(request,pk):
     if request.method == 'POST':
         # Check for User group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session["Estimate"]:
             # Update Round off
             Round_off = request.POST['roff']
             if len(Round_off) >= 1 :
@@ -284,7 +293,7 @@ def updatepurchase(request,pk):
             return redirect('viewpurchase')
             messages.success(request,"Purchase Successfully !")
 
-        if request.user.groups.filter(name='GST').exists():
+        if request.session["GST"]:
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
             else:
@@ -392,7 +401,7 @@ def updatepurchase(request,pk):
 @login_required(login_url='login')
 def purchaseinvoice(request,pk):
     # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session["Estimate"]:
         # Purchase data based on ID
         Purchase_data = Estimate_Purchase.objects.get(pk=pk)
         # Purchase product data
@@ -400,7 +409,7 @@ def purchaseinvoice(request,pk):
         word = 1
     
     # Check for user Group
-    if request.user.groups.filter(name='GST').exists():
+    if request.session["GST"]:
         # Purchase data based on ID
         Purchase_data = GST_Purchase.objects.get(pk=pk)
         # Purchase product data
@@ -421,8 +430,18 @@ def purchaseinvoice(request,pk):
 ''' We will hit this on change event of Supplier name, When we will select the Supplier name it will get the due amount for that Supplier. '''
 @login_required(login_url='login')
 def supplierdueamount_estimate(request):
-    cname = request.GET['cname']
-    camount = supplieraccount_estimate.objects.get(supplier_name = cname)
+    sname = request.GET['cname']
+
+    cache_key = "supplier_data_estimate_cache"
+    cache_supplier_data = cache.get(cache_key)
+
+    if cache_supplier_data is None:
+        supplier_data = Supplier_estimate.objects.all()
+        cache.set(cache_key, supplier_data , timeout=None)
+    else:
+        supplier_data = cache_supplier_data
+
+    camount = supplier_data.get(id=sname).supplieraccount_estimate
     due_amount = camount.amount
 
     return HttpResponse(due_amount)
@@ -431,10 +450,20 @@ def supplierdueamount_estimate(request):
 @login_required(login_url='login')
 def purchaseprice_estimate(request):
     product_name = request.GET['pname']
-    supplier_name = request.GET['sname']
+
+    cache_key = "product_data_estimate_cache" 
+    cached_productdata = cache.get(cache_key)
     
     # Get the Product details
-    prodct_data = Product_estimate.objects.get(product_name=product_name)
+    if cached_productdata is None:
+        productdata = Product_estimate.objects.all()
+        cache.set(cache_key, productdata, timeout=None)
+        print("Non Cached Data")
+    else:
+        productdata = cached_productdata
+        print("cached Data")
+
+    prodct_data = productdata.get(product_name=product_name)
 
     response_data = {
         "purchase_price" : prodct_data.purchase_price,
@@ -456,7 +485,19 @@ def estimate_purchase_count(request):
 It will reduce the complexity and increase data maintainability '''
 @login_required(login_url='login')
 def supplier_products(request):
-    product_data = Product_estimate.objects.filter(supplier=request.GET['supplier_name']).exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
+
+    cache_key = "product_data_estimate_cache" 
+    cached_productdata = cache.get(cache_key)
+
+    if cached_productdata is None:
+        productdata = Product_estimate.objects.all()
+        cache.set(cache_key, productdata, timeout=None)
+        print("Non Cached Data")
+    else:
+        productdata = cached_productdata
+        print("cached Data")
+
+    product_data = productdata.filter(supplier=request.GET['supplier_name']).exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
     return JsonResponse({"Product_data":list(product_data.values())})
 
 # GST Start Here

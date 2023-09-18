@@ -7,7 +7,7 @@ Add Manufacturing Product
 {% block content %}
 {% include "pages/message.html" %}
 
-{% if request.user|has_group:"Estimate" and request.user|has_group:"Manufacture" %}
+{% if request.session.Estimate and request.session.Manufacture %}
 <form method="POST" id="product_required_form">
 {% csrf_token %}
 <div class="row">

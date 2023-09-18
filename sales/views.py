@@ -19,7 +19,7 @@ from .models import *
 def addsale(request):
     if request.method == 'POST':
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Check for cash on Hand Value
             if len(request.POST['cod']):
                 cash_on_hand = request.POST['cod']
@@ -100,7 +100,7 @@ def addsale(request):
             customerAccount.save()
             Estimatesale.save()
 
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
                 print(Round_off)
@@ -168,22 +168,23 @@ def addsale(request):
     d1 = date_.strftime("%d/%m/%Y")
 
     # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
-        # Get the Product Data
-        if request.user.groups.filter(name="Manufacture").exists():
-            Product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
-        else:
-            cache_key = "product_data_estimate_cache" 
-            cached_product_data = cache.get(cache_key)
+    if request.session['Estimate']:
+        cache_key = "product_data_estimate_cache" 
+        cached_product_data = cache.get(cache_key)
 
-            # Check for caching data weather that is there or not.
-            if cached_product_data is None:
-                Product_data = Product_estimate.objects.all()
-                cache.set(cache_key, Product_data, timeout=None)
-                print("Non Cached Data")
-            else:
-                Product_data = cached_product_data
-                print("cached Data")
+        # Check for caching data weather that is there or not.
+        if cached_product_data is None:
+            Product_data = Product_estimate.objects.all()
+            cache.set(cache_key, Product_data, timeout=None)
+            print("Non Cached Data")
+        else:
+            Product_data = cached_product_data
+            print("cached Data")
+
+        # Get the Product Data
+        if request.session["Manufacture"]:
+            Product_data = Product_data.filter(product_type = Product_type.objects.get(product_type="Manufacture"))
+            
         
         # Get the customer Data
         cache_key = "customer_data_estimate_cache"
@@ -202,7 +203,7 @@ def addsale(request):
         else:
             new_billno = 1
     
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         Product_data = Product_gst.objects.all()
         Customer_data = Customer_gst.objects.all()
         
@@ -223,12 +224,12 @@ def addsale(request):
 @login_required(login_url='login')
 def viewsale(request):
     # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # Get the sale data
-        Sale_data = Estimate_sales.objects.all()
+        Sale_data = Estimate_sales.objects.all().order_by("-date")
     
     # Check for user Group
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         # Get the sale data
         Sale_data = gstsale.objects.all()
 
@@ -242,7 +243,7 @@ def viewsale(request):
 def updatesale(request , pk):
     if request.method == 'POST':
         # Check for user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
             else:
@@ -324,7 +325,7 @@ def updatesale(request , pk):
             return redirect('viewsale')
             messages.success(request, "Sale Updated Successfully ! ")
 
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
 
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
@@ -408,7 +409,7 @@ def updatesale(request , pk):
 
 
     # Check for user Grpup
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # To get the data to get display the update page
         sale_Bill_no = Estimate_sales.objects.get(pk=pk).Bill_no
         sale_data = Estimate_sales.objects.get(Bill_no=sale_Bill_no)
@@ -437,7 +438,7 @@ def updatesale(request , pk):
         if request.user.groups.filter(name="Manufacture").exists():
             product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
 
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         sale_Bill_no = gstsale.objects.get(pk=pk).Bill_no
         sale_data = gstsale.objects.get(Bill_no=sale_Bill_no)
         sale_product = gstsales_Product.objects.filter(Bill_no=sale_Bill_no)
@@ -458,14 +459,14 @@ def updatesale(request , pk):
 def saleinvoice(request,pk):
     try:
         # Check for User group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get the sale data
             sale_data = Estimate_sales.objects.get(pk=pk)
             # Get the Product data
             product_data = estimatesales_Product.objects.filter(Bill_no = sale_data.Bill_no)
             word = 1
 
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             sale_data = gstsale.objects.get(pk=pk)
             product_data = gstsales_Product.objects.filter(Bill_no = sale_data.Bill_no)
             word =num2words(gst.Grand_total)
@@ -489,7 +490,18 @@ This will hit on change of customer name. '''
 @login_required(login_url='login')
 def customerdue_estimate(request):
     cname = request.GET['cname']
-    camount = customeraccount_estimate.objects.get(customer_name = cname)
+
+    cache_key = "customer_data_estimate_cache"
+    cache_customer_data = cache.get(cache_key)
+
+    if cache_customer_data is None:
+        customer_data = Customer_estimate.objects.all()
+        cache.set(cache_key, customer_data , timeout = None)
+    else:
+        customer_data = cache_customer_data
+
+    customer_data = customer_data.get(id=cname)
+    camount = customer_data.customeraccount_estimate
     due_amount = camount.amount
 
     return HttpResponse(due_amount)
@@ -510,7 +522,7 @@ def product_data_estimate(request):
         productdata = cached_productdata
         print("cached Data")
 
-    if request.user.groups.filter(name="Manufacture").exists():
+    if request.session['Manufacture']:
         product_type = Product_type.objects.get(product_type = "Manufacture")
         productdata = productdata.filter(product_type = product_type)
 

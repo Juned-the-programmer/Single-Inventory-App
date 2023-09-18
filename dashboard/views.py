@@ -23,8 +23,7 @@ from .models import *
 ''' The data comes from the dashborad_data_estimate model which is continuosly updating as we are adding the records into the purchase and sale '''
 @login_required(login_url='login')
 def dashboard(request):
-    if request.user.groups.filter(name='Estimate').exists():
-        
+    if request.session['Estimate']:
         # Added Try catch block to Validate weather we have the dashboard data or not, If we don't have then create record in model.
         try:
             # Loaded dashboard data 

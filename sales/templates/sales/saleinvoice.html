@@ -12,7 +12,8 @@ table {
     padding: 0px;
 }
 </style>
-{% if request.user|has_group:"Estimate" %}
+
+{% if request.session.Estimate %}
 <div class="row">
     <div class="offset-xl-2 col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="card">
@@ -115,48 +116,6 @@ table {
                         </tfoot>
                     </table>
                 </div>
-                {% comment %} <div class="row">
-                    <div class="col-lg-4 col-sm-5">
-                    </div>
-                    <div class="col-lg-4 col-sm-5 ml-auto">
-                        <table class="table table-clear">
-                            <tbody>
-                                <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Total</strong>
-                                    </td>
-                                    <td class="right">
-                                        <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Total_amount|intcomma}}</strong>
-                                    </td>
-                                </tr>
-                                 <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Old Amount</strong>
-                                    </td>
-                                    <td class="right">
-                                        <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Due_amount|intcomma}}</strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Round Off</strong>
-                                    </td>
-                                    <td class="right">
-                                        <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Round_off|intcomma}}</strong>
-                                    </td>
-                                </tr> 
-                                <tr>
-                                    <td class="left">
-                                        <strong class="text-dark">Grand Total</strong>
-                                    </td>
-                                    <td class="right">
-                                        <strong class="text-dark">{{raw_text}}&nbsp;&nbsp;{{sale_data.Grand_total|intcomma}}</strong>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div> {% endcomment %}
             </div>
         </div>
     </div>

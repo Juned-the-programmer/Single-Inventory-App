@@ -12,7 +12,7 @@ from .models import *
 def dailyincome(request):
     if request.method == 'POST':
         # Check for User Groups 
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
 
             DailyIncome = dailyincome_estimate(
                 name=request.POST['name'],
@@ -23,7 +23,7 @@ def dailyincome(request):
             messages.success(request,"Daily Income Added Successfully !")
 
         # Check for User Groups 
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             DailyIncome = dailyincome_gst(
                 name = request.POST['name'],
                 amount=request.POST['amount']
@@ -38,12 +38,12 @@ def dailyincome(request):
     d2 = date_.strftime("%Y-%m-%d")
 
     # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # Get today's Income data 
         Dailyincome_data = dailyincome_estimate.objects.filter(date=d2)
 
     # Check for user Group
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         Dailyincome_data = dailyincome_gst.objects.filter(date=d2)
 
     context = {
@@ -57,7 +57,7 @@ def dailyincome(request):
 def dailyexpense(request):
     if request.method == 'POST':
         # Check for user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             if 'Estimate' in request.POST:
                 DailyExpense = dailyexpense_estimate(
                         category=request.POST['category'],
@@ -72,7 +72,7 @@ def dailyexpense(request):
                 Category.save()
         
         # check for user Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             if 'GST' in request.POST:
                 DailyExpense = dailyexpense_gst(
                     category=request.POST['category'],
@@ -92,14 +92,14 @@ def dailyexpense(request):
     d2 = date_.strftime("%Y-%m-%d")
 
     # Check for User Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # Get today's expense data
         DailyExpense_data = dailyexpense_estimate.objects.filter(date=d2)
         # Get total category data
         category_data = category_estimate.objects.all()
     
     # Check for User Group
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         # Get today's expense data
         DailyExpense_data = dailyexpense_gst.objects.filter(date=d2)
         # Get total category data

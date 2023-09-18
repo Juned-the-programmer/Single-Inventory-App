@@ -12,6 +12,25 @@ def login(request):
         if user_login is not None:
             auth.login(request,user_login)
             messages.success(request,"Login Successfull")
+
+            request.session['company_name'] = user_login.profile.company_name
+            request.session['username'] = user_login.username
+
+            if user_login.groups.filter(name="Estimate").exists():
+                request.session['Estimate'] = True
+            else:
+                request.session['Estimate'] = False
+
+            if user_login.groups.filter(name="GST").exists():
+                request.session['GST'] = True
+            else:
+                request.session['GST'] = False
+            
+            if user_login.groups.filter(name="Manufacture").exists():
+                request.session['Manufacture'] = True
+            else:
+                request.session['Manufacture'] = False
+
             return redirect('dashboard')
         else:
             print("Login Again")

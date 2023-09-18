@@ -15,7 +15,7 @@ import json
 def addproduct(request):
     if request.method == 'POST':
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             supplier_id = request.POST.get('supplier')
             supplier = None
             if supplier_id:
@@ -51,7 +51,7 @@ def addproduct(request):
             cache_product_data()
             
         # Check for user Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             product = Product_gst(
                 product_name = request.POST['productname'],
                 product_categ = request.POST['productcategory'],
@@ -66,7 +66,7 @@ def addproduct(request):
             messages.success(request , "Product Addedd Successfully ! ")
 
     # check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # Get all the supplier data Estimate
         cache_key = "supplier_data_estimate_cache"
         cache_supplier_data = cache.get(cache_key)
@@ -78,7 +78,7 @@ def addproduct(request):
             Supplier_data = cache_supplier_data
 
     # Check for User Group        
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         # Get all the supplier data
         Supplier_data = Supplier_gst.objects.all()
 
@@ -92,12 +92,12 @@ def addproduct(request):
 def viewproduct(request):
     try:
         # Check for user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get all the product data for Estimate
             Product_data = Product_estimate.objects.all()
 
         # Check for user Group            
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get all the product data for GST
             Product_data = Product_gst.objects.all()
             
@@ -114,7 +114,7 @@ def updateproduct(request,pk):
     try:
         if request.method =='POST':
             # Check for User group
-            if request.user.groups.filter(name='Estimate').exists():
+            if request.session['Estimate']:
                 product = Product_estimate.objects.get(pk=pk)
 
                 supplier_id = request.POST.get('supplier')
@@ -147,7 +147,7 @@ def updateproduct(request,pk):
                 product.save()
                 messages.success(request, "Product Updated Successfully ! ")
 
-            if request.user.groups.filter(name='GST').exists():
+            if request.session['GST']:
                 product = Product_gst.objects.get(pk=pk)
 
                 product.product_name = request.POST['productname']
@@ -160,7 +160,7 @@ def updateproduct(request,pk):
                 product.save()
                 messages.success(request , "Product Updated Successfully ! ")
         
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             Product_data = Product_estimate.objects.get(pk=pk)
             cache_key = "supplier_data_estimate_cache"
             cache_supplier_data = cache.get(cache_key)
@@ -171,7 +171,7 @@ def updateproduct(request,pk):
             else:
                 supplier_data = cache_supplier_data
         
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             Product_data = Product_gst.objects.get(pk=pk)
             supplier_data = Supplier_gst.objects.all()
 
@@ -185,7 +185,7 @@ def updateproduct(request,pk):
 
 @login_required(login_url='login')
 def manufacture_product(request):
-    if request.user.groups.filter(name="Manufacture").exists() and request.user.groups.filter(name="Estimate").exists():
+    if request.session["Manufacture"] and request.session["Estimate"]:
         if request.method == 'POST':
             selected_products = request.POST.get('selected_product_data')
             if selected_products:
@@ -237,7 +237,7 @@ def product_required_manufacture(request):
 
 @login_required(login_url='login')
 def product_required(request):
-    if request.user.groups.filter(name="Estimate").exists():
+    if request.session["Manufacture"] and request.session["Estimate"]:
         if request.method == 'POST':
             selected_products = request.POST.get('selected_products')
             if selected_products:

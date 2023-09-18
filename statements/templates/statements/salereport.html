@@ -14,7 +14,7 @@ From to Where
 <link rel="stylesheet" href="{% static 'vendor/fonts/fontawesome/css/fontawesome-all.css' %}">
 
 
-{% if request.user|has_group:"Estimate" %}
+{% if request.session.Estimate %}
 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
     <div class="card">
         <h5 class="card-header">From To Where Sale Records</h5>

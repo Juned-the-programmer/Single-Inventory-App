@@ -23,7 +23,7 @@ def list_stock(request):
     try:   
         if request.method == 'POST':
             # Check for user Group
-            if request.user.groups.filter(name='Estimate').exists():
+            if request.session['Estimate']:
                 # Get the stock detail for that product based on the product_name
                 stockdata = Stock_estimate.objects.get(product = request.POST['product_name'])
                 # Update the quantity
@@ -32,7 +32,7 @@ def list_stock(request):
                 stockdata.save()
             
             # Check for User Group
-            if request.user.groups.filter(name='GST').exists():
+            if request.session['GST']:
                 # Get the stock detail for that product based on the product_name
                 stockdata = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['product_name']))
                 # Update the stock quantity
@@ -41,12 +41,12 @@ def list_stock(request):
                 stockdata.save()
 
         # Check for the user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get all the stock data for Estimate
             stock_data = Stock_estimate.objects.all()
         
         # Check for User Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get all the stock data for GST
             stock_data = Stock_gst.objects.all()
 
@@ -61,12 +61,12 @@ def list_stock(request):
 @login_required(login_url='login')
 def customer_payment_list(request):
     # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # Get all the customer Payment for Estimate
-        customer_payment = customerpay_estimate.objects.all()
+        customer_payment = customerpay_estimate.objects.all().order_by("-date")
     
     # Check for User Group
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         # Get all the Customer Payment for GST
         customer_payment = customerpay_gst.objects.all()
 
@@ -80,12 +80,12 @@ def customer_payment_list(request):
 def supplier_payment_list(request):
     try:
         # Check for User GRoup
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get all the supplier payments for Estimate
-            supplier_payment = supplierpay_estimate.objects.all()
+            supplier_payment = supplierpay_estimate.objects.all().order_by("-date")
             
         # Check for user Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get all the supplier payments for GST
             supplier_payment = supplierpay_gst.objects.all()
         
@@ -101,12 +101,12 @@ def supplier_payment_list(request):
 def customer_Credit(request):
     try:
         # Check for user group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get all the customer credit for Estimate
             customer_credit_data = customeraccount_estimate.objects.all()
         
         # Check for User Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get all the customer creadit for GST
             customer_credit_data = customeraccount_gst.objects.all()
         
@@ -122,12 +122,12 @@ def customer_Credit(request):
 def supplier_credit(request):
     try:
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get all the supplier credit for Estimate
             supplier_credit_list = supplieraccount_estimate.objects.all()
         
         # Check for User Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get all the supplier credit for GST
             supplier_credit_list = supplieraccount_gst.objects.all()
 
@@ -143,14 +143,14 @@ def supplier_credit(request):
 def totalincome(request):
     try:
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get the daily Income data
             daily_income_data = dailyincome_estimate.objects.all()
             # Get the customer payment data
             customer_income_data = customerpay_estimate.objects.all()
         
         # Check for User Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get the daily Income data
             daily_income_data = dailyincome_gst.objects.all()
             # Get the customer payment data
@@ -169,14 +169,14 @@ def totalincome(request):
 def totalexpense(request):
     try:
         # Check for user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get the daily Expense data
             daily_expense_data = dailyexpense_estimate.objects.all()
             # Get the supplier payment data
             supplier_expense_data = supplierpay_estimate.objects.all()
         
         # Check for User Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get the daily Expense data
             daily_expense_data = dailyexpense_gst.objects.all()
             # Get the supplier payment data
@@ -196,7 +196,7 @@ def totalexpense(request):
 def salereport(request):
     try:
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             if request.method == 'POST':
                 # Search from the sale data between two dates.
                 searchsale = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
@@ -207,7 +207,7 @@ def salereport(request):
                 return render(request,'statements/salereport.html',context)
 
         # Check for user Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             if request.method == 'POST':
                 # Serach from the sales data between two dates
                 searchsale = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
@@ -227,7 +227,7 @@ if the stock for that product is less than that value then we will display that 
 @login_required(login_url='login')
 def outofstock(request):
     # Check for User Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         if request.method=='GET':
             # Get the stock data which has minimum quantity
             stocks_with_min_quantity = Stock_estimate.objects.annotate(min_stock=F('product__minimum_stock')).filter(quantity__lte=F('min_stock'))
@@ -241,14 +241,14 @@ def outofstock(request):
 @login_required(login_url='login')
 def customerstatement(request):
     # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         # Get the customer data for Estimate
         customer_data = Customer_estimate.objects.all()
         # Get the customer Pending amount for Estimate
         customer_pending_amount = customeraccount_estimate.objects.all()
     
     # Check for User Group
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         # Get the customer data for GST
         customer_data = Customer_gst.objects.all()
         # Get the customer Pending amount for Estimate
@@ -265,7 +265,7 @@ def customerstatement(request):
 def customer_statement_view(request,pk):
     if request.method == "POST":
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get the sale data from estimate using filter like dates and customer
             sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer = Customer_estimate.objects.get(pk=pk))
             
@@ -322,7 +322,7 @@ def customer_statement_view(request,pk):
             }
             return render(request , 'statements/customer_statement_view.html',context)
         
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             sale_data = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
             payment_data = customerpay_gst.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
 

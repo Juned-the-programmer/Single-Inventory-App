@@ -12,11 +12,11 @@ from .models import *
 # Method to check weather the ID what we have generated is Unique all over the database.
 def is_unique_id_unique(unique_id, request):
     #Check for the Unique ID
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         from .models import Customer_estimate
         return not Customer_estimate.objects.filter(customer_id=unique_id).exists()
     
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         from .models import Customer_gst
         return not Customer_gst.objects.filter(customerid=unique_id).exists()
 
@@ -50,7 +50,7 @@ def generate_unique_id(full_name, request):
 def addcustomer(request):
     if request.method == 'POST':
         # Check for weather the request is from Estimate or GST.
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Generating the customer object
             customer = Customer_estimate(
                 customer_id=generate_unique_id(request.POST['fullname'], request),
@@ -67,7 +67,7 @@ def addcustomer(request):
             cache_customer_data()
         
         # Check for weather the request is from Estimate or GST.
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Generating Customer Object
             customer = Customer_gst(
                 customerid=generate_unique_id(request.POST['fullname'], request),
@@ -91,7 +91,7 @@ def addcustomer(request):
 def viewcustomer(request):
     try:
         # Check for weather the request is from Estimate or GST.
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             cache_key = "customer_data_estimate_cache"
             cache_customer_data = cache.get(cache_key)
 
@@ -99,10 +99,10 @@ def viewcustomer(request):
                 customer_data = Customer_estimate.objects.all()
                 cache.set(cache_key, customer_data , timeout = None)
             else:
-                customer_data = cache_customer_data
+                customer_data = cache_customer_data 
         
         # Check for weather the request is from Estimate or GST.
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             customer_data = Customer_gst.objects.all()
 
         context = {
@@ -117,7 +117,7 @@ def viewcustomer(request):
 def updatecustomer(request,pk):
     if request.method == 'POST':
         # Check for weather the request is from Estimate or GST.
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             customer = Customer_estimate.objects.get(pk=pk)
 
             customer.fullname = request.POST['fullname']
@@ -134,7 +134,7 @@ def updatecustomer(request,pk):
             cache_customer_data()
         
         # Check for weather the request is from Estimate or GST.
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             customer = Customer_gst.objects.get(pk=pk)
 
             customer.fullname = request.POST['fullname']
@@ -152,7 +152,7 @@ def updatecustomer(request,pk):
 
     ''' To get the data from the datbase and and poplate that into the template for updating details '''
     # Check for weather the request is from Estimate or GST.
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         cache_key = "customer_data_estimate_cache"
         cache_customer_data = cache.get(cache_key)
 
@@ -165,7 +165,7 @@ def updatecustomer(request,pk):
         customer_data = customer_data.get(pk=pk)
 
     # Check for weather the request is from Estimate or GST.
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         customer_data = Customer_gst.objects.get(pk=pk)
 
     context = {

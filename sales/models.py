@@ -28,7 +28,6 @@ class estimatesales_Product(models.Model):
     dis = models.FloatField()
     netrate = models.FloatField()
     total = models.FloatField()
-    # date = models.DateField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):

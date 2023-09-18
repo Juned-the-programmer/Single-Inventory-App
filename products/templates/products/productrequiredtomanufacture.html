@@ -9,7 +9,7 @@ Configure Manufacture Product
 
 {% include "pages/message.html" %}
 
-{% if request.user|has_group:"Estimate" %}
+{% if request.session.Estimate and request.session.Manufacture %}
 <form class="needs-validation" method='POST' id="configureManufactureForm">
 {% csrf_token %}
 <div class="form-group">
