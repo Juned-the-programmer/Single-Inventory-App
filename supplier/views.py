@@ -12,11 +12,11 @@ from .models import *
 # Method to check weather the ID what we have generated is Unique all over the database.
 def is_unique_id_unique(unique_id, request):
     #Check for the Unique ID
-    if request.user.groups.filter(name='Estimate').exists():
+    if request.session['Estimate']:
         from .models import Supplier_estimate
         return not Supplier_estimate.objects.filter(supplier_id=unique_id).exists()
     
-    if request.user.groups.filter(name='GST').exists():
+    if request.session['GST']:
         from .models import Supplier_gst
         return not Supplier_gst.objects.filter(supplierid=unique_id).exists()
 
@@ -50,7 +50,7 @@ def generate_unique_id(full_name, request):
 def addsupplier(request):
     if request.method == 'POST':
         # Check for User Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Creating object
             supplier = Supplier_estimate(
                 supplier_id=generate_unique_id(request.POST['fullname'], request),
@@ -67,7 +67,7 @@ def addsupplier(request):
             cache_supplier_data()
         
         # Check for User Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Creating object
             supplier = Supplier_gst(
                 supplierid=generate_unique_id(request.POST['fullname'], request),
@@ -93,7 +93,7 @@ def addsupplier(request):
 def viewsupplier(request):
     try:
         # Check for user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # To get all the supplier data
             cache_key = "supplier_data_estimate_cache"
             cache_supplier_data = cache.get(cache_key)
@@ -105,7 +105,7 @@ def viewsupplier(request):
                 supplier_data = cache_supplier_data
 
         # Check for user Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # To get all the supplier data
             supplier_data = Supplier_gst.objects.all()
 
@@ -122,9 +122,19 @@ def updatesupplier(request,pk):
     try:
         if request.method == 'POST':
             # Check for user Group
-            if request.user.groups.filter(name='Estimate').exists():
+            if request.session['Estimate']:
                 # Get the supplier details
-                supplier = Supplier_estimate.objects.get(pk=pk)
+
+                cache_key = "supplier_data_estimate_cache"
+                cache_supplier_data = cache.get(cache_key)
+
+                if cache_supplier_data is None:
+                    supplier_data = Supplier_estimate.objects.all()
+                    cache.set(cache_key, supplier_data , timeout = None)
+                else:
+                    supplier_data = cache_supplier_data
+
+                supplier = supplier_data.get(pk=pk)
 
                 # Update the values
                 supplier.fullname = request.POST['fullname']
@@ -141,7 +151,7 @@ def updatesupplier(request,pk):
                 cache_supplier_data()
             
             # Check for user Group
-            if request.user.groups.filter(name='GST').exists():
+            if request.session['GST']:
                 # Get the supplier details
                 supplier = Supplier_gst.objects.get(pk=pk)
 
@@ -160,7 +170,7 @@ def updatesupplier(request,pk):
                 messages.success(request, "Update Supplier Successfully ! ")
         
         # Check for user Group
-        if request.user.groups.filter(name='Estimate').exists():
+        if request.session['Estimate']:
             # Get the supplier detail
             cache_key = "supplier_data_estimate_cache"
             cache_supplier_data = cache.get(cache_key)
@@ -174,7 +184,7 @@ def updatesupplier(request,pk):
             supplier_data = supplier_data.get(id=pk)
 
         # Check for user Group
-        if request.user.groups.filter(name='GST').exists():
+        if request.session['GST']:
             # Get the supplier details
             supplier_data = Supplier_gst.objects.get(pk=pk)
             

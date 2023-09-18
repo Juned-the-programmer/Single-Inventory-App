@@ -5,7 +5,7 @@
 
 {% block content %}
 {% include "pages/message.html" %}
-{% if request.user|has_group:"Estimate" %}
+{% if request.session.Estimate %}
 <form method="POST">
 {% csrf_token %}
 <div class="row">
