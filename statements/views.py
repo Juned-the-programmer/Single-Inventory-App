@@ -25,7 +25,7 @@ def list_stock(request):
             # Check for user Group
             if request.user.groups.filter(name='Estimate').exists():
                 # Get the stock detail for that product based on the product_name
-                stockdata = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['product_name']))
+                stockdata = Stock_estimate.objects.get(product = request.POST['product_name'])
                 # Update the quantity
                 stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
                 # Save

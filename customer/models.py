@@ -23,7 +23,7 @@ class Customer_estimate(models.Model):
         indexes = [models.Index(fields = [ 'id' , 'fullname'])]
 
 class customeraccount_estimate(models.Model):
-    customer_name = models.ForeignKey(Customer_estimate,on_delete=models.CASCADE)
+    customer_name = models.OneToOneField(Customer_estimate,on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
@@ -48,7 +48,7 @@ class Customer_gst(models.Model):
         return self.fullname
 
 class customeraccount_gst(models.Model):
-    customer_name = models.ForeignKey(Customer_gst,on_delete=models.CASCADE)
+    customer_name = models.OneToOneField(Customer_gst,on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 

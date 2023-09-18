@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect, render
+from django.core.cache import cache
 
 from .models import *
 
@@ -62,6 +63,8 @@ def addcustomer(request):
             # Save
             customer.save()
             messages.success(request , "Added Customer Successfully ! ")
+
+            cache_customer_data()
         
         # Check for weather the request is from Estimate or GST.
         if request.user.groups.filter(name='GST').exists():
@@ -80,35 +83,23 @@ def addcustomer(request):
             customer.save()
             messages.success(request, "Added Customer Successfully ! ")
 
-    ''' Here If we are not hitting POST request then it will go with GET request and use this values for customerID. 
-    Here the customerid we are generating is useless but for now we are doing it we will remove this in short time.'''
-    # Check for weather the request is from Estimate or GST.
-    if request.user.groups.filter(name='Estimate').exists():
-        if Customer_estimate.objects.all().exists():
-            customerdata_estimate = Customer_estimate.objects.all().count()
-            customer_id = customerdata_estimate + 1
-        else:
-            customer_id = 1
+    context = {}
 
-    # Check for weather the request is from Estimate or GST.
-    if request.user.groups.filter(name='GST').exists():
-        if Customer_gst.objects.all().exists():
-            customerdata_gst = Customer_gst.objects.all().count()
-            customer_id = customerdata_gst + 1
-        else:
-            customer_id = 1
-    
-    context = {
-        'customer_id':customer_id
-    }
-    return render(request,"customer/addcustomer.html",context)
+    return render(request,"customer/addcustomer.html", context)
     
 @login_required(login_url='login')
 def viewcustomer(request):
     try:
         # Check for weather the request is from Estimate or GST.
         if request.user.groups.filter(name='Estimate').exists():
-            customer_data = Customer_estimate.objects.all()
+            cache_key = "customer_data_estimate_cache"
+            cache_customer_data = cache.get(cache_key)
+
+            if cache_customer_data is None:
+                customer_data = Customer_estimate.objects.all()
+                cache.set(cache_key, customer_data , timeout = None)
+            else:
+                customer_data = cache_customer_data
         
         # Check for weather the request is from Estimate or GST.
         if request.user.groups.filter(name='GST').exists():
@@ -139,6 +130,8 @@ def updatecustomer(request,pk):
             customer.save()
             messages.success(request,"Update Customer Successfully ! ")
             return redirect('viewcustomer')
+
+            cache_customer_data()
         
         # Check for weather the request is from Estimate or GST.
         if request.user.groups.filter(name='GST').exists():
@@ -160,7 +153,16 @@ def updatecustomer(request,pk):
     ''' To get the data from the datbase and and poplate that into the template for updating details '''
     # Check for weather the request is from Estimate or GST.
     if request.user.groups.filter(name='Estimate').exists():
-        customer_data = Customer_estimate.objects.get(pk=pk)
+        cache_key = "customer_data_estimate_cache"
+        cache_customer_data = cache.get(cache_key)
+
+        if cache_customer_data is None:
+            customer_data = Customer_estimate.objects.all()
+            cache.set(cache_key, customer_data , timeout = None)
+        else:
+            customer_data = cache_customer_data
+
+        customer_data = customer_data.get(pk=pk)
 
     # Check for weather the request is from Estimate or GST.
     if request.user.groups.filter(name='GST').exists():
@@ -170,3 +172,8 @@ def updatecustomer(request,pk):
         'customer_data':customer_data
     }
     return render(request,"customer/updatecustomer.html",context)
+
+def cache_customer_data():
+    cache_key = "customer_data_estimate_cache"
+    customer_data = Customer_estimate.objects.all()
+    cache.set(cache_key, customer_data, timeout=None)

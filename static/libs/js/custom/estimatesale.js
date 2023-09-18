@@ -208,19 +208,4 @@ $(document).ready(function () {
       })
       
   });
-  
-  // $('.addsales').submit(function (){
-  //   var c=$('tbody').find('tr:last').attr('itemid')
-  //       $.ajax({
-  //         type:"GET",
-  //         url: $('#c').attr('data-href'),
-  //         data:{'c':c},
-  //         success: function(response){
-  //           console.log(response)
-  //         },
-  //         error: function(response){
-  //           alert("error c")
-  //         }
-  //       })
-  // })
 });

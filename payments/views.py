@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.core.cache import cache
 
 from customer.models import *
 from supplier.models import *
@@ -70,7 +71,14 @@ def supplierpayment(request):
     # Check for user Group
     if request.user.groups.filter(name='Estimate').exists():
         # Get all the supplier data
-        supplier_data = Supplier_estimate.objects.all()
+        cache_key = "supplier_data_estimate_cache"
+        cache_supplier_data = cache.get(cache_key)
+
+        if cache_supplier_data is None:
+            supplier_data = Supplier_estimate.objects.all()
+            cache.set(cache_key, supplier_data , timeout=None)
+        else:
+            supplier_data = cache_supplier_data
     
     # Check for user Group
     if request.user.groups.filter(name='GST').exists():
@@ -146,7 +154,16 @@ def customerpayment(request):
     d1 = date_.strftime("%d/%m/%Y")
 
     if request.user.groups.filter(name='Estimate').exists():
-        customer_data = Customer_estimate.objects.all()
+        cache_key = "customer_data_estimate_cache"
+        cache_customer_data = cache.get(cache_key)
+
+        if cache_customer_data is None:
+            customer_data = Customer_estimate.objects.all()
+            cache.set(cache_key, customer_data , timeout = None)
+            print("Not Cached Data")
+        else:
+            customer_data = cache_customer_data
+            print("Cached Data")
     
     if request.user.groups.filter(name='GST').exists():
         customer_data = Customer_gst.objects.all()
@@ -161,8 +178,21 @@ def customerpayment(request):
 @login_required(login_url='login')
 def supplier_dueamount_estimate(request):
     sid = request.GET['sid']
-    supplierdata = supplieraccount_estimate.objects.get(supplier_name = sid)
-    pendingamount = supplierdata.amount
+
+    cache_key = "supplier_data_estimate_cache"
+    cache_supplier_data = cache.get(cache_key)
+
+    if cache_supplier_data is None:
+        supplier_data = Supplier_estimate.objects.all()
+        cache.set(cache_key, supplier_data , timeout=None)
+        print("Not Cached Data")
+    else:
+        supplier_data = cache_supplier_data
+        print("cached Data")
+
+    supplierdata = supplier_data.get(id=sid)
+    supplier_account = supplierdata.supplieraccount_estimate
+    pendingamount = supplier_account.amount
 
     return HttpResponse(pendingamount)
 
@@ -170,8 +200,21 @@ def supplier_dueamount_estimate(request):
 @login_required(login_url='login')
 def customer_dueamount_estimate(request):
     cid = request.GET['cid']
-    customerdata = customeraccount_estimate.objects.get(customer_name = cid)
-    pendingamount = customerdata.amount
+
+    cache_key = "customer_data_estimate_cache"
+    cache_customer_data = cache.get(cache_key)
+
+    if cache_customer_data is None:
+        customer_data = Customer_estimate.objects.all()
+        cache.set(cache_key, customer_data , timeout = None)
+        print("Not Cached Data")
+    else:
+        customer_data = cache_customer_data
+        print("Cached Data")
+
+    customerdata = customer_data.get(id=cid)
+    customer_account = customerdata.customeraccount_estimate
+    pendingamount = customer_account.amount
 
     return HttpResponse(pendingamount)
 

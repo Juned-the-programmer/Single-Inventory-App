@@ -6,49 +6,43 @@
 {% block content %}
 {% include "pages/message.html" %}
 {% if request.user|has_group:"Estimate" %}
-<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-    <div class="card">
-        <h5 class="card-header">Update customer</h5>
-        <div class="card-body">
-            <form method="POST">
-            {% csrf_token %}
-                <div class="form-group">
-                    <label for="inputUserName">Customer ID</label>
-                    <input
-                    id="customerid"
-                    type="text"
-                    name="customerid"
-                    required=""
-                    placeholder="Enter Customer ID"
-                    class="form-control"
-                    value="{{customer_data.customerid}}"
-                    readonly
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="inputUserName">Full Name</label>
-                    <input
-                    id="Full name"
-                    type="text"
-                    name="fullname"
-                    required=""
-                    placeholder="Enter Full name"
-                    value="{{customer_data.fullname}}"
-                    class="form-control"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="username">Contact No</label>
-                    <input
-                    id="username"
-                    type="tel"
-                    name="mobile"
-                    placeholder="Enter Contact Number"
-                    required=""
-                    pattern="[0-9]{10}"
-                    value="{{customer_data.contactno}}"
-                    class="form-control"
-                    />
+<form method="POST">
+{% csrf_token %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <h5 class="card-header">Update customer</h5>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="inputUserName">Full Name</label>
+                            <input
+                            id="Full name"
+                            type="text"
+                            name="fullname"
+                            required=""
+                            placeholder="Enter Full name"
+                            value="{{customer_data.fullname}}"
+                            class="form-control"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="username">Contact No</label>
+                            <input
+                            id="username"
+                            type="tel"
+                            name="mobile"
+                            placeholder="Enter Contact Number"
+                            required=""
+                            pattern="[0-9]{10}"
+                            value="{{customer_data.contactno}}"
+                            class="form-control"
+                            />
+                        </div>
+                    </div>
                 </div>
                 <div class="form-row">
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
@@ -117,10 +111,11 @@
                         </p>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+</form>
 {% else %}
 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
     <div class="card">

@@ -68,7 +68,14 @@ def addproduct(request):
     # check for user Group
     if request.user.groups.filter(name='Estimate').exists():
         # Get all the supplier data Estimate
-        Supplier_data = Supplier_estimate.objects.all()
+        cache_key = "supplier_data_estimate_cache"
+        cache_supplier_data = cache.get(cache_key)
+
+        if cache_supplier_data is None:
+            Supplier_data = Supplier_estimate.objects.all()
+            cache.set(cache_key, Supplier_data , timeout=None)
+        else:
+            Supplier_data = cache_supplier_data
 
     # Check for User Group        
     if request.user.groups.filter(name='GST').exists():
@@ -155,7 +162,14 @@ def updateproduct(request,pk):
         
         if request.user.groups.filter(name='Estimate').exists():
             Product_data = Product_estimate.objects.get(pk=pk)
-            supplier_data = Supplier_estimate.objects.all()
+            cache_key = "supplier_data_estimate_cache"
+            cache_supplier_data = cache.get(cache_key)
+
+            if cache_supplier_data is None:
+                supplier_data = Supplier_estimate.objects.all()
+                cache.set(cache_key, supplier_data , timeout=None)
+            else:
+                supplier_data = cache_supplier_data
         
         if request.user.groups.filter(name='GST').exists():
             Product_data = Product_gst.objects.get(pk=pk)
@@ -180,7 +194,7 @@ def manufacture_product(request):
                 # Load Stock data
                 stock_detail = Stock_estimate.objects.all()
 
-                product_data = stock_detail.get(product=Product_estimate.objects.get(id=request.POST['manufacture_product']))
+                product_data = stock_detail.get(product = request.POST['manufacture_product'])
                 product_data.quantity += int(request.POST['manufacture_quantity'])
                 product_data.save()
                 
@@ -192,10 +206,21 @@ def manufacture_product(request):
 
                 messages.success(request, "Product Manufactured Successfully ! ")
 
-    product_data = Product_estimate.objects.all()
+    cache_key = "product_data_estimate_cache" 
+    cached_product_data = cache.get(cache_key)
+
+    # Check for caching data weather that is there or not.
+    if cached_product_data is None:
+        product_data = Product_estimate.objects.all()
+        cache.set(cache_key, product_data, timeout=None)
+        print("Non Cached Data")
+    else:
+        product_data = cached_product_data
+        print("cached Data")
+
     product_type = Product_type.objects.get(product_type="Manufacture")
 
-    product_manufacture = product_data.filter(product_type=product_type)
+    product_manufacture = product_data.filter(product_type=product_type.id)
 
     context = {
         'product_manufacture' : product_manufacture
@@ -236,11 +261,22 @@ def product_required(request):
                 product_required_manufacture.required_products.set(required_product)
                 product_required_manufacture.save()
 
-    product_data = Product_estimate.objects.all()
+    cache_key = "product_data_estimate_cache" 
+    cached_product_data = cache.get(cache_key)
+
+    # Check for caching data weather that is there or not.
+    if cached_product_data is None:
+        product_data = Product_estimate.objects.all()
+        cache.set(cache_key, product_data, timeout=None)
+        print("Non Cached Data")
+    else:
+        product_data = cached_product_data
+        print("cached Data")
+
     product_type = Product_type.objects.get(product_type="Manufacture")
 
-    Manufacured_products = product_data.filter(product_type=product_type)
-    Required_products = product_data.exclude(product_type=product_type)
+    Manufacured_products = product_data.filter(product_type=product_type.id)
+    Required_products = product_data.exclude(product_type=product_type.id)
     context = {
         'manufactured_product' : Manufacured_products,
         'required_products' : Required_products

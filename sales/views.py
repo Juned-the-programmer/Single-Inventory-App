@@ -173,10 +173,27 @@ def addsale(request):
         if request.user.groups.filter(name="Manufacture").exists():
             Product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
         else:
-            Product_data = Product_estimate.objects.all()
+            cache_key = "product_data_estimate_cache" 
+            cached_product_data = cache.get(cache_key)
+
+            # Check for caching data weather that is there or not.
+            if cached_product_data is None:
+                Product_data = Product_estimate.objects.all()
+                cache.set(cache_key, Product_data, timeout=None)
+                print("Non Cached Data")
+            else:
+                Product_data = cached_product_data
+                print("cached Data")
         
         # Get the customer Data
-        Customer_data = Customer_estimate.objects.all()
+        cache_key = "customer_data_estimate_cache"
+        cache_customer_data = cache.get(cache_key)
+
+        if cache_customer_data is None:
+            customer_data = Customer_estimate.objects.all()
+            cache.set(cache_key, customer_data , timeout = None)
+        else:
+            customer_data = cache_customer_data
 
         # To get the Bill no
         if Estimate_sales.objects.all().exists():
@@ -197,7 +214,7 @@ def addsale(request):
 
     context = {
         'Product_data' : Product_data,
-        'Customer_data' : Customer_data,
+        'Customer_data' : customer_data,
         'new_billno' : new_billno,
         'd1' : d1,
     }
@@ -396,12 +413,29 @@ def updatesale(request , pk):
         sale_Bill_no = Estimate_sales.objects.get(pk=pk).Bill_no
         sale_data = Estimate_sales.objects.get(Bill_no=sale_Bill_no)
         sale_product = estimatesales_Product.objects.filter(Bill_no=sale_Bill_no)
-        customer_data = Customer_estimate.objects.all()
-        if request.user.groups.filter(name="Manufacture").exists():
-            Product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
-        else:
-            Product_data = Product_estimate.objects.all()
+        cache_key = "customer_data_estimate_cache"
+        cache_customer_data = cache.get(cache_key)
 
+        if cache_customer_data is None:
+            customer_data = Customer_estimate.objects.all()
+            cache.set(cache_key, customer_data , timeout = None)
+        else:
+            customer_data = cache_customer_data
+
+        cache_key = "product_data_estimate_cache" 
+        cached_product_data = cache.get(cache_key)
+
+        # Check for caching data weather that is there or not.
+        if cached_product_data is None:
+            product_data = Product_estimate.objects.all()
+            cache.set(cache_key, product_data, timeout=None)
+            print("Non Cached Data")
+        else:
+            product_data = cached_product_data
+            print("cached Data")
+
+        if request.user.groups.filter(name="Manufacture").exists():
+            product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
 
     if request.user.groups.filter(name='GST').exists():
         sale_Bill_no = gstsale.objects.get(pk=pk).Bill_no
@@ -469,14 +503,18 @@ def product_data_estimate(request):
 
     # Check for caching data weather that is there or not.
     if cached_productdata is None:
-        productdata = list(Product_estimate.objects.values())
+        productdata = Product_estimate.objects.all()
         cache.set(cache_key, productdata, timeout=None)
         print("Non Cached Data")
     else:
         productdata = cached_productdata
         print("cached Data")
 
-    return JsonResponse({"productdata": productdata})
+    if request.user.groups.filter(name="Manufacture").exists():
+        product_type = Product_type.objects.get(product_type = "Manufacture")
+        productdata = productdata.filter(product_type = product_type)
+
+    return JsonResponse({"productdata": list(productdata.values())})
 
 # To get unit and stock quantity
 ''' This will hit on change of product. we will get the unit and quantity for that product, 
@@ -484,7 +522,20 @@ As we are validating that if the stock quantity for that product is 0 then we do
 @login_required(login_url='login')
 def selected_product(request):
     productname = request.GET['product_name']
-    product_data = Product_estimate.objects.get(product_name= productname)
+
+    cache_key = "product_data_estimate_cache" 
+    cached_productdata = cache.get(cache_key)
+
+    # Check for caching data weather that is there or not.
+    if cached_productdata is None:
+        productdata = Product_estimate.objects.all()
+        cache.set(cache_key, productdata, timeout=None)
+        print("Non Cached Data")
+    else:
+        productdata = cached_productdata
+        print("cached Data")
+    
+    product_data = productdata.get(product_name = productname)
     stock_data = Stock_estimate.objects.get(product = product_data.id)
     print(stock_data.quantity)
 

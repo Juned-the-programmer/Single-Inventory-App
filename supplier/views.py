@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.shortcuts import render, redirect
+from django.core.cache import cache
 
 from .models import *
 
@@ -62,6 +63,8 @@ def addsupplier(request):
             # Save
             supplier.save()
             messages.success(request , "Added Supplier Successfully ! ")
+
+            cache_supplier_data()
         
         # Check for User Group
         if request.user.groups.filter(name='GST').exists():
@@ -80,27 +83,8 @@ def addsupplier(request):
             supplier.save()
             messages.success(request, "Added Supplier Successfully ! ")
     
-    # Check for user Group
-    if request.user.groups.filter(name='Estimate').exists():
-        # Get the supplier data
-        if Supplier_estimate.objects.all().exists():
-            supplierdata_estimate = Supplier_estimate.objects.all().count()
-            supplier_id = supplierdata_estimate + 1
-        else:
-            supplier_id = 1
-
-    # Check for User Group
-    if request.user.groups.filter(name='GST').exists():
-        # Get the supplier data
-        if Supplier_gst.objects.all().exists():
-            supplierdata_gst = Supplier_gst.objects.all().count()
-            supplier_id = supplierdata_gst + 1
-        else:
-            supplier_id = 1
+    context = {}
     
-    context = {
-        'supplier_id' : supplier_id
-    }
     return render(request,"supplier/addsupplier.html",context)
 
 
@@ -111,8 +95,15 @@ def viewsupplier(request):
         # Check for user Group
         if request.user.groups.filter(name='Estimate').exists():
             # To get all the supplier data
-            supplier_data = Supplier_estimate.objects.all()
-        
+            cache_key = "supplier_data_estimate_cache"
+            cache_supplier_data = cache.get(cache_key)
+
+            if cache_supplier_data is None:
+                supplier_data = Supplier_estimate.objects.all()
+                cache.set(cache_key, supplier_data , timeout = None)
+            else:
+                supplier_data = cache_supplier_data
+
         # Check for user Group
         if request.user.groups.filter(name='GST').exists():
             # To get all the supplier data
@@ -146,6 +137,8 @@ def updatesupplier(request,pk):
                 # Save
                 supplier.save()
                 messages.success(request,"Update Supplier Successfully ! ")
+
+                cache_supplier_data()
             
             # Check for user Group
             if request.user.groups.filter(name='GST').exists():
@@ -169,7 +162,16 @@ def updatesupplier(request,pk):
         # Check for user Group
         if request.user.groups.filter(name='Estimate').exists():
             # Get the supplier detail
-            supplier_data = Supplier_estimate.objects.get(pk=pk)
+            cache_key = "supplier_data_estimate_cache"
+            cache_supplier_data = cache.get(cache_key)
+
+            if cache_supplier_data is None:
+                supplier_data = Supplier_estimate.objects.all()
+                cache.set(cache_key, supplier_data , timeout = None)
+            else:
+                supplier_data = cache_supplier_data
+
+            supplier_data = supplier_data.get(id=pk)
 
         # Check for user Group
         if request.user.groups.filter(name='GST').exists():
@@ -182,3 +184,8 @@ def updatesupplier(request,pk):
         return render(request,"supplier/updatesupplier.html",context)
     except:
         return redirect('error404')
+
+def cache_supplier_data():
+    cache_key = "supplier_data_estimate_cache"
+    supplier_data = Supplier_estimate.objects.all()
+    cache.set(cache_key, supplier_data, timeout=None)

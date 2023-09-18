@@ -18,7 +18,7 @@ class Supplier_estimate(models.Model):
         indexes = [models.Index(fields=['id' , 'fullname'])]
 
 class supplieraccount_estimate(models.Model):
-    supplier_name = models.ForeignKey(Supplier_estimate,on_delete=models.CASCADE)
+    supplier_name = models.OneToOneField(Supplier_estimate,on_delete=models.CASCADE)
     amount = models.FloatField(default=0,null=True,blank=True)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
@@ -43,7 +43,7 @@ class Supplier_gst(models.Model):
         return self.fullname
 
 class supplieraccount_gst(models.Model):
-    supplier_name = models.ForeignKey(Supplier_gst,on_delete=models.CASCADE)
+    supplier_name = models.OneToOneField(Supplier_gst,on_delete=models.CASCADE)
     amount = models.FloatField(default=0,null=True,blank=True)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
