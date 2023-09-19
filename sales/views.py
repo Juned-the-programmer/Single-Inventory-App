@@ -1,4 +1,5 @@
 from datetime import date
+import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -10,11 +11,30 @@ from django.core.cache import cache
 
 from dashboard.models import *
 from products.models import *
+from Inventory.cache_storage import *
 
 from .models import *
 
 
 # To add / view and update sale data
+@login_required(login_url='login')
+def generate_bill_number(request):
+    today = datetime.date.today()
+    year = today.strftime("%Y")
+    day_of_year = today.strftime("%j")
+
+    # Assuming you have a model named Bill
+    last_bill = Bill_number.objects.all().first()
+
+    if last_bill:
+        print(last_bill.last_bill_number)
+        last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
+        new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
+    else:
+        new_bill_number = "001"  # First bill of the day
+
+    return f"{year}{day_of_year}{new_bill_number}"
+
 @login_required(login_url='login')
 def addsale(request):
     if request.method == 'POST':
@@ -36,7 +56,7 @@ def addsale(request):
         
             # Create a Estimate sale data
             Estimatesale = Estimate_sales(
-                Bill_no=request.POST['bill_no'],
+                Bill_no = generate_bill_number(request),
                 customer = Customer_estimate.objects.get(id=request.POST['customer']),
                 Total_amount=request.POST['total'],
                 Due_amount=request.POST['oldamt'],
@@ -95,6 +115,11 @@ def addsale(request):
                 stock.save()
                 # Save
                 estimate.save()
+
+            # Update the bill number in the Bill_number model.
+            last_bill = Bill_number.objects.all().first()
+            last_bill.last_bill_number = generate_bill_number(request)
+            last_bill.save()
             
             # save
             customerAccount.save()
@@ -169,17 +194,8 @@ def addsale(request):
 
     # Check for user Group
     if request.session['Estimate']:
-        cache_key = "product_data_estimate_cache" 
-        cached_product_data = cache.get(cache_key)
 
-        # Check for caching data weather that is there or not.
-        if cached_product_data is None:
-            Product_data = Product_estimate.objects.all()
-            cache.set(cache_key, Product_data, timeout=None)
-            print("Non Cached Data")
-        else:
-            Product_data = cached_product_data
-            print("cached Data")
+        Product_data = product_cache()
 
         # Get the Product Data
         if request.session["Manufacture"]:
@@ -187,21 +203,9 @@ def addsale(request):
             
         
         # Get the customer Data
-        cache_key = "customer_data_estimate_cache"
-        cache_customer_data = cache.get(cache_key)
+        customer_data = customer_cache()
 
-        if cache_customer_data is None:
-            customer_data = Customer_estimate.objects.all()
-            cache.set(cache_key, customer_data , timeout = None)
-        else:
-            customer_data = cache_customer_data
-
-        # To get the Bill no
-        if Estimate_sales.objects.all().exists():
-            new_billno = Estimate_sales.objects.all().count()
-            new_billno = new_billno + 1
-        else:
-            new_billno = 1
+        new_billno = generate_bill_number(request)
     
     if request.session['GST']:
         Product_data = Product_gst.objects.all()
@@ -226,7 +230,7 @@ def viewsale(request):
     # Check for user Group
     if request.session['Estimate']:
         # Get the sale data
-        Sale_data = Estimate_sales.objects.all().order_by("-date")
+        Sale_data = Estimate_sales.objects.all().prefetch_related("customer").order_by("-date")
     
     # Check for user Group
     if request.session['GST']:
@@ -414,26 +418,10 @@ def updatesale(request , pk):
         sale_Bill_no = Estimate_sales.objects.get(pk=pk).Bill_no
         sale_data = Estimate_sales.objects.get(Bill_no=sale_Bill_no)
         sale_product = estimatesales_Product.objects.filter(Bill_no=sale_Bill_no)
-        cache_key = "customer_data_estimate_cache"
-        cache_customer_data = cache.get(cache_key)
+        
+        customer_data = customer_cache()
 
-        if cache_customer_data is None:
-            customer_data = Customer_estimate.objects.all()
-            cache.set(cache_key, customer_data , timeout = None)
-        else:
-            customer_data = cache_customer_data
-
-        cache_key = "product_data_estimate_cache" 
-        cached_product_data = cache.get(cache_key)
-
-        # Check for caching data weather that is there or not.
-        if cached_product_data is None:
-            product_data = Product_estimate.objects.all()
-            cache.set(cache_key, product_data, timeout=None)
-            print("Non Cached Data")
-        else:
-            product_data = cached_product_data
-            print("cached Data")
+        product_data = product_cache()
 
         if request.user.groups.filter(name="Manufacture").exists():
             product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
@@ -491,14 +479,7 @@ This will hit on change of customer name. '''
 def customerdue_estimate(request):
     cname = request.GET['cname']
 
-    cache_key = "customer_data_estimate_cache"
-    cache_customer_data = cache.get(cache_key)
-
-    if cache_customer_data is None:
-        customer_data = Customer_estimate.objects.all()
-        cache.set(cache_key, customer_data , timeout = None)
-    else:
-        customer_data = cache_customer_data
+    customer_data = customer_cache()
 
     customer_data = customer_data.get(id=cname)
     camount = customer_data.customeraccount_estimate
@@ -513,14 +494,7 @@ def product_data_estimate(request):
     cache_key = "product_data_estimate_cache" 
     cached_productdata = cache.get(cache_key)
 
-    # Check for caching data weather that is there or not.
-    if cached_productdata is None:
-        productdata = Product_estimate.objects.all()
-        cache.set(cache_key, productdata, timeout=None)
-        print("Non Cached Data")
-    else:
-        productdata = cached_productdata
-        print("cached Data")
+    productdata = product_cache()
 
     if request.session['Manufacture']:
         product_type = Product_type.objects.get(product_type = "Manufacture")
@@ -535,17 +509,7 @@ As we are validating that if the stock quantity for that product is 0 then we do
 def selected_product(request):
     productname = request.GET['product_name']
 
-    cache_key = "product_data_estimate_cache" 
-    cached_productdata = cache.get(cache_key)
-
-    # Check for caching data weather that is there or not.
-    if cached_productdata is None:
-        productdata = Product_estimate.objects.all()
-        cache.set(cache_key, productdata, timeout=None)
-        print("Non Cached Data")
-    else:
-        productdata = cached_productdata
-        print("cached Data")
+    productdata = product_cache()
     
     product_data = productdata.get(product_name = productname)
     stock_data = Stock_estimate.objects.get(product = product_data.id)

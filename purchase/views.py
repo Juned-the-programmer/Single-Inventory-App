@@ -9,11 +9,11 @@ from django.db.models import Max
 from django.core.cache import cache
 
 from products.models import *
+from Inventory.cache_storage import *
 
 from .models import *
 
 # To Add / view and update the purchase data
-
 # To Add Purchase
 @login_required(login_url='login')
 def addpurchase(request):
@@ -148,14 +148,7 @@ def addpurchase(request):
 
     if request.session["Estimate"]:
 
-        cache_key = "supplier_data_estimate_cache"
-        cache_supplier_data = cache.get(cache_key)
-
-        if cache_supplier_data is None:
-            Supplier_data = Supplier_estimate.objects.all()
-            cache.set(cache_key, supplier_data , timeout=None)
-        else:
-            Supplier_data = cache_supplier_data
+        Supplier_data = supplier_cache()
 
         if Estimate_Purchase.objects.exists():
             new_bill = Estimate_Purchase.objects.all().count()
@@ -186,7 +179,7 @@ def viewpurchase(request):
         # Check for user Group
         if request.session["Estimate"]:
             # Get the product data
-            Purchase_data = Estimate_Purchase.objects.all().order_by("-date")
+            Purchase_data = Estimate_Purchase.objects.all().prefetch_related('supplier').order_by("-date")
         
         # Check for user Group
         if request.session["GST"]:
@@ -376,8 +369,12 @@ def updatepurchase(request,pk):
         purchase_Bill_date = Estimate_Purchase.objects.get(Bill_no=purchase_Bill_no).date
         purchase_data = Estimate_Purchase.objects.get(Bill_no=purchase_Bill_no)
         purchase_product = estimatepurchase_Product.objects.filter(Bill_no=purchase_Bill_no)
-        supplier_data = Supplier_estimate.objects.all()
-        product_data = Product_estimate.objects.exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
+        
+        supplier_data = supplier_cache()
+
+        productdata = product_cache()
+
+        product_data = productdata.exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
     
     if request.user.groups.filter(name='GST').exists():
         purchase_Bill_no = GST_Purchase.objects.get(pk=pk).Bill_no
@@ -432,14 +429,7 @@ def purchaseinvoice(request,pk):
 def supplierdueamount_estimate(request):
     sname = request.GET['cname']
 
-    cache_key = "supplier_data_estimate_cache"
-    cache_supplier_data = cache.get(cache_key)
-
-    if cache_supplier_data is None:
-        supplier_data = Supplier_estimate.objects.all()
-        cache.set(cache_key, supplier_data , timeout=None)
-    else:
-        supplier_data = cache_supplier_data
+    supplier_data = supplier_cache()
 
     camount = supplier_data.get(id=sname).supplieraccount_estimate
     due_amount = camount.amount
@@ -451,17 +441,7 @@ def supplierdueamount_estimate(request):
 def purchaseprice_estimate(request):
     product_name = request.GET['pname']
 
-    cache_key = "product_data_estimate_cache" 
-    cached_productdata = cache.get(cache_key)
-    
-    # Get the Product details
-    if cached_productdata is None:
-        productdata = Product_estimate.objects.all()
-        cache.set(cache_key, productdata, timeout=None)
-        print("Non Cached Data")
-    else:
-        productdata = cached_productdata
-        print("cached Data")
+    productdata = product_cache()
 
     prodct_data = productdata.get(product_name=product_name)
 
@@ -486,16 +466,7 @@ It will reduce the complexity and increase data maintainability '''
 @login_required(login_url='login')
 def supplier_products(request):
 
-    cache_key = "product_data_estimate_cache" 
-    cached_productdata = cache.get(cache_key)
-
-    if cached_productdata is None:
-        productdata = Product_estimate.objects.all()
-        cache.set(cache_key, productdata, timeout=None)
-        print("Non Cached Data")
-    else:
-        productdata = cached_productdata
-        print("cached Data")
+    productdata = product_cache()
 
     product_data = productdata.filter(supplier=request.GET['supplier_name']).exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
     return JsonResponse({"Product_data":list(product_data.values())})

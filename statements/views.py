@@ -15,6 +15,7 @@ from payments.models import *
 from products.models import *
 from sales.models import *
 from supplier.models import *
+from Inventory.cache_storage import *
 
 # To generate the different report.
 
@@ -244,14 +245,7 @@ def customerstatement(request):
     # Check for user Group
     if request.session['Estimate']:
         # Get the customer data for Estimate
-        cache_key = "customer_data_estimate_cache"
-        cache_customer_data = cache.get(cache_key)
-
-        if cache_customer_data is None:
-            customer_data = Customer_estimate.objects.all()
-            cache.set(cache_key, customer_data , timeout = None)
-        else:
-            customer_data = cache_customer_data
+        customer_data = customer_cache()
     
     # Check for User Group
     if request.session['GST']:
@@ -273,14 +267,8 @@ def customer_statement_view(request,pk):
         # Check for User Group
         if request.session['Estimate']:
             # Load a cache Customer Data
-            cache_key = "customer_data_estimate_cache"
-            cache_customer_data = cache.get(cache_key)
-
-            if cache_customer_data is None:
-                customer_data = Customer_estimate.objects.all()
-                cache.set(cache_key, customer_data , timeout = None)
-            else:
-                customer_data = cache_customer_data
+            
+            customer_data = customer_cache()
             
             customer_data = customer_data.get(id=pk)
             

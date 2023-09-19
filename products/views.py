@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 
 from .models import *
+from Inventory.cache_storage import *
 import json
 
 ''' To add / view and update Product details '''
@@ -78,14 +79,7 @@ def addproduct(request):
     # check for user Group
     if request.session['Estimate']:
         # Get all the supplier data Estimate
-        cache_key = "supplier_data_estimate_cache"
-        cache_supplier_data = cache.get(cache_key)
-
-        if cache_supplier_data is None:
-            Supplier_data = Supplier_estimate.objects.all()
-            cache.set(cache_key, Supplier_data , timeout=None)
-        else:
-            Supplier_data = cache_supplier_data
+        Supplier_data = supplier_cache()
 
         category = product_category.objects.all()
 
@@ -107,7 +101,7 @@ def viewproduct(request):
         # Check for user Group
         if request.session['Estimate']:
             # Get all the product data for Estimate
-            Product_data = Product_estimate.objects.all()
+            Product_data = Product_estimate.objects.all().prefetch_related('product_categ')
 
         # Check for user Group            
         if request.session['GST']:
@@ -174,15 +168,10 @@ def updateproduct(request,pk):
                 messages.success(request , "Product Updated Successfully ! ")
         
         if request.session['Estimate']:
-            Product_data = Product_estimate.objects.get(pk=pk)
-            cache_key = "supplier_data_estimate_cache"
-            cache_supplier_data = cache.get(cache_key)
-
-            if cache_supplier_data is None:
-                supplier_data = Supplier_estimate.objects.all()
-                cache.set(cache_key, supplier_data , timeout=None)
-            else:
-                supplier_data = cache_supplier_data
+            product_data = product_cache()
+            Product_data = product_data.get(pk=pk)
+        
+            supplier_data = supplier_cache()
         
         if request.session['GST']:
             Product_data = Product_gst.objects.get(pk=pk)
@@ -219,17 +208,7 @@ def manufacture_product(request):
 
                 messages.success(request, "Product Manufactured Successfully ! ")
 
-    cache_key = "product_data_estimate_cache" 
-    cached_product_data = cache.get(cache_key)
-
-    # Check for caching data weather that is there or not.
-    if cached_product_data is None:
-        product_data = Product_estimate.objects.all()
-        cache.set(cache_key, product_data, timeout=None)
-        print("Non Cached Data")
-    else:
-        product_data = cached_product_data
-        print("cached Data")
+    product_data = product_cache()
 
     product_type = Product_type.objects.get(product_type="Manufacture")
 
@@ -274,17 +253,7 @@ def product_required(request):
                 product_required_manufacture.required_products.set(required_product)
                 product_required_manufacture.save()
 
-    cache_key = "product_data_estimate_cache" 
-    cached_product_data = cache.get(cache_key)
-
-    # Check for caching data weather that is there or not.
-    if cached_product_data is None:
-        product_data = Product_estimate.objects.all()
-        cache.set(cache_key, product_data, timeout=None)
-        print("Non Cached Data")
-    else:
-        product_data = cached_product_data
-        print("cached Data")
+    product_data = product_cache()
 
     product_type = Product_type.objects.get(product_type="Manufacture")
 
@@ -300,5 +269,5 @@ def product_required(request):
 When we add new product then it will update the cache to new details of all the product data '''
 def cache_product_data():
     cache_key = "product_data_estimate_cache"
-    product_data = list(Product_estimate.objects.values())
+    product_data = Product_estimate.objects.all()
     cache.set(cache_key, product_data, timeout=None)
