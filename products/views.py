@@ -13,7 +13,13 @@ import json
 # To add Product
 @login_required(login_url='login')
 def addproduct(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and 'Add Category' in request.POST:
+        category = product_category(
+            product_category = request.POST['category']
+        )
+        category.save()
+
+    if request.method == 'POST' and 'Estimate' in request.POST:
         # Check for User Group
         if request.session['Estimate']:
             supplier_id = request.POST.get('supplier')
@@ -24,25 +30,29 @@ def addproduct(request):
             purchase_price_str = request.POST.get('purchaseprice', 0.0)
             purchase_price = float(purchase_price_str) if purchase_price_str else 0.0
 
-            is_manufacturing_product = request.POST['radio-inline']
-            is_manufacturing = is_manufacturing_product == "yes"
+            if request.session["Manufacture"]:
+                is_manufacturing_product = request.POST['radio-inline']
+                is_manufacturing = is_manufacturing_product == "yes"
 
-            if is_manufacturing:
-                product_type = Product_type.objects.get(product_type="Manufacture")
-            else:
-                product_type = None
+                if is_manufacturing:
+                    product_type = Product_type.objects.get(product_type="Manufacture")
+                else:
+                    product_type = None
 
             product = Product_estimate(
                 product_name = request.POST['productname'],
-                product_categ = request.POST['productcategory'],
+                product_categ = product_category.objects.get(id=request.POST['category']),
                 unit = request.POST['unit'],
                 selling_price = request.POST['sellingprice'],
                 store_location = request.POST['storelocation'],
                 supplier = supplier,
                 minimum_stock =  request.POST['minimum_stock'],
                 purchase_price = purchase_price,
-                product_type = product_type
             )
+
+            if request.session['Manufacture']:
+                product.product_type = product_type
+
             # save
             product.save()
             messages.success(request, "Product Addedd Successfully ! ")
@@ -77,13 +87,16 @@ def addproduct(request):
         else:
             Supplier_data = cache_supplier_data
 
+        category = product_category.objects.all()
+
     # Check for User Group        
     if request.session['GST']:
         # Get all the supplier data
         Supplier_data = Supplier_gst.objects.all()
 
     context = {
-        'Supplier_data':Supplier_data
+        'Supplier_data':Supplier_data,
+        'category' : category
     }
     return render(request,"products/addproduct.html",context)
 

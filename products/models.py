@@ -3,6 +3,13 @@ import uuid
 from supplier.models import *
 
 # Create your models here.
+class product_category(models.Model):
+    product_category = models.CharField(max_length=100)
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
+
+    def __str__(self):
+        return self.product_category
+
 class Product_type(models.Model):
     product_type = models.CharField(max_length=100)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
@@ -17,7 +24,7 @@ class Product_type(models.Model):
 
 class Product_estimate(models.Model):
     product_name = models.CharField(max_length=100)
-    product_categ = models.CharField(max_length=50)
+    product_categ = models.ForeignKey(product_category, null=True, blank=True, on_delete=models.SET_NULL)
     product_type = models.ForeignKey(Product_type, null=True, blank=True, on_delete=models.SET_NULL)
     unit = models.CharField(max_length=50)
     selling_price = models.FloatField()

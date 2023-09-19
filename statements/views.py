@@ -200,7 +200,7 @@ def salereport(request):
         if request.session['Estimate']:
             if request.method == 'POST':
                 # Search from the sale data between two dates.
-                searchsale = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).select_related('customer')
+                searchsale = Estimate_sales.objects.filter(date__range = (request.POST['fromdate'] , request.POST['todate'])).select_related('customer')
 
                 context = {
                     'searchsale' : searchsale
@@ -272,48 +272,57 @@ def customer_statement_view(request,pk):
     if request.method == "POST":
         # Check for User Group
         if request.session['Estimate']:
+            # Load a cache Customer Data
+            cache_key = "customer_data_estimate_cache"
+            cache_customer_data = cache.get(cache_key)
+
+            if cache_customer_data is None:
+                customer_data = Customer_estimate.objects.all()
+                cache.set(cache_key, customer_data , timeout = None)
+            else:
+                customer_data = cache_customer_data
+            
+            customer_data = customer_data.get(id=pk)
+            
             # Get the sale data from estimate using filter like dates and customer
-            sale_data = Estimate_sales.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer = Customer_estimate.objects.get(pk=pk))
+            sale_data = customer_data.estimate_sales.filter(date__range=(request.POST['fromdate'], request.POST['todate']))
             
             # Processing data.
-            if sale_data.count() > 0:
-                sale_data_total_filter =  sale_data.aggregate(Sum('Total_amount'))
-                sale_data_total = sale_data_total_filter['Total_amount__sum']
-                sale_data_round_off_filter = sale_data.aggregate(Sum('Round_off')) 
-                sale_data_round_off = sale_data_round_off_filter['Round_off__sum']
+            if sale_data.exists():
+                sale_data_aggregates = sale_data.aggregate(
+                    total_amount_sum=Sum('Total_amount'),
+                    round_off_sum=Sum('Round_off')
+                )
+                sale_data_total = sale_data_aggregates.get('total_amount_sum', 0) or 0
+                sale_data_round_off = sale_data_aggregates.get('round_off_sum', 0) or 0
+                sale_data_money = sale_data_total - sale_data_round_off
+                sale_data_money = round(sale_data_money , 2)
             else:
                 sale_data_total = 0
                 sale_data_round_off = 0
-
-
-            if sale_data.count() == 0:
                 sale_data_money = 0
-            else:
-                sale_data_money = sale_data_total - sale_data_round_off
-                sale_data_money = round(sale_data_money , 2)
-                print(sale_data_money)
 
             # Get the payment data for that customer.
-            payment_data = customerpay_estimate.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate']).filter(customer_name = Customer_estimate.objects.get(pk=pk))
+            payment_data = customer_data.customerpay_estimate_set.filter(date__range=(request.POST['fromdate'], request.POST['todate']))
             payment_data_total_money = 0
             payment_data_round_off_money = 0
 
             # Processing data
-            if payment_data.count() > 0:
-                payment_data_total_filter = payment_data.aggregate(Sum('paid_amount'))
-                payment_data_total = payment_data_total_filter['paid_amount__sum']
-                payment_data_round_off_filter = payment_data.aggregate(Sum('round_off'))
-                payment_data_round_off = payment_data_round_off_filter['round_off__sum']
+            if payment_data.exists():
+                payment_data_aggregates = payment_data.aggregate(
+                    payment_data_total = Sum('paid_amount'),
+                    payment_data_round_off = Sum('round_off')
+                )
+                payment_data_total = payment_data_aggregates.get('paid_amount__sum' , 0) or 0
+                payment_data_round_off = payment_data_aggregates.get('round_off__sum' ,  0) or 0
                 payment_data_total_plus_round_off = float(payment_data_total) + float(payment_data_round_off)
+                payment_data_total_money = round(payment_data_total_plus_round_off , 2)
+                payment_data_round_off_money = round(payment_data_round_off , 2)
             else:
                 payment_data_total = 0
                 payment_data_round_off = 0
-
-            if payment_data.count() == 0:
-                payment_data_money = 0
-            else:
-                payment_data_total_money = round(payment_data_total_plus_round_off , 2)
-                payment_data_round_off_money = round(payment_data_round_off , 2)
+                payment_data_total_money = 0
+                payment_data_round_off_money = 0
 
             total_data = itertools.zip_longest(payment_data,sale_data)
 

@@ -15,7 +15,13 @@ Add Product
 <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">  
         <div class="card">
-            <h5 class="card-header">Add Product</h5>
+            <div class="card-header">
+                <h5 class="align-middle">Add Product
+                    <button type="submit" class="btn btn-space btn-success rounded float-right" data-toggle="modal" data-target="#exampleModal">
+                        Add Category
+                    </button>
+                </h5>
+            </div>
             <div class="card-body">
                 <div class="form-row">
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
@@ -33,15 +39,13 @@ Add Product
                     </div>
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <div class="form-group">
-                            <label for="validationCustom01">Product Category</label>
-                            <input
-                            type="text"
-                            class="form-control"
-                            id="validationCustom01"
-                            placeholder="Product Category"
-                            name="productcategory"
-                            required
-                            />
+                            <label for="validationCustom02">Product Category</label>
+                            <select name="category" id="validationCustom02" class="form-control">
+                                <option value="-1">--------select category--------</option>
+                                {% for i in category %} 
+                                    <option value="{{i.id}}">{{i.product_category}}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
                     {% if request.session.Manufacture %}
@@ -157,6 +161,33 @@ Add Product
     </div>
 </div>
 </form>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Stock</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+        <div class="modal-body">
+        <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="">
+                <label for="validationCustom03">Category</label>
+                <input type="text" class="form-control mt-3" name="category"> 
+            </div>
+        </div>
+    </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-space btn-success rounded" name="Add Category" value="Submit">
+        </div>
+        </form>
+        </div>
+    </div>
+</div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Get the radio buttons

@@ -5,7 +5,7 @@ from customer.models import *
 # Create your models here.
 class Estimate_sales(models.Model):
     Bill_no = models.IntegerField()
-    customer = models.ForeignKey(Customer_estimate,on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer_estimate,on_delete=models.CASCADE, related_name="estimate_sales")
     date = models.DateField(auto_now_add=True)
     Total_amount = models.FloatField()
     Due_amount = models.FloatField()
