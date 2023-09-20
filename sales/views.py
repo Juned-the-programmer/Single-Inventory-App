@@ -11,6 +11,7 @@ from django.core.cache import cache
 
 from dashboard.models import *
 from products.models import *
+from payments.models import *
 from Inventory.cache_storage import *
 
 from .models import *
@@ -24,14 +25,17 @@ def generate_bill_number(request):
     day_of_year = today.strftime("%j")
 
     # Assuming you have a model named Bill
-    last_bill = Bill_number.objects.all().first()
+    last_bill = Estimate_sale_bill_number.objects.all().first()
 
     if last_bill:
-        print(last_bill.last_bill_number)
         last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
         new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
     else:
         new_bill_number = "001"  # First bill of the day
+        bill_number = Estimate_sale_bill_number (
+            last_bill_number = f"{year}{day_of_year}{new_bill_number}"
+        )
+        bill_number.save()
 
     return f"{year}{day_of_year}{new_bill_number}"
 
@@ -53,10 +57,10 @@ def addsale(request):
                 Round_off = 0
 
             Grand_total = request.POST['gtot']
-        
+
             # Create a Estimate sale data
             Estimatesale = Estimate_sales(
-                Bill_no = generate_bill_number(request),
+                Bill_no = request.POST['bill_no'],
                 customer = Customer_estimate.objects.get(id=request.POST['customer']),
                 Total_amount=request.POST['total'],
                 Due_amount=request.POST['oldamt'],
@@ -69,12 +73,12 @@ def addsale(request):
             # Update the Grand Total
             customerAccount.amount = float(Grand_total)
             
-            if cash_on_hand == 0:
-                print("Customer Payment")
-            else:
+            customer_data = customer_cache()
+            
+            if cash_on_hand != 0:
                 # Create a object for Customer Pay when we have a Cash on Hand Value
                 CustomerPay = customerpay_estimate (
-                    customer_name = request.POST['customer'],
+                    customer_name = customer_data.get(id=request.POST['customer']),
                     pending_amount = Grand_total,
                     paid_amount = cash_on_hand,
                     round_off = 0
@@ -86,7 +90,7 @@ def addsale(request):
 
             # Loop through the list of prodcuts for that Sale
             # esc : Check for declaration
-            for i in range(0,esc):
+            for i in range(0,int(request.POST['product_count'])):
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:
@@ -118,7 +122,7 @@ def addsale(request):
 
             # Update the bill number in the Bill_number model.
             last_bill = Bill_number.objects.all().first()
-            last_bill.last_bill_number = generate_bill_number(request)
+            last_bill.last_bill_number = request.POST['bill_no']
             last_bill.save()
             
             # save

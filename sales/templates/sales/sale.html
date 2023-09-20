@@ -44,7 +44,6 @@ Add Sales
                     </select>
                 </div>
             </div>
-            <div id="c" data-href="{% url 'estimatesalec' %}"></div>
             <table class="table table-striped table-bordered table-condensed table-hover">
                 <thead class="thead-dark punit">
                     <tr>
@@ -130,6 +129,7 @@ Add Sales
                 <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
                 </p>
             </div>
+            <input type="hidden" class="form-control" id="product_count" name="product_count">
             </form>
             </div>
         </div>
@@ -139,7 +139,6 @@ Add Sales
 <div class="selected_product" data-href="{% url 'selected_product' %}"></div>
 
 <div class="product_data_estimate" data-href="{% url 'product_data_estimate' %}"></div>
-<div id="c" data-href="{% url 'estimatesalec' %}"></div>
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script src="{% static 'libs/js/custom/estimatesale.js' %}"></script>

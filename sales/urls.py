@@ -7,7 +7,6 @@ urlpatterns = [
     path('updatesale/<pk>',views.updatesale,name="updatesale"),
     path('saleinvoice/<pk>',views.saleinvoice,name="saleinvoice"),
     #Ajax Call for Estimate Sale Start here
-    path('estimatesalec/',views.estimatesalec,name="estimatesalec"),
     path('customerdue_estimate/',views.customerdue_estimate,name="customerdue_estimate"),
     path('product_data_estimate/',views.product_data_estimate,name="product_data_estimate"),
     path('selected_product/',views.selected_product, name="selected_product"),

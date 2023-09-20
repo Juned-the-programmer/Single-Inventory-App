@@ -3,7 +3,7 @@ import uuid
 from customer.models import *
 
 # Create your models here.
-class Bill_number(models.Model):
+class Estimate_sale_bill_number(models.Model):
     last_bill_number = models.IntegerField()
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 

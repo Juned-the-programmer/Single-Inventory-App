@@ -44,18 +44,9 @@ $(document).ready(function () {
               counter++;
               no=counter+1
               unit='pcs'
+              console.log(counter)
 
-              $.ajax({
-                type:"GET",
-                url: $('#purchase_product_count').attr('data-href'),
-                data:{'estimate_purchase_product_count':counter},
-                success: function(response){
-                  console.log(response)
-                },
-                error: function(response){
-                  alert("error c")
-                }
-              })
+              $('#product_count').val(counter)
 
               var newRow= $(document.createElement('tr'))
               .attr("id", 'row' + counter)

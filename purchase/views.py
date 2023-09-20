@@ -1,4 +1,5 @@
-from datetime import date, datetime
+from datetime import date
+import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -15,6 +16,27 @@ from .models import *
 
 # To Add / view and update the purchase data
 # To Add Purchase
+@login_required(login_url='login')
+def generate_bill_number(request):
+    today = datetime.date.today()
+    year = today.strftime("%Y")
+    day_of_year = today.strftime("%j")
+
+    # Assuming you have a model named Bill
+    last_bill = Estimate_purchase_bill_number.objects.all().first()
+
+    if last_bill:
+        last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
+        new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
+    else:
+        new_bill_number = "001"  # First bill of the day
+        bill_number = Estimate_purchase_bill_number (
+            last_bill_number = f"{year}{day_of_year}{new_bill_number}"
+        )
+        bill_number.save()
+
+    return f"{year}{day_of_year}{new_bill_number}"
+
 @login_required(login_url='login')
 def addpurchase(request):
     if request.method == 'POST':
@@ -45,10 +67,13 @@ def addpurchase(request):
             # Get supplier account Estimate based on the supplier data
             supplierAccount = supplieraccount_estimate.objects.get(supplier_name = request.POST['supplier'])
             supplierAccount.amount = float(request.POST['gtot'])
+
+            print(request.POST['product_count'])
+            print(type(request.POST['product_count']))
             
             # Loop to save the data for product details for that sale.
             # estimate_purchase_product_list_count : See the declaration for more
-            for i in range(0,estimate_purchase_product_list_count):
+            for i in range(0,int(request.POST['product_count'])):
                 # Check for discount
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
@@ -76,6 +101,10 @@ def addpurchase(request):
                 # Save
                 stock.save()
                 estimate.save()
+
+                last_bill = Estimate_purchase_bill_number.objects.all().first()
+                last_bill.last_bill_number = request.POST['bill_no']
+                last_bill.save()
 
             # Save
             Estimate.save()
@@ -150,11 +179,7 @@ def addpurchase(request):
 
         Supplier_data = supplier_cache()
 
-        if Estimate_Purchase.objects.exists():
-            new_bill = Estimate_Purchase.objects.all().count()
-            new_bill = new_bill + 1
-        else:
-            new_bill = 1
+        new_bill = generate_bill_number(request)
 
     if request.session["GST"]:
         Supplier_data = Supplier_gst.objects.all()
@@ -450,15 +475,6 @@ def purchaseprice_estimate(request):
         "product_unit" : prodct_data.unit
     }
     return JsonResponse(response_data)
-
-# To get count for the list of product for that purchase record.
-''' This method will give us the count for how many product does it have in the purchase bill 
-So we can use that to iterate the loop to save the product details for that purchase '''
-@login_required(login_url='login')
-def estimate_purchase_count(request):
-    global estimate_purchase_product_list_count
-    estimate_purchase_product_list_count=int(request.GET['estimate_purchase_product_count'])
-    return HttpResponse(estimate_purchase_product_list_count)
 
 # To get the Products details based on the supplier selected
 ''' We will not get all the products at all for purchase we will filter out those products which we can purchase from this supplier.

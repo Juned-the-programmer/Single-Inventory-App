@@ -35,18 +35,8 @@ $(document).ready(function () {
               counter++;
               no=counter+1
               unit='pcs'
-
-              $.ajax({
-                type:"GET",
-                url: $('#c').attr('data-href'),
-                data:{'c':counter},
-                success: function(response){
-                  console.log(response)
-                },
-                error: function(response){
-                  alert("error c")
-                }
-              })
+              
+              $('#product_count').val(counter)
               
               var newRow= $(document.createElement('tr'))
               .attr("id", 'row' + counter)

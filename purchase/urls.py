@@ -10,7 +10,6 @@ urlpatterns = [
     # Ajax Call for Purchase Start here Estimate
     path('supplierdueamount_estimate/',views.supplierdueamount_estimate,name="supplierdueamount_estimate"),
     path('purchaseprice_estimate/',views.purchaseprice_estimate,name="purchaseprice_estimate"),
-    path('estimatepurchasec/',views.estimate_purchase_count,name="estimatepurchasec"),
     path('supplier_product/', views.supplier_products, name="supplier_product"),
     
     # Ajax Call for Purchase start here GST
