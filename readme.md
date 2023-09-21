@@ -74,3 +74,6 @@ Run the following commands in the separate terminals.
 - ` celery -A Inventory worker --loglevel=debug `
 
 - ` celery -A Inventory beat --loglevel=debug `
+
+
+#### Feel Free to create any issue if it required for any suggestion. That will be appreciable
