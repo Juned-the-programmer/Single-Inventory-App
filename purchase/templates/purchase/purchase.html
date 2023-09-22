@@ -137,6 +137,26 @@ Estimate Purchase
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script src="{% static 'libs/js/custom/estimatepurchase.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        // Disable product select by default
+        $("select[id^='prod']").prop("disabled", true);
+    
+        // Listen for changes on the customer select
+        $("#cname").change(function () {
+            // Get the selected customer value
+            var selectedCustomer = $(this).val();
+    
+            // Enable product select if a customer is selected
+            if (selectedCustomer !== '-1') {
+                $("select[id^='prod']").prop("disabled", false);
+            } else {
+                // Disable product select if no customer is selected
+                $("select[id^='prod']").prop("disabled", true);
+            }
+        });
+    });
+</script>   
 
 {% else %}
 <div class="row">
