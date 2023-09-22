@@ -89,8 +89,27 @@ def signup_estimate(request):
             user_login = auth.authenticate(username=request.POST['username'],password=request.POST['password'])
             if user_login is not None:
                 auth.login(request,user_login)
+                if user_login.groups.filter(name="Estimate").exists():
+                    request.session['Estimate'] = True
+                else:
+                    request.session['Estimate'] = False
+
+                if user_login.groups.filter(name="GST").exists():
+                    request.session['GST'] = True
+                else:
+                    request.session['GST'] = False
+                
+                if user_login.groups.filter(name="Manufacture").exists():
+                    request.session['Manufacture'] = True
+                else:
+                    request.session['Manufacture'] = False
             else:
                 print("Singup Again")
+            
+            if request.POST['Manufacture'] == "Yes":
+                add_group = Group.objects.get_or_create(name="Manufacture")
+                add_group = Group.objects.get(name='Manufacture')
+                add_group.user_set.add(user_signup)
 
             data = request.user.profile
 
