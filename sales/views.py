@@ -8,6 +8,9 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.db.models import Max
 from django.core.cache import cache
+from django.http import HttpResponse
+from django.template.loader import get_template
+from weasyprint import HTML
 
 from dashboard.models import *
 from products.models import *
@@ -449,32 +452,50 @@ def updatesale(request , pk):
 # To generate the Sale Invoice
 @login_required(login_url='login')
 def saleinvoice(request,pk):
-    try:
-        # Check for User group
-        if request.session['Estimate']:
-            # Get the sale data
-            sale_data = Estimate_sales.objects.get(pk=pk)
-            # Get the Product data
-            product_data = estimatesales_Product.objects.filter(Bill_no = sale_data.Bill_no)
-            word = 1
+    
+    template = get_template('sales/saleinvoice.html') 
 
-        if request.session['GST']:
-            sale_data = gstsale.objects.get(pk=pk)
-            product_data = gstsales_Product.objects.filter(Bill_no = sale_data.Bill_no)
-            word =num2words(gst.Grand_total)
+    # Context data for rendering the template (replace with your actual data)
+    context = {
+        'logo': 'path/to/your/logo.png',
+        'company_name': 'Company Name',
+        'dated': '01/01/2000',
+        'challan_number': '2023265002',
+        'date': '01/01/2000',
+        'cgst': 18,
+        'sgst': 18,
+        'cgst_amount': 2025.25,
+        'sgst_amount': 2000.25,
+        'total': 4025.50,
+        'grand_total': 4025.50,
+        'amount_in_words': 'Four Thousand and Twenty Five',
+        'works': [  # Replace with your actual data
+            {
+                'code': 'Product Code',
+                'vendor_name': 'Vendor Name',
+                'po_number': 'PO123',
+                'jc_number': 'JC456',
+                'weight': '10 kg',
+                'bags': 5,
+                'quantity': 100,
+                'rate': 20.50,
+                'amount': 2050.00,
+            },
+            # Add more work items as needed
+        ],
+    }
 
-        raw_text = u"\u20B9"        
-        print(raw_text)
+    # Render the template with the context data
+    html = template.render(context)
 
-        context = {
-            'sale_data' : sale_data,
-            'product_data':product_data,
-            'word' : word,
-            'raw_text' : raw_text,
-        }
-        return render(request,"sales/saleinvoice.html",context)
-    except:
-        return redirect('error404')
+    # Create a PDF file
+    pdf_file = HTML(string=html).write_pdf()
+
+    # Create an HTTP response with the PDF file
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="invoice.pdf"'
+
+    return response
 
 # To get customer Due
 ''' We will get the Customer Due from the customerAccount model based on the customer name. 
