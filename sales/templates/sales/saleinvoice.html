@@ -3,6 +3,10 @@
 <html>
 <head>
 <style>
+@page {
+    size: A4; /* Set the page size to A4 or any size you prefer */
+    margin: 0cm 0.5cm; /* Adjust margins as needed (top right bottom left) */
+}
 table {
     width:100%;
 }
@@ -42,11 +46,11 @@ img{
         <tr>
             <th colspan="7" style="text-align: center;">
                 <div style="text-align: center">
-                    <h3 style="padding-top: 5px; margin: 0;">DELIEVERY CHALLAN / INVOICE<span style="white-space: pre;">               MOB NO :- 9423222798 & 9881212348</span></h3>
-                    <p style="padding: 0; font-size: 40px; margin: 0;"><img src="{{ logo }}" style="height: 40px; width: 70px; margin-left: 30px;"> Vaibhav Engineering Works</p>
+                    <h3 style="padding-top: 5px; margin: 0;">DELIEVERY CHALLAN / INVOICE<span style="white-space: pre;">               MOB NO :- {{mobile_number}}</span></h3>
+                    <p style="padding: 0; font-size: 40px; margin: 0;"><img src="{{ logo }}" style="height: 40px; width: 70px; margin-left: 30px;"> {{company_name}}</p>
                     <p style="padding-bottom: 2px; margin: 0; font-size: 15px;">An ISO 9001:2014 CERTIFICATION</p>
                     <h3 style="padding-bottom: 5px; margin: 0;">
-                            S.No.15/11/3, Old Warje Jakat Naka, Behind Kakde City, Karvanagar
+                            {{address}}                    
                     </h3>
                 </div>
             </th>
@@ -54,51 +58,70 @@ img{
 
         <!-- Company Information and Date Section -->
         <tr>
-            <td colspan="5"><b>To, M/s:</b> Juned Davada</td>
-            <td colspan="2"><b>Dated:</b> 01/01/2000</td>
+            <td colspan="5"><b>To, M/s:</b> {{bill_detail.customer.fullname}}</td>
+            <td colspan="2"><b>Dated:</b> {{bill_detail.customer.date}}</td>
         </tr>
 
         <!-- Invoice Number and Date Section -->
         <tr>
-            <td colspan="7"><b>Invoice No: <span>2023265002</span></b><br><b>Date:</b> 01/01/2000</td>
+            <td colspan="7"><b>Invoice No: <span>{{bill_detail.Bill_no}}</span></b><br><b>Date:</b> {{bill_detail.date}}</td>
         </tr>
 
         <!-- Table Header Section -->
         <tr>
-            <th style="text-align: center; width: 40%">Particular</th>
+            <th style="text-align: center; width: 35%">Particular</th>
             <th style="text-align: center; width: 10%">Unit</th>
             <th style="text-align: center; width: 10%">Rate</th>
             <th style="text-align: center; width: 10%">Quantity</th>
             <th style="text-align: center; width: 10%">Discount</th>
             <th style="text-align: center; width: 10%">Net Rate</th>
-            <th style="text-align: center; width: 10%">Total</th>
+            <th style="text-align: center; width: 15%">Total</th>
         </tr>
 
         <!-- Data Rows -->
-        {% for i in '0123456789'|make_list %}
+        {% for product in product_detail %}
         <tr>
-            <td>Product Name</td>
-            <td>Unit</td>
-            <td>Rate</td>
-            <td>Quantity</td>
-            <td>Discount</td>
-            <td>Net Rate</td>
-            <td>Total</td>
+            <td style="text-align:center;">{{product.product_name}}</td>
+            <td style="text-align:center;">{{product.unit}}</td>
+            <td style="text-align:center;">{{product.rate}}</td>
+            <td style="text-align:center;">{{product.qty}}</td>
+            <td style="text-align:center;">{{product.dis}}</td>
+            <td style="text-align:center;">{{product.netrate}}</td>
+            <td style="text-align:center;">{{product.total}}</td>
         </tr>
         {% endfor %}
+        <tr>
+            <td colspan="7" style="border-bottom: 2px solid black;"></td>
+        </tr>
 
         <!-- Tax and Total Section -->
         <tr>
-            <td colspan="7" style="text-align:right;"><b>Total : </b> 4025.25</td>
+            <td colspan="5"></td>
+            <td style="text-align:center;"><b>Total  </b> </td>
+            <td style="text-align:center;">{{bill_detail.Total_amount}}</td>
         </tr>
+        {% if request.session.GST %}
         <tr>
             <td colspan="7" style="text-align:right;"><b>CGST (18%%) : </b> 2025.25</td>
         </tr>
         <tr>
             <td colspan="7" style="text-align:right;"><b>SGST (18%%) : </b> 2025.25</td>
         </tr>
+        {% endif %}
         <tr>
-            <td colspan="7" style="text-align:right;"><b>Grant Total : </b> 4050.50</td>
+            <td colspan="5"></td>
+            <td style="text-align:center;"><b>Due Amount </b></td> 
+            <td style="text-align:center;">{{bill_detail.Due_amount}}</td>
+        </tr>
+        <tr>
+            <td colspan="5"></td>
+            <td style="text-align:center;"><b>Round off  </b></td> 
+            <td style="text-align:center;">{{bill_detail.Round_off}}</td>
+        </tr>
+        <tr>
+            <td colspan="5"></td>
+            <td style="text-align:center;"><b>Grant Total </b></td> 
+            <td style="text-align:center;">{{bill_detail.Grand_total}}</td>
         </tr>
 
         <!-- Amount in Words Section -->
@@ -122,7 +145,7 @@ img{
             <td colspan="2">
                 <br>
                 <div style="vertical-align: bottom !important; text-align: center">
-                    For Vaibhav Engineering Works
+                    For {{company_name}}
                 </div>
             </td>
         </tr>

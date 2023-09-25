@@ -453,36 +453,30 @@ def updatesale(request , pk):
 @login_required(login_url='login')
 def saleinvoice(request,pk):
     
-    template = get_template('sales/saleinvoice.html') 
+    template = get_template('sales/saleinvoice.html')
+
+    # Get Bill details
+    bill_detail = Estimate_sales.objects.get(id=pk)
+
+    # Get product details
+    product_detail = estimatesales_Product.objects.filter(Bill_no = bill_detail.Bill_no)
+
+    # Company name
+    company_name = request.user.profile.company_name
+
+    # Mobile Number
+    mobile_number = request.user.profile.phone_no
+
+    # Address
+    address = f"{request.user.profile.Address}, {request.user.profile.city}, {request.user.profile.state}, {request.user.profile.pincode}"
 
     # Context data for rendering the template (replace with your actual data)
     context = {
-        'logo': 'path/to/your/logo.png',
-        'company_name': 'Company Name',
-        'dated': '01/01/2000',
-        'challan_number': '2023265002',
-        'date': '01/01/2000',
-        'cgst': 18,
-        'sgst': 18,
-        'cgst_amount': 2025.25,
-        'sgst_amount': 2000.25,
-        'total': 4025.50,
-        'grand_total': 4025.50,
-        'amount_in_words': 'Four Thousand and Twenty Five',
-        'works': [  # Replace with your actual data
-            {
-                'code': 'Product Code',
-                'vendor_name': 'Vendor Name',
-                'po_number': 'PO123',
-                'jc_number': 'JC456',
-                'weight': '10 kg',
-                'bags': 5,
-                'quantity': 100,
-                'rate': 20.50,
-                'amount': 2050.00,
-            },
-            # Add more work items as needed
-        ],
+        "bill_detail" : bill_detail,
+        "product_detail" : product_detail,
+        "company_name" : company_name,
+        "mobile_number" : mobile_number,
+        "address" : address
     }
 
     # Render the template with the context data
