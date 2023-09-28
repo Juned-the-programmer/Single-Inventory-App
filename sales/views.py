@@ -11,6 +11,7 @@ from django.core.cache import cache
 from django.http import HttpResponse
 from django.template.loader import get_template
 from weasyprint import HTML
+from num2words import num2words
 
 from dashboard.models import *
 from products.models import *
@@ -470,13 +471,17 @@ def saleinvoice(request,pk):
     # Address
     address = f"{request.user.profile.Address}, {request.user.profile.city}, {request.user.profile.state}, {request.user.profile.pincode}"
 
+    # Amount in Words
+    word_amount = str.upper(num2words(bill_detail.Grand_total))
+
     # Context data for rendering the template (replace with your actual data)
     context = {
         "bill_detail" : bill_detail,
         "product_detail" : product_detail,
         "company_name" : company_name,
         "mobile_number" : mobile_number,
-        "address" : address
+        "address" : address,
+        "word_amount" : word_amount
     }
 
     # Render the template with the context data
