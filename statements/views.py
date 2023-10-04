@@ -301,8 +301,8 @@ def customer_statement_view(request,pk):
                     payment_data_total = Sum('paid_amount'),
                     payment_data_round_off = Sum('round_off')
                 )
-                payment_data_total = payment_data_aggregates.get('paid_amount__sum' , 0) or 0
-                payment_data_round_off = payment_data_aggregates.get('round_off__sum' ,  0) or 0
+                payment_data_total = payment_data_aggregates.get('payment_data_total' , 0) or 0
+                payment_data_round_off = payment_data_aggregates.get('payment_data_round_off' ,  0) or 0
                 payment_data_total_plus_round_off = float(payment_data_total) + float(payment_data_round_off)
                 payment_data_total_money = round(payment_data_total_plus_round_off , 2)
                 payment_data_round_off_money = round(payment_data_round_off , 2)
