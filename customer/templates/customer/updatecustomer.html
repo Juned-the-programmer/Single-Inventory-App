@@ -117,86 +117,117 @@
 </div>
 </form>
 {% else %}
-<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-    <div class="card">
-        <h5 class="card-header">Update customer</h5>
-        <div class="card-body">
-            <form method="POST">
-            {% csrf_token %}
-                <div class="form-group">
-                    <label for="inputUserName">Customer ID</label>
-                    <input
-                    id="customerid"
-                    type="text"
-                    name="customerid"
-                    required=""
-                    placeholder="Enter Customer ID"
-                    class="form-control"
-                    value="{{customer_data.customerid}}"
-                    readonly
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="inputUserName">Full Name</label>
-                    <input
-                    id="Full name"
-                    type="text"
-                    name="fullname"
-                    required=""
-                    placeholder="Enter Full name"
-                    value="{{customer_data.fullname}}"
-                    class="form-control"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="inputUserName">E-Mail</label>
-                    <input
-                    id="Full name"
-                    type="email"
-                    name="email"
-                    required=""
-                    placeholder="Enter E-Mail Here"
-                    value="{{customer_data.email}}"
-                    class="form-control"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="username">Contact No</label>
-                    <input
-                    id="username"
-                    type="tel"
-                    name="mobile"
-                    placeholder="Enter Contact Number"
-                    required=""
-                    pattern="[0-9]{10}"
-                    value="{{customer_data.contactno}}"
-                    class="form-control"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="username">GST No</label>
-                    <input
-                    id="username"
-                    type="text"
-                    name="gstno"
-                    placeholder="Enter GST Number"
-                    required=""
-                    value="{{customer_data.gst}}"
-                    class="form-control"
-                    />
-                </div>
+<form method="POST">
+{% csrf_token %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="align-middle">Add Customer
+            </div>
+            <div class="card-body">
                 <div class="form-row">
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="inputUserName">Full Name</label>
+                            <input
+                            id="Customer ID"
+                            type="text"
+                            name="customerid"
+                            required=""
+                            placeholder="Enter Customer ID"
+                            class="form-control"
+                            value="{{customer_data.customerid}}"
+                            readonly
+                            />
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="inputUserName">Full Name</label>
+                            <input
+                            id="Full name"
+                            type="text"
+                            name="fullname"
+                            required=""
+                            placeholder="Enter Full name"
+                            class="form-control"
+                            value="{{customer_data.fullname}}"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="align-middle">Customer Personal Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="inputUserName">E-Mail</label>
+                            <input
+                            id="Full name"
+                            type="email"
+                            name="email"
+                            required=""
+                            placeholder="Enter E-Mail Here"
+                            class="form-control"
+                            value="{{customer_data.email}}"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="username">Contact No</label>
+                            <input
+                            id="username"
+                            type="tel"
+                            name="mobile"
+                            placeholder="Enter Contact Number"
+                            required=""
+                            pattern="[0-9]{10}"
+                            class="form-control"
+                            value="{{customer_data.contactno}}"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="username">GST No</label>
+                            <input
+                            id="username"
+                            type="text"
+                            name="gstno"
+                            placeholder="Enter GST Number"
+                            required=""
+                            class="form-control"
+                            value="{{customer_data.gst}}"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h5 clas="align-middle">Address Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom03">City</label>
                         <input type="text" class="form-control" id="validationCustom03" name="city" placeholder="City" value="{{customer_data.city}}" required>
                         <div class="invalid-feedback">
                         Please provide a valid city.
                         </div>
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom04">State</label>
-                        <select name="state" id="validationCustom02" class="form-control customer">
-                            <option value="-1" selected>{{customer_data.state}}</option>
+                        <select name="state" id="validationCustom02" class="form-control state">
+                            <option value="{{customer_data.state}}" selected>{{customer_data.state}}</option>
                             <option value="Andaman and Nicobar Isaland">Andaman and Nicobar Isaland</option>
                             <option value="Andhra Pradesh">Andhra Pradesh</option>
                             <option value="Arunachal Pradesh">Arunachal Pradesh</option>
@@ -238,12 +269,14 @@
                         Please provide a valid state.
                         </div>
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <label for="validationCustom05">Landmark</label>
                         <input type="text" class="form-control" id="validationCustom05" name="landmark" placeholder="Landmark" value="{{customer_data.landmark}}" required>
                         <div class="invalid-feedback">
                         Please provide a Landmark
                         </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                     </div>
                     <div class="form-row">
                         <p class="text-right pl-2 pt-3">
@@ -252,10 +285,10 @@
                         </p>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
+</form>
 {% endif %}
 
 {% endblock content %}

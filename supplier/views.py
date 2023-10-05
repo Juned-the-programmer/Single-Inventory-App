@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.core.cache import cache
 
 from .models import *
+from Inventory.cache_storage import *
 
 # Method to check weather the ID what we have generated is Unique all over the database.
 def is_unique_id_unique(unique_id, request):
@@ -64,7 +65,8 @@ def addsupplier(request):
             supplier.save()
             messages.success(request , "Added Supplier Successfully ! ")
 
-            cache_supplier_data()
+            cache.delete("supplier_data_estimate_cache")
+            supplier_cache()
         
         # Check for User Group
         if request.session['GST']:
@@ -82,6 +84,9 @@ def addsupplier(request):
             # Save
             supplier.save()
             messages.success(request, "Added Supplier Successfully ! ")
+
+            cache.delete("gst_supplier_data_cache")
+            supplier_cache_gst()
     
     context = {}
     
@@ -95,19 +100,12 @@ def viewsupplier(request):
         # Check for user Group
         if request.session['Estimate']:
             # To get all the supplier data
-            cache_key = "supplier_data_estimate_cache"
-            cache_supplier_data = cache.get(cache_key)
-
-            if cache_supplier_data is None:
-                supplier_data = Supplier_estimate.objects.all()
-                cache.set(cache_key, supplier_data , timeout = None)
-            else:
-                supplier_data = cache_supplier_data
+            supplier_data = supplier_cache()
 
         # Check for user Group
         if request.session['GST']:
             # To get all the supplier data
-            supplier_data = Supplier_gst.objects.all()
+            supplier_data = supplier_cache_gst()
 
         context = {
             'supplier_data': supplier_data
@@ -119,83 +117,65 @@ def viewsupplier(request):
 # To update the supplier details.
 @login_required(login_url='login')
 def updatesupplier(request,pk):
-    try:
-        if request.method == 'POST':
-            # Check for user Group
-            if request.session['Estimate']:
-                # Get the supplier details
-
-                cache_key = "supplier_data_estimate_cache"
-                cache_supplier_data = cache.get(cache_key)
-
-                if cache_supplier_data is None:
-                    supplier_data = Supplier_estimate.objects.all()
-                    cache.set(cache_key, supplier_data , timeout = None)
-                else:
-                    supplier_data = cache_supplier_data
-
-                supplier = supplier_data.get(pk=pk)
-
-                # Update the values
-                supplier.fullname = request.POST['fullname']
-                supplier.customerid = request.POST['customerid']
-                supplier.contactno = request.POST['mobile']
-                supplier.city = request.POST['city']
-                supplier.state = request.POST['state']
-                supplier.landmark = request.POST['landmark']
-
-                # Save
-                supplier.save()
-                messages.success(request,"Update Supplier Successfully ! ")
-
-                cache_supplier_data()
-            
-            # Check for user Group
-            if request.session['GST']:
-                # Get the supplier details
-                supplier = Supplier_gst.objects.get(pk=pk)
-
-                # Update the values
-                supplier.fullname = request.POST['fullname']
-                supplier.customerid = request.POST['customerid']
-                supplier.contactno = request.POST['mobile']
-                supplier.gst = request.POST['gstno']
-                supplier.email = request.POST['email']
-                supplier.city = request.POST['city']
-                supplier.state = request.POST['state']
-                supplier.landmark = request.POST['landmark']
-
-                # Save
-                supplier.save()
-                messages.success(request, "Update Supplier Successfully ! ")
-        
+    if request.method == 'POST':
         # Check for user Group
         if request.session['Estimate']:
-            # Get the supplier detail
-            cache_key = "supplier_data_estimate_cache"
-            cache_supplier_data = cache.get(cache_key)
+            # Get the supplier details
 
-            if cache_supplier_data is None:
-                supplier_data = Supplier_estimate.objects.all()
-                cache.set(cache_key, supplier_data , timeout = None)
-            else:
-                supplier_data = cache_supplier_data
+            supplier_data = supplier_cache()
+            supplier = supplier_data.get(pk=pk)
 
-            supplier_data = supplier_data.get(id=pk)
+            # Update the values
+            supplier.fullname = request.POST['fullname']
+            supplier.customerid = request.POST['customerid']
+            supplier.contactno = request.POST['mobile']
+            supplier.city = request.POST['city']
+            supplier.state = request.POST['state']
+            supplier.landmark = request.POST['landmark']
 
+            # Save
+            supplier.save()
+            messages.success(request,"Update Supplier Successfully ! ")
+
+            cache.delete("supplier_data_estimate_cache")
+            cache_supplier_data()
+        
         # Check for user Group
         if request.session['GST']:
             # Get the supplier details
-            supplier_data = Supplier_gst.objects.get(pk=pk)
-            
-        context = {
-            'supplier_data':supplier_data
-        }
-        return render(request,"supplier/updatesupplier.html",context)
-    except:
-        return redirect('error404')
 
-def cache_supplier_data():
-    cache_key = "supplier_data_estimate_cache"
-    supplier_data = Supplier_estimate.objects.all()
-    cache.set(cache_key, supplier_data, timeout=None)
+            supplier_data = supplier_cache_gst()
+            supplier = supplier_data.get(pk=pk)
+
+            # Update the values
+            supplier.fullname = request.POST['fullname']
+            supplier.contactno = request.POST['mobile']
+            supplier.gst = request.POST['gstno']
+            supplier.email = request.POST['email']
+            supplier.city = request.POST['city']
+            supplier.state = request.POST['state']
+            supplier.landmark = request.POST['landmark']
+
+            # Save
+            supplier.save()
+            messages.success(request, "Update Supplier Successfully ! ")
+
+            cache.delete("gst_supplier_data_cache")
+            supplier_cache_gst()
+    
+    # Check for user Group
+    if request.session['Estimate']:
+        # Get the supplier detail
+        supplier_data = supplier_cache()
+        supplier_data = supplier_data.get(id=pk)
+
+    # Check for user Group
+    if request.session['GST']:
+        # Get the supplier details
+        supplier_data = supplier_cache_gst()
+        supplier_data = supplier_data.get(pk=pk)
+        
+    context = {
+        'supplier_data':supplier_data
+    }
+    return render(request,"supplier/updatesupplier.html",context)

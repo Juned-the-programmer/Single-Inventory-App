@@ -8,6 +8,7 @@ from django.shortcuts import redirect, render
 from django.core.cache import cache
 
 from .models import *
+from Inventory.cache_storage import *
 
 # Method to check weather the ID what we have generated is Unique all over the database.
 def is_unique_id_unique(unique_id, request):
@@ -64,7 +65,8 @@ def addcustomer(request):
             customer.save()
             messages.success(request , "Added Customer Successfully ! ")
 
-            cache_customer_data()
+            cache.delete("customer_data_estimate_cache")
+            customer_cache()
         
         # Check for weather the request is from Estimate or GST.
         if request.session['GST']:
@@ -83,6 +85,9 @@ def addcustomer(request):
             customer.save()
             messages.success(request, "Added Customer Successfully ! ")
 
+            cache.delete("gst_customer_data_cache")
+            customer_cache_gst()
+
     context = {}
 
     return render(request,"customer/addcustomer.html", context)
@@ -92,18 +97,11 @@ def viewcustomer(request):
     try:
         # Check for weather the request is from Estimate or GST.
         if request.session['Estimate']:
-            cache_key = "customer_data_estimate_cache"
-            cache_customer_data = cache.get(cache_key)
-
-            if cache_customer_data is None:
-                customer_data = Customer_estimate.objects.all()
-                cache.set(cache_key, customer_data , timeout = None)
-            else:
-                customer_data = cache_customer_data 
+            customer_data = customer_cache()
         
         # Check for weather the request is from Estimate or GST.
         if request.session['GST']:
-            customer_data = Customer_gst.objects.all()
+            customer_data = customer_cache_gst()
 
         context = {
             'customer_data':customer_data
@@ -118,7 +116,9 @@ def updatecustomer(request,pk):
     if request.method == 'POST':
         # Check for weather the request is from Estimate or GST.
         if request.session['Estimate']:
-            customer = Customer_estimate.objects.get(pk=pk)
+
+            customer_data = customer_cache()
+            customer = customer_data.get(pk=pk)
 
             customer.fullname = request.POST['fullname']
             customer.customerid = request.POST['customerid']
@@ -129,13 +129,15 @@ def updatecustomer(request,pk):
 
             customer.save()
             messages.success(request,"Update Customer Successfully ! ")
-            return redirect('viewcustomer')
 
-            cache_customer_data()
+            cache.delete("customer_data_estimate_cache")
+            customer_cache()
         
         # Check for weather the request is from Estimate or GST.
         if request.session['GST']:
-            customer = Customer_gst.objects.get(pk=pk)
+
+            customer_data = customer_cache_gst()
+            customer = customer_data.get(pk=pk)
 
             customer.fullname = request.POST['fullname']
             customer.customerid = request.POST['customerid']
@@ -148,32 +150,22 @@ def updatecustomer(request,pk):
 
             customer.save()
             messages.success(request, "Update Customer Successfully ! ")
-            return redirect('viewcustomer')
+
+            cache.delete("gst_customer_data_cache")
+            customer_cache_gst()
 
     ''' To get the data from the datbase and and poplate that into the template for updating details '''
     # Check for weather the request is from Estimate or GST.
     if request.session['Estimate']:
-        cache_key = "customer_data_estimate_cache"
-        cache_customer_data = cache.get(cache_key)
-
-        if cache_customer_data is None:
-            customer_data = Customer_estimate.objects.all()
-            cache.set(cache_key, customer_data , timeout = None)
-        else:
-            customer_data = cache_customer_data
-
-        customer_data = customer_data.get(pk=pk)
+        customer_data = customer_cache()
+        customer_data = customer_data.get(id=pk)
 
     # Check for weather the request is from Estimate or GST.
     if request.session['GST']:
-        customer_data = Customer_gst.objects.get(pk=pk)
+        customer_data = customer_cache_gst()
+        customer_data = customer_data.get(id=pk)
 
     context = {
         'customer_data':customer_data
     }
     return render(request,"customer/updatecustomer.html",context)
-
-def cache_customer_data():
-    cache_key = "customer_data_estimate_cache"
-    customer_data = Customer_estimate.objects.all()
-    cache.set(cache_key, customer_data, timeout=None)

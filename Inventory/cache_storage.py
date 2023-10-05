@@ -44,3 +44,45 @@ def customer_cache():
         print("Customer Cache Data")
 
     return customer_data
+
+def customer_cache_gst():
+    cache_key = "gst_customer_data_cache"
+    cache_customer_data = cache.get(cache_key)
+
+    if cache_customer_data is None:
+        customer_data = Customer_gst.objects.all()
+        cache.set(cache_key, customer_data, timeout=None)
+        print("GST Customer Non Cache Data")
+    else:
+        customer_data = cache_customer_data
+        print("GST Customer Cache Data")
+
+    return customer_data
+
+def product_cache_gst():
+    cache_key = "gst_product_data_cache"
+    cache_product_data = cache.get(cache_key)
+
+    if cache_product_data is None:
+        product_data = Product_gst.objects.all()
+        cache.set(cache_key, product_data, timeout=None)
+        print("GST Product Non Cache Data")
+    else:
+        product_data = cache_product_data
+        print("GST Product Cache Data")
+    
+    return product_data
+    
+def supplier_cache_gst():
+    cache_key = "gst_supplier_data_cache"
+    cache_supplier_data = cache.get(cache_key)
+
+    if cache_supplier_data is None:
+        supplier_data = Supplier_gst.objects.all()
+        cache.set(cache_key, supplier_data, timeout=None)
+        print("GST Supplier Non Cache Data")
+    else:
+        supplier_data = cache_supplier_data
+        print("GST Supplier Cache Data")
+
+    return supplier_data
