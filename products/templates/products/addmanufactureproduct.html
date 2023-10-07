@@ -62,6 +62,61 @@ Add Manufacturing Product
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 {% endif %}
 
+{% if request.session.GST and request.session.Manufacture %}
+<form method="POST" id="product_required_form">
+{% csrf_token %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">        
+        <div class="card">
+            <h4 class="card-header"><strong style="color: black;">Select Manufacture Product</strong></h4>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom01"><strong style="color: black;">Manufacture Product</strong></label>
+                        <select name="manufacture_product" id="manufacture_product" class="form-control manufacture_product">
+                            <option selected>---------------------Select Product---------------------</option>
+                            {% for i in product_manufacture %}
+                                <option value="{{i.id}}">{{i.product_name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="validationCustom05"><strong style="color: black;">Quantity</strong></label>
+                        <input type="text" class="form-control" id="manufacture_quantity" name="manufacture_quantity" placeholder="Manufacture Quantity" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4 class="card-header"><strong style="color: black;">Product Required</strong></h4>
+            <div class="card-body">
+                <table class="table table-bordered table-condensed" id="productTable">
+                    <!-- Table headers here -->
+                    <tbody>
+                      <!-- Existing rows, if any -->
+                    </tbody>
+                  </table>
+                  
+                <div class="form-row">
+                    <p class="text-right pl-2 pt-3">
+                    <input type="submit" class="btn btn-space btn-success rounded addpurchase" name="Estimate" value="Submit">
+                    <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="selected_product_data" id="selected_product_data">
+</form>
+
+<div class="purchaseprice" data-href="{% url 'purchaseprice_estimate' %}"></div>
+<div class="supplier_product" data-href="{% url 'supplier_product' %}"></div>
+
+<script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
+{% endif %}
+
 <script>
   $(document).ready(function () {
     var selectedProducts = [];

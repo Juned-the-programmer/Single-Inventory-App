@@ -81,6 +81,78 @@ Configure Manufacture Product
 </form>
 {% endif %}
 
+{% if request.session.GST and request.session.Manufacture %}
+<form class="needs-validation" method='POST' id="configureManufactureForm">
+{% csrf_token %}
+<div class="form-group">
+    <div class="card">
+        <h5 class="card-header">Configure Manufacture Product</h5>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="validationCustom02">Manufacture Product</label>
+                <select name="manufactured_product" id="validationCustom02" class="form-control manufactured_product">
+                <option value="-1">-------Select Product-------</option>
+                    {% for i in manufactured_product %}
+                        <option value="{{i.id}}">{{i.product_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h5 class="card-header">Description for Manufacturing Product</h5>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Description</label>
+                <textarea name="manufacture_description" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h5 class="card-header">Select Product Required to Manufacture</h5>
+        <div class="card-body">
+            <div class="form-group">
+                <div class="input-group">
+                    <select name="product" id="validationCustom02" class="form-control required_product">
+                    <option value="-1">-------Select Product-------</option>
+                        {% for i in required_products %}
+                            <option value="{{i.id}}">{{i.product_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-primary addtotable">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+<h5 class="card-header">Selected Products</h5>
+<div class="card-body">
+    <table class="table table-bordered" id="selectedProductsTable">
+    <thead>
+        <tr>
+        <th>Manufacture Product</th>
+        <th>Required Product</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Selected products will be displayed here -->
+    </tbody>
+    </table>
+</div>
+</div>
+<div class="form-row">
+    <p class="text-right pl-2 pt-3">
+        <input type="submit" class="btn btn-space btn-success rounded" name="GST" value="Submit">
+        <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+    </p>
+</div>
+</form>
+{% endif %}
+
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script>
     $(document).ready(function () {
@@ -120,7 +192,7 @@ Configure Manufacture Product
         $('#configureManufactureForm').append('<input type="hidden" name="selected_products" value=\'' + JSON.stringify(selectedProducts) + '\' />');
       });
     })
-  </script>
+</script>
   
 
 {% endblock content %}

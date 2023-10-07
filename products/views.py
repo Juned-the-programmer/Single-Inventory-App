@@ -29,11 +29,12 @@ def addproduct(request):
 
     if request.method == 'POST':
         # Check for User Group
-        if request.session['Estimate']:
+        if request.session['Estimate'] and 'Estimate' in request.POST:
             supplier_id = request.POST.get('supplier')
             supplier = None
             if supplier_id:
-                supplier = Supplier_estimate.objects.get(id=supplier_id)
+                supplier = supplier_cache()
+                supplier = supplier.get(id=supplier_id)
 
             purchase_price_str = request.POST.get('purchaseprice', 0.0)
             purchase_price = float(purchase_price_str) if purchase_price_str else 0.0
@@ -66,22 +67,50 @@ def addproduct(request):
             messages.success(request, "Product Addedd Successfully ! ")
 
             # Populate the new value to caching by refreshing the entire chache
+            cache.delete("product_data_estimate_cache")
             cache_product_data()
             
         # Check for user Group
-        if request.session['GST']:
+        if request.session['GST'] and 'GST' in request.POST:
+            supplier_id = request.POST.get('supplier')
+            supplier = None
+            if supplier_id:
+                supplier = supplier_cache_gst()
+                supplier = supplier.get(id=supplier_id)
+
+            purchase_price_str = request.POST.get('purchaseprice' , 0.0)
+            purchase_price = float(purchase_price_str) if purchase_price_str else 0.0
+
+            if request.session["Manufacture"]:
+                is_manufacturing_product = request.POST['radio-inline']
+                is_manufacturing = is_manufacturing_product == "yes"
+
+                if is_manufacturing:
+                    product_type = product_type_gst.objects.get(product_type = "Manufacture")
+                else:
+                    product_type = None
+
             product = Product_gst(
                 product_name = request.POST['productname'],
                 product_categ = product_category_gst.objects.get(id=request.POST['category']) ,
                 unit = request.POST['unit'],
                 selling_price = request.POST['sellingprice'],
                 store_location = request.POST['storelocation'],
-                supplier = Supplier_gst.objects.get(id=request.POST['supplier']),
-                minimum_stock =  request.POST['minimum_stock']
+                supplier = supplier,
+                minimum_stock =  request.POST['minimum_stock'],
+                purchase_price = purchase_price
             )
+
+            if request.session["Manufacture"]:
+                product.product_type = product_type
+
             # Save
             product.save()
             messages.success(request , "Product Addedd Successfully ! ")
+
+            # Updating Cache for Product
+            cache.delete("gst_product_data_cache")
+            product_cache_gst()
 
     # check for user Group
     if request.session['Estimate']:
@@ -217,11 +246,36 @@ def manufacture_product(request):
 
                 messages.success(request, "Product Manufactured Successfully ! ")
 
-    product_data = product_cache()
+    if request.session["Manufacture"] and request.session["GST"]:
+        if request.method == 'POST':
+            selected_products = request.POST.get('selected_product_data')
+            if selected_products:
+                # Parse JSON object
+                selected_products = json.loads(selected_products)
+                # Load Stock data
+                stock_detail = Stock_gst.objects.all()
 
-    product_type = Product_type.objects.get(product_type="Manufacture")
+                product_data = stock_detail.get(product = request.POST['manufacture_product'])
+                product_data.quantity += int(request.POST['manufacture_quantity'])
+                product_data.save()
+                
 
-    product_manufacture = product_data.filter(product_type=product_type.id)
+                for product_pair in selected_products:
+                    stock_data = stock_detail.get(product=Product_gst.objects.get(id=product_pair['productId']))
+                    stock_data.quantity -= int(product_pair['quantity'])
+                    stock_data.save()
+
+                messages.success(request, "Product Manufactured Successfully ! ")
+
+    if request.session["Manufacture"] and request.session["Estimate"]:
+        product_data = product_cache()
+        product_type = Product_type.objects.get(product_type="Manufacture")
+        product_manufacture = product_data.filter(product_type=product_type.id)
+
+    if request.session["Manufacture"] and request.session["GST"]:
+        product_data = product_cache_gst()
+        product_type = product_type_gst.objects.get(product_type="Manufacture")
+        product_manufacture = product_data.filter(product_type=product_type.id)
 
     context = {
         'product_manufacture' : product_manufacture
@@ -230,16 +284,23 @@ def manufacture_product(request):
 
 @login_required(login_url='login')
 def product_required_manufacture(request):
-    product_name = request.GET['manufacture_product']
-    product_detail = product_required_to_manufacture.objects.get(manufacture_product = product_name)
-    product_data = product_detail.required_products.all()
-    return JsonResponse({"Product_data":list(product_data.values())})
+    if request.session['Estimate']:
+        product_name = request.GET['manufacture_product']
+        product_detail = product_required_to_manufacture.objects.get(manufacture_product = product_name)
+        product_data = product_detail.required_products.all()
+        return JsonResponse({"Product_data":list(product_data.values())})
 
+    if request.session['GST']:
+        product_name = request.GET['manufacture_product']
+        product_detail = product_required_to_manufacture_gst.objects.get(manufacture_product = product_name)
+        product_data = product_detail.required_products.all()
+        return JsonResponse({"Product_data":list(product_data.values())})
 
 @login_required(login_url='login')
 def product_required(request):
     if request.session["Manufacture"] and request.session["Estimate"]:
         if request.method == 'POST':
+            product_data = product_cache()
             selected_products = request.POST.get('selected_products')
             if selected_products:
                 # Parse the JSON data from the hidden field
@@ -251,23 +312,54 @@ def product_required(request):
                 # Loop through the selected products and create product_required_to_manufacture instances
                 for product_pair in selected_products:
                     required_product_id = product_pair['requiredProduct']
-                    required_product.append(Product_estimate.objects.get(id=required_product_id))
+                    required_product.append(product_data.get(id=required_product_id))
 
                 product_required_manufacture = product_required_to_manufacture(
-                    manufacture_product = Product_estimate.objects.get(id=request.POST['manufactured_product']),
+                    manufacture_product = product_data.get(id=request.POST['manufactured_product']),
                     desciption = request.POST['manufacture_description']
                 )
                 product_required_manufacture.save()
 
                 product_required_manufacture.required_products.set(required_product)
                 product_required_manufacture.save()
+    
+    if request.session["Manufacture"] and request.session["GST"]:
+        if request.method == 'POST':
+            product_data = product_cache_gst()
+            selected_products = request.POST.get('selected_products')
+            if selected_products:
+                # Parse the JSON data from the hidden field
+                selected_products = json.loads(selected_products)
+                
+                # Intialize an Empty Array
+                required_product = []
 
-    product_data = product_cache()
+                # Loop through the selected products and create product_required_to_manufacture instances
+                for product_pair in selected_products:
+                    required_product_id = product_pair['requiredProduct']
+                    required_product.append(product_data.get(id=required_product_id))
 
-    product_type = Product_type.objects.get(product_type="Manufacture")
+                product_required_manufacture = product_required_to_manufacture_gst(
+                    manufacture_product = product_data.get(id=request.POST['manufactured_product']),
+                    desciption = request.POST['manufacture_description']
+                )
+                product_required_manufacture.save()
 
-    Manufacured_products = product_data.filter(product_type=product_type.id)
-    Required_products = product_data.exclude(product_type=product_type.id)
+                product_required_manufacture.required_products.set(required_product)
+                product_required_manufacture.save()
+    
+    if request.session["Manufacture"] and request.session["Estimate"]:
+        product_data = product_cache()
+        product_type = Product_type.objects.get(product_type="Manufacture")
+        Manufacured_products = product_data.filter(product_type=product_type.id)
+        Required_products = product_data.exclude(product_type=product_type.id)
+    
+    if request.session["Manufacture"] and request.session["GST"]:
+        product_data = product_cache_gst()
+        product_type = product_type_gst.objects.get(product_type="Manufacture")
+        Manufacured_products = product_data.filter(product_type=product_type.id)
+        Required_products = product_data.exclude(product_type=product_type.id)
+
     context = {
         'manufactured_product' : Manufacured_products,
         'required_products' : Required_products

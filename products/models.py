@@ -96,7 +96,7 @@ class Stock_gst(models.Model):
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
 
     def __str__(self):
-        return str(self.product.product)
+        return str(self.product.product_name)
 
     class Meta:
         indexes = [models.Index(fields=('product' , 'id'))]
@@ -105,6 +105,14 @@ class product_required_to_manufacture(models.Model):
     manufacture_product = models.ForeignKey(Product_estimate, on_delete=models.SET_NULL, null=True, blank=True, related_name='manufactured_products')
     desciption = models.CharField(max_length=500, null=True, blank=True)
     required_products = models.ManyToManyField(Product_estimate , blank=True, symmetrical=False, related_name='required_products_for_manufacture')
+
+    def __str__(self):
+        return self.manufacture_product.product_name
+
+class product_required_to_manufacture_gst(models.Model):
+    manufacture_product = models.ForeignKey(Product_gst, on_delete=models.SET_NULL, null=True, blank=True, related_name='manufactured_products_gst')
+    desciption = models.CharField(max_length=500, null=True, blank=True)
+    required_products = models.ManyToManyField(Product_gst , blank=True, symmetrical=False, related_name='required_products_for_manufacture_gst')
 
     def __str__(self):
         return self.manufacture_product.product_name
