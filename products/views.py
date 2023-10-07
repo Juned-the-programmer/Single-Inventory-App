@@ -15,12 +15,19 @@ import json
 @login_required(login_url='login')
 def addproduct(request):
     if request.method == 'POST' and 'Add Category' in request.POST:
-        category = product_category(
-            product_category = request.POST['category']
-        )
-        category.save()
+        if request.session['Estimate']:
+            category = product_category(
+                product_category = request.POST['category']
+            )
+            category.save()
+        
+        if request.session['GST']:
+            category = product_category_gst(
+                product_category = request.POST['category']
+            )
+            category.save()
 
-    if request.method == 'POST' and 'Estimate' in request.POST:
+    if request.method == 'POST':
         # Check for User Group
         if request.session['Estimate']:
             supplier_id = request.POST.get('supplier')
@@ -65,11 +72,11 @@ def addproduct(request):
         if request.session['GST']:
             product = Product_gst(
                 product_name = request.POST['productname'],
-                product_categ = request.POST['productcategory'],
+                product_categ = product_category_gst.objects.get(id=request.POST['category']) ,
                 unit = request.POST['unit'],
                 selling_price = request.POST['sellingprice'],
                 store_location = request.POST['storelocation'],
-                supplier = Supplier_gst.objects.get(fullname=request.POST['supplier']),
+                supplier = Supplier_gst.objects.get(id=request.POST['supplier']),
                 minimum_stock =  request.POST['minimum_stock']
             )
             # Save
@@ -86,7 +93,9 @@ def addproduct(request):
     # Check for User Group        
     if request.session['GST']:
         # Get all the supplier data
-        Supplier_data = Supplier_gst.objects.all()
+        Supplier_data = supplier_cache_gst()
+
+        category = product_category_gst.objects.all()
 
     context = {
         'Supplier_data':Supplier_data,
@@ -101,12 +110,12 @@ def viewproduct(request):
         # Check for user Group
         if request.session['Estimate']:
             # Get all the product data for Estimate
-            Product_data = Product_estimate.objects.all().prefetch_related('product_categ')
+            Product_data = product_cache().prefetch_related('product_categ')
 
         # Check for user Group            
         if request.session['GST']:
             # Get all the product data for GST
-            Product_data = Product_gst.objects.all()
+            Product_data = product_cache_gst().prefetch_related('product_categ')
             
         context = {
             'Product_data' : Product_data

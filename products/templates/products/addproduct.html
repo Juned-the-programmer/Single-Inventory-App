@@ -40,7 +40,7 @@ Add Product
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
                         <div class="form-group">
                             <label for="validationCustom02">Product Category</label>
-                            <select name="category" id="validationCustom02" class="form-control">
+                            <select name="category" id="validationCustom02" class="form-control category">
                                 <option value="-1">--------select category--------</option>
                                 {% for i in category %} 
                                     <option value="{{i.id}}">{{i.product_category}}</option>
@@ -165,7 +165,7 @@ Add Product
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add Stock</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Add Category</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -219,108 +219,229 @@ Add Product
     
         // Initialize Select2
         $('.supplier').select2();
+        $('.category').select2();
     });
 </script>
 {% else %}
-<div class="form-group">
-    <div class="card">
-        <h5 class="card-header">Add Product</h5>
-        <div class="card-body">
-            <form class="needs-validation" method='POST'>
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="validationCustom01">Product Name</label>
-                <input
-                type="text"
-                class="form-control"
-                id="validationCustom01"
-                placeholder="Product Name"
-                name="productname"
-                required
-                />
+<form class="needs-validation" method='POST'>
+{% csrf_token %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">  
+        <div class="card">
+            <div class="card-header">
+                <h5 class="align-middle">Add Product
+                    <button type="submit" class="btn btn-space btn-success rounded float-right" data-toggle="modal" data-target="#exampleModal">
+                        Add Category
+                    </button>
+                </h5>
             </div>
-            <div class="form-group">
-                <label for="validationCustom01">Product Category</label>
-                <input
-                type="text"
-                class="form-control"
-                id="validationCustom01"
-                placeholder="Product Category"
-                name="productcategory"
-                required
-                />
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="validationCustom01">Product Name</label>
+                            <input
+                            type="text"
+                            class="form-control"
+                            id="validationCustom01"
+                            placeholder="Product Name"
+                            name="productname"
+                            required
+                            />
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="validationCustom02">Product Category</label>
+                            <select name="category" id="validationCustom02" class="form-control category">
+                                <option value="-1">--------select category--------</option>
+                                {% for i in category %} 
+                                    <option value="{{i.id}}">{{i.product_category}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% if request.session.Manufacture %}
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <h5>Is this Manufacturing Product ? </h5>
+                        <label class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radio-inline" class="custom-control-input" id="radio-yes" value="yes"><span class="custom-control-label">Yes</span>
+                        </label>
+                        <label class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radio-inline" checked="" class="custom-control-input" id="radio-no" value="no"><span class="custom-control-label">No</span>
+                        </label>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="form-group">
-                <label for="validationCustom02">Unit</label>
-                <select name="unit" id="validationCustom02" class="form-control">
-                    <option value="pcs">Pcs.</option>
-                    <option value="set">Set.</option>
-                </select>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="validationCustom02">Unit</label>
+                            <select name="unit" id="validationCustom02" class="form-control">
+                                <option value="pcs">Pcs.</option>
+                                <option value="set">Set.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="validationCustom02">Minimum Stock</label>
+                            <input
+                            type="number"
+                            class="form-control"
+                            id="validationCustom02"
+                            placeholder="Enter Minimum Stock Yoy Required"
+                            name="minimum_stock"
+                            required
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="validationCustom02">Selling Price</label>
-                <input
-                type="text"
-                class="form-control"
-                id="validationCustom02"
-                placeholder="Enter Selling Price"
-                name="sellingprice"
-                required
-                />
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="validationCustom02">Selling Price</label>
+                            <input
+                            type="text"
+                            class="form-control"
+                            id="validationCustom02"
+                            placeholder="Enter Selling Price"
+                            name="sellingprice"
+                            required
+                            />
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="validationCustom02">Purchase Price</label>
+                            <input
+                            type="text"
+                            class="form-control"
+                            id="validationCustom02"
+                            placeholder="Enter Purchase Price"
+                            name="purchaseprice"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="validationCustom02">Minimum Stock</label>
-                <input
-                type="number"
-                class="form-control"
-                id="validationCustom02"
-                placeholder="Enter Minimum Stock Yoy Required"
-                name="minimum_stock"
-                required
-                />
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-group">
+                            <label for="validationCustom02">Supplier</label>
+                            <select name="supplier" id="validationCustom02" class="form-control supplier">
+                            <option value="-1">-------Select Supplier-------</option>
+                                {% for i in Supplier_data %}
+                                    <option value="{{i.id}}">{{i.fullname}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                            <div class="form-group">
+                            <label for="validationCustom02">Store Location</label>
+                            <input
+                            type="text"
+                            class="form-control"
+                            id="validationCustom02"
+                            placeholder="Enter Store Location"
+                            name="storelocation"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
+                        <div class="form-row">
+                            <p class="text-right pl-1 pt-2">
+                                <input type="submit" class="btn btn-space btn-success rounded" name="GST" value="Submit">
+                                <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="validationCustom02">Supplier</label>
-                <select name="supplier" id="validationCustom02" class="form-control supplier">
-                <option value="-1">-------Select Supplier-------</option>
-                {% if request.user|has_group:"Estimate" %}
-                    {% for i in Supplier_data %}
-                        <option value="{{i.fullname}}">{{i.fullname}}</option>
-                    {% endfor %}
-                {% else %}
-                    {% for i in supplierdata_gst %}
-                        <option value="{{i.fullname}}">{{i.fullname}}</option>
-                    {% endfor %}
-                {% endif %}
-                </select>
+        </div>   
+    </div>
+</div>
+</form>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
             </div>
-            <div class="form-group">
-                <label for="validationCustom02">Store Location</label>
-                <input
-                type="text"
-                class="form-control"
-                id="validationCustom02"
-                placeholder="Enter Store Location"
-                name="storelocation"
-                required
-                />
+        <div class="modal-body">
+        <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="">
+                <label for="validationCustom03">Category</label>
+                <input type="text" class="form-control mt-3" name="category"> 
             </div>
-            <div class="form-row">
-                <p class="text-right pl-1 pt-2">
-                    <input type="submit" class="btn btn-space btn-success rounded" name="GST" value="Submit">
-                    <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
-                </p>
-            </div>
-            </form>
+        </div>
+    </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-space btn-success rounded" name="Add Category" value="Submit">
+        </div>
+        </form>
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the radio buttons
+        var radioYes = document.getElementById("radio-yes");
+        var radioNo = document.getElementById("radio-no");
+    
+        // Get the elements to make readonly
+        var purchasePriceInput = document.querySelector('input[name="purchaseprice"]');
+        var supplierSelect = document.querySelector('select[name="supplier"]');
+    
+        // Function to make elements readonly
+        function makeReadonly() {
+            purchasePriceInput.setAttribute("readonly", true);
+            supplierSelect.setAttribute("disabled", true);
+    
+            // Additionally, trigger the Select2 "close" event to hide any open dropdown
+            $(supplierSelect).trigger("select2:close");
+        }
+    
+        // Function to make elements editable
+        function makeEditable() {
+            purchasePriceInput.removeAttribute("readonly");
+            supplierSelect.removeAttribute("disabled");
+        }
+    
+        // Add event listeners to the radio buttons
+        radioYes.addEventListener("change", makeReadonly);
+        radioNo.addEventListener("change", makeEditable);
+    
+        // Initialize Select2
+        $('.category').select2();
+        $('.supplier').select2();
+    });
+</script>
 {% endif %}
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script>
 $(document).ready(function () {
     $('.supplier').select2();
+    $('.category').select2();
   })
 </script>
 
