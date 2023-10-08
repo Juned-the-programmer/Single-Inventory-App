@@ -60,7 +60,7 @@ class Product_estimate(models.Model):
         indexes = [models.Index(fields=('id' , 'supplier'))]
 
 class Stock_estimate(models.Model):
-    product = models.OneToOneField(Product_estimate,on_delete=models.CASCADE)    
+    product = models.OneToOneField(Product_estimate,on_delete=models.CASCADE, related_name="stock_estimate")    
     quantity = models.IntegerField(null=True,blank=True,default=0)
     purchase_price = models.IntegerField(null=True,blank=True,default=0)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
@@ -90,7 +90,7 @@ class Product_gst(models.Model):
         indexes = [models.Index(fields=('id', 'supplier'))]
 
 class Stock_gst(models.Model):
-    product = models.OneToOneField(Product_gst,on_delete=models.CASCADE)    
+    product = models.OneToOneField(Product_gst,on_delete=models.CASCADE, related_name="stock_gst")    
     quantity = models.IntegerField(null=True,blank=True,default=0)
     purchase_price = models.IntegerField(null=True,blank=True,default=0)
     id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)

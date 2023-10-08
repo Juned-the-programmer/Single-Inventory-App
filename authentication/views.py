@@ -15,6 +15,7 @@ def login(request):
 
             request.session['company_name'] = user_login.profile.company_name
             request.session['username'] = user_login.username
+            request.session['ownerstate'] = user_login.profile.state
 
             if user_login.groups.filter(name="Estimate").exists():
                 request.session['Estimate'] = True

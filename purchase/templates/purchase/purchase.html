@@ -143,7 +143,7 @@ Estimate Purchase
         $("select[id^='prod']").prop("disabled", true);
     
         // Listen for changes on the customer select
-        $("#cname").change(function () {
+        $("#supplier_estimate").change(function () {
             // Get the selected customer value
             var selectedCustomer = $(this).val();
     
@@ -181,10 +181,10 @@ Estimate Purchase
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2" >
                         <br>
                         <label for="validationCustom01"><strong style="color: black;">Supplier Name</strong></label>
-                        <select name="supplier" id="supplier_gst" class="form-control supplier_gst">
+                        <select name="supplier_name" id="supplier_gst" class="form-control supplier_gst">
                         <option value="-1" selected>-----------------------Select Supplier-----------------------</option>
                         {% for i in Supplier_data %}
-                            <option value="{{i.fullname}}">{{i.fullname}}</option>
+                            <option value="{{i.id}}">{{i.fullname}}</option>
                         {% endfor %}
                         </select>   
                         <br>
@@ -284,17 +284,16 @@ Estimate Purchase
                         <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
                     </p>
                 </div>
+                <input type="hidden" class="form-control" id="product_count" name="product_count">
+                <input type="hidden" class="form-control" id="owner_state" name="owner_state" value="{{request.session.ownerstate}}">
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<div id="st" data-href="{% url 'supplier_state_gst' %}"></div>
-<div id="c" data-href="{% url 'gstpurchasec' %}"></div>
-<div id="ownerstate_gst" data-href="{% url 'ownerstate_gst' %}"></div>
-<div class="purchaseprice_gst" data-href="{% url 'purchaseprice_gst' %}"></div>
-<div class="product_data_gst" data-href="{% url 'product_data_gst' %}"></div>
+<div class="purchaseprice" data-href="{% url 'purchaseprice' %}"></div>
+<div class="supplier_product" data-href="{% url 'supplier_product' %}"></div>
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script src="{% static 'libs/js/custom/gstpurchase.js' %}"></script>
@@ -318,5 +317,25 @@ Estimate Purchase
 
   })
 </script>
+<script>
+$(document).ready(function () {
+    // Disable product select by default
+    $("select[id^='prod']").prop("disabled", true);
+
+    // Listen for changes on the customer select
+    $("#supplier_gst").change(function () {
+        // Get the selected customer value
+        var selectedCustomer = $(this).val();
+
+        // Enable product select if a customer is selected
+        if (selectedCustomer !== '-1') {
+            $("select[id^='prod']").prop("disabled", false);
+        } else {
+            // Disable product select if no customer is selected
+            $("select[id^='prod']").prop("disabled", true);
+        }
+    });
+});
+</script> 
 
 {% endblock content %}

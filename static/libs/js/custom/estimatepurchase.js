@@ -64,12 +64,11 @@ $(document).ready(function () {
 
       $('#prod'+counter).change(function(){
         var pname=$('#prod'+counter).val()
-        var sname = $('#supplier_estimate').val()
 
         $.ajax({
           type:"GET",
           url: $('.purchaseprice').attr('data-href'),
-          data:{'pname':pname , 'sname':sname},
+          data:{'pname':pname},
           success: function(response){
             console.log(response)
             $('#rate'+counter).val(response.purchase_price)

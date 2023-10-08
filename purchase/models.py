@@ -9,6 +9,13 @@ class Estimate_purchase_bill_number(models.Model):
     def __str__(self):
         return str(self.last_bill_number)
 
+class Gst_purchase_bill_number(models.Model):
+    last_bill_number = models.IntegerField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
+
+    def __str__(self):
+        return str(self.last_bill_number)
+
 class Estimate_Purchase(models.Model):
     Bill_no = models.IntegerField()
     supplier = models.ForeignKey(Supplier_estimate,on_delete=models.CASCADE)

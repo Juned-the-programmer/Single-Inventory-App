@@ -22,26 +22,55 @@ def generate_bill_number(request):
     year = today.strftime("%Y")
     day_of_year = today.strftime("%j")
 
-    # Assuming you have a model named Bill
-    last_bill = Estimate_purchase_bill_number.objects.all().first()
+    if request.session['Estimate']:
+        # Assuming you have a model named Bill
+        last_bill = Estimate_purchase_bill_number.objects.all().first()
 
-    if last_bill:
-        last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
-        new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
-    else:
-        new_bill_number = "001"  # First bill of the day
-        bill_number = Estimate_purchase_bill_number (
-            last_bill_number = f"{year}{day_of_year}{new_bill_number}"
-        )
-        bill_number.save()
+        if last_bill:
+            last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
+            new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
+        else:
+            new_bill_number = "001"  # First bill of the day
+            bill_number = Estimate_purchase_bill_number (
+                last_bill_number = f"{year}{day_of_year}{new_bill_number}"
+            )
+            bill_number.save()
 
-    return f"{year}{day_of_year}{new_bill_number}"
+        return f"{year}{day_of_year}{new_bill_number}"
+
+    if request.session['GST']:
+        # Assuming you have a model named Bill
+        last_bill = Gst_purchase_bill_number.objects.all().first()
+
+        if last_bill:
+            last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
+            new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
+        else:
+            new_bill_number = "001"  # First bill of the day
+            bill_number = Estimate_purchase_bill_number_gst (
+                last_bill_number = f"{year}{day_of_year}{new_bill_number}"
+            )
+            bill_number.save()
+
+        return f"{year}{day_of_year}{new_bill_number}"
 
 @login_required(login_url='login')
 def addpurchase(request):
+    
+    # Load Estimate Product and Supplier data
+    supplier_data = supplier_cache()
+    product_data = product_cache()
+
+    # Load GST Product and Supplier data
+    supplier_data_gst = supplier_cache_gst()
+    product_data_gst = product_cache_gst()
+
     if request.method == 'POST':
         # Check for User Group
         if request.session["Estimate"]:
+            # Load Supplier Data 
+            supplier_data = supplier_data.objects.get(id=request.POST['supplier'])
+
             # Check for round off values
             Round_off = request.POST['roff']
             if len(Round_off) >= 1 :
@@ -57,7 +86,7 @@ def addpurchase(request):
 
             Estimate = Estimate_Purchase(
                 Bill_no = request.POST['bill_no'],
-                supplier = Supplier_estimate.objects.get(id=request.POST['supplier']),
+                supplier = supplier_data,
                 Total_amount = request.POST['total'],
                 Due_amount = Due_amount,
                 Round_off = Round_off,
@@ -65,11 +94,8 @@ def addpurchase(request):
             )
             
             # Get supplier account Estimate based on the supplier data
-            supplierAccount = supplieraccount_estimate.objects.get(supplier_name = request.POST['supplier'])
+            supplierAccount = supplier_data.supplieraccount_estimate
             supplierAccount.amount = float(request.POST['gtot'])
-
-            print(request.POST['product_count'])
-            print(type(request.POST['product_count']))
             
             # Loop to save the data for product details for that sale.
             # estimate_purchase_product_list_count : See the declaration for more
@@ -94,10 +120,11 @@ def addpurchase(request):
                 print("Product Added !")
 
                 # Update stock for that Product
-                stock = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['prod'+str(i)]))
-                c = stock.quantity
-                a = int(c)
-                stock.quantity = a + int(request.POST['qty'+str(i)])
+                product_data = product_data.get(product_name=request.POST['prod'+str(i)])
+                stock = product_data.stock_estimate
+                quantity = stock.quantity
+                quantity = int(quantity)
+                stock.quantity = quantity + int(request.POST['qty'+str(i)])
                 # Save
                 stock.save()
                 estimate.save()
@@ -112,6 +139,9 @@ def addpurchase(request):
             messages.success(request,"Purchase Added Successfully ! ")
 
         if request.session["GST"]:
+            # Load Supplier data
+            supplier_data = supplier_data_gst.get(id=request.POST['supplier_name'])
+
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
             else:
@@ -134,7 +164,7 @@ def addpurchase(request):
 
             GSTPURCHASE = GST_Purchase (
                 Bill_no=request.POST['bill_no'],
-                supplier_name=Supplier_gst.objects.get(fullname=request.POST['supplier']),
+                supplier_name = supplier_data,
                 total_amount=request.POST['total'],
                 CGST=CGST,
                 SGST=SGST,
@@ -143,10 +173,10 @@ def addpurchase(request):
                 Grand_total=request.POST['gtot']
             )
 
-            GSTSUPPLIER = supplieraccount_gst.objects.get(supplier_name = Supplier_gst.objects.get(fullname=request.POST['supplier']))
+            GSTSUPPLIER = supplier_data.supplieraccount_gst
             GSTSUPPLIER.amount = float(request.POST['gtot']) + float(GSTSUPPLIER.amount)
             
-            for i in range(0,gstp):
+            for i in range(0,int(request.POST['product_count'])):
                 Gstpurchase = gstpurchase_Product (
                     Bill_no = request.POST['bill_no'],
                     hsncode = request.POST['hsn'+str(i)],
@@ -159,13 +189,18 @@ def addpurchase(request):
                     total = request.POST['tot'+str(i)]
                 )
 
-                stock = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['prod'+str(i)]))
-                c = stock.quantity
-                a = int(c)
-                b = int(request.POST['qty'+str(i)])
-                stock.quantity = a + b
+                product_data = product_data_gst.get(product_name = request.POST['prod'+str(i)])
+                stock = product_data.stock_gst
+                quantity = stock.quantity
+                stock_there = int(quantity)
+                stock_to_add = int(request.POST['qty'+str(i)])
+                stock.quantity = stock_there + stock_to_add
                 stock.save()
                 Gstpurchase.save()
+
+            last_bill = Gst_purchase_bill_number.objects.all().first()
+            last_bill.last_bill_number = request.POST['bill_no']
+            last_bill.save()
 
             GSTPURCHASE.save()
             GSTSUPPLIER.save()
@@ -176,19 +211,14 @@ def addpurchase(request):
     d1 = date_.strftime("%d/%m/%Y")
 
     if request.session["Estimate"]:
-
         Supplier_data = supplier_cache()
 
         new_bill = generate_bill_number(request)
 
     if request.session["GST"]:
-        Supplier_data = Supplier_gst.objects.all()
-
-        if GST_Purchase.objects.exists():
-            new_bill = GST_Purchase.objects.last().Bill_no
-            new_bill = new_bill + 1
-        else:
-            new_bill = 1
+        Supplier_data = supplier_cache_gst()
+        
+        new_bill = generate_bill_number(request)
 
     context = {
         'Supplier_data' : Supplier_data,
@@ -209,7 +239,7 @@ def viewpurchase(request):
         # Check for user Group
         if request.session["GST"]:
             # Get the product data
-            Purchase_data = GST_Purchase.objects.all()
+            Purchase_data = GST_Purchase.objects.all().order_by("-date")
 
         context = {
             'Purchase_data' : Purchase_data
@@ -362,7 +392,7 @@ def updatepurchase(request,pk):
             GSTSUPPLIER = supplieraccount_gst.objects.get(supplier_name = Supplier_gst.objects.get(fullname=request.POST['supplier']))
             GSTSUPPLIER.amount = float(GSTSUPPLIER.amount) + float(old_amount)
 
-            for i in range(0,gstp):
+            for i in range(0,int(request.POST['product_count'])):
                 Gstpurchase = gstpurchase_Product (
                 Bill_no = request.POST['bill_no'],
                 hsncode = request.POST['hsn'+str(i)],
@@ -396,10 +426,12 @@ def updatepurchase(request,pk):
         purchase_product = estimatepurchase_Product.objects.filter(Bill_no=purchase_Bill_no)
         
         supplier_data = supplier_cache()
-
         productdata = product_cache()
-
-        product_data = productdata.exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
+        
+        if request.session["Manufacture"]:
+            product_data = productdata.exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
+        else:
+            product_data = productdata
     
     if request.user.groups.filter(name='GST').exists():
         purchase_Bill_no = GST_Purchase.objects.get(pk=pk).Bill_no
@@ -464,11 +496,18 @@ def supplierdueamount_estimate(request):
 # To get the Purchase Price and unit for the selected product
 @login_required(login_url='login')
 def purchaseprice_estimate(request):
-    product_name = request.GET['pname']
+    if request.session['Estimate']:
+        product_name = request.GET['pname']
 
-    productdata = product_cache()
+        productdata = product_cache()
 
-    prodct_data = productdata.get(product_name=product_name)
+        prodct_data = productdata.get(product_name=product_name)
+    
+    if request.session['GST']:
+        product_name = request.GET['pname']
+
+        productdata = product_cache_gst()
+        prodct_data = productdata.get(product_name=product_name)
 
     response_data = {
         "purchase_price" : prodct_data.purchase_price,
@@ -481,57 +520,16 @@ def purchaseprice_estimate(request):
 It will reduce the complexity and increase data maintainability '''
 @login_required(login_url='login')
 def supplier_products(request):
+    if request.session['Estimate']:
+        productdata = product_cache()
 
-    productdata = product_cache()
+        product_data = productdata.filter(supplier=request.GET['supplier_name']).exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
+        return JsonResponse({"Product_data":list(product_data.values())})
 
-    product_data = productdata.filter(supplier=request.GET['supplier_name']).exclude(product_type=Product_type.objects.get(product_type="Manufacture"))
-    return JsonResponse({"Product_data":list(product_data.values())})
+    if request.session['GST']:
+        productdata = product_cache_gst()
+        supplier_data = supplier_cache_gst()
 
-# GST Start Here
-@login_required(login_url='login')
-def gstpurchasec(request):
-    global gstp
-    gstp=int(request.GET['c'])
-    return HttpResponse(gstp)
-
-def supplier_state_gst(request):
-    sname = request.GET['sname'] 
-    supplier = Supplier_gst.objects.get(id=Supplier_gst.objects.get(fullname=sname).id)
-    state = supplier.state
-
-    return HttpResponse(state)
-
-def ownerstate_gst(request):
-    state = request.user.profile.state
-    print(state)
-
-    return HttpResponse(state)
-
-def purchaseprice_gst(request):
-    pname = request.GET['pname']
-    sname = request.GET['sname']
-    rate_ = 0
-    last_price = 0
-    last_rate = 0
-    pk_id = 0
-    
-    if GST_Purchase.objects.filter(supplier_name = Supplier_gst.objects.get(fullname=sname)).count() >= 1:
-        customer_id = GST_Purchase.objects.filter(supplier_name = Supplier_gst.objects.get(fullname=sname)).last()
-        pk_id = customer_id.Bill_no
-
-    if gstpurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
-        product_rate = gstpurchase_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).last()
-        rate_ = product_rate.rate
-        print(rate_)
-    else:
-        last_price = Product_gst.objects.get(product_name=pname).selling_price
-
-
-    if len(str(rate_)) > 1:
-        last_rate = rate_
-        print(last_rate)
-    else:
-        last_rate = last_price
-        print(last_rate)
-
-    return HttpResponse(last_rate)
+        product_data = productdata.filter(supplier=request.GET['supplier_name']).exclude(product_type=product_type_gst.objects.get(product_type="Manufacture"))
+        supplier_state = supplier_data.get(id=request.GET['supplier_name']).state
+        return JsonResponse({"Product_data":list(product_data.values()) , "supplier_state" : supplier_state})

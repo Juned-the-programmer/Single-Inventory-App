@@ -153,6 +153,7 @@ Estimate Purchase
 </script>
 
 {% else %}
+
 <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="card">
@@ -176,10 +177,10 @@ Estimate Purchase
                         <br>
                         <label for="validationCustom01"><strong style="color: black;">Supplier Name</strong></label>
                         <select name="supplier" id="supplier_gst" class="form-control supplier_gst">
-                        <option value="{{purchase_data.supplier_name}}" selected>{{purchase_data.supplier_name}}</option>
+                        <option value="{{purchase_data.supplier_name.id}}" selected>{{purchase_data.supplier_name}}</option>
                         {% for i in supplier_data %}
-                            <option value="{{i.fullname}}">{{i.fullname}}</option>
-                        {% endfor %}
+                            <option value="{{i.id}}">{{i.fullname}}</option>
+                        {% endfor %}    
                         </select>   
                         <br>
                     </div>
@@ -278,22 +279,36 @@ Estimate Purchase
                         <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
                     </p>
                 </div>
+                <input type="hidden" class="form-control" id="product_count" name="product_count">
+                <input type="hidden" class="form-control" id="owner_state" name="owner_state" value="{{request.session.ownerstate}}">
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<div id="st" data-href="{% url 'supplier_state_gst' %}"></div>
-<div id="c" data-href="{% url 'gstpurchasec' %}"></div>
-<div id="ownerstate_gst" data-href="{% url 'ownerstate_gst' %}"></div>
-<div class="purchaseprice_gst" data-href="{% url 'purchaseprice_gst' %}"></div>
-<div class="product_data_gst" data-href="{% url 'product_data_gst' %}"></div>
+<div class="purchaseprice" data-href="{% url 'purchaseprice' %}"></div>
+<div class="supplier_product" data-href="{% url 'supplier_product' %}"></div>
+
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script src="{% static 'libs/js/custom/gstpurchase.js' %}"></script>  
+
+<script> 
+    var supplier_id_update = $('#supplier_gst').val()
+    $(document).ready(function () {
+        $.ajax({
+         type : "GET",
+         url: $('.supplier_product').attr('data-href'),
+         data : {'supplier_name' : supplier_id_update},
+         success : function (data) {
+           product_data = data
+           console.log(product_data)
+       }
+    })
+})
+</script>
+
 {% endif %}
-
-
 
 <script>
   $(document).ready(function () {
