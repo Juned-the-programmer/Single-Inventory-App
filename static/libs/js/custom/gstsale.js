@@ -8,34 +8,17 @@ $(document).ready(function () {
     $loading.hide();
   });
 
-  var product_data = []
   var customer_state;
   var profile_state;
-  var stock = []
-  
-    $.ajax({
-      type:"GET",
-      url: $('#sto').attr('data-href'),
-      success: function(response){
-        stock = response
-      },
-    })
 
+  var product_data =[]
   $.ajax({
-    type: "GET",
-    url: $('#ownerstate_gst').attr('data-href'),
-    async: false,
-    success: function (response) {
-      profile_state = response
-    },
-  })
-
-  $.ajax({
-    type: "GET",
-    url: $('.product_data_gst').attr('data-href'),
-    async: false,
-    success: function (response) {
+    type:"GET",
+    url: $('.product_data_estimate').attr('data-href'),
+    async : false,
+    success: function(response){
       product_data = response
+      console.log(product_data)
     },
   })
 
@@ -47,14 +30,9 @@ $(document).ready(function () {
       data: { 'cname': name },
       success: function (response) {
         customer_state = response
-        alert(customer_state)
       },
     })
   })
-  
-  console.log(profile_state);
-  console.log(product_data);
-  console.log(stock);
 
   var counter = 1;
   $(document).on('focus', "tr td", function (e) {
@@ -74,6 +52,7 @@ $(document).ready(function () {
 
         counter++;
         no = counter + 1
+        $('#product_count').val(counter)
 
         $.ajax({
           type: "GET",
@@ -102,40 +81,23 @@ $(document).ready(function () {
 
     $('#prod' + counter).change(function () {
       var pname = $('#prod' + counter).val()
-      var cname=$('#cname').val()
       $.ajax({
         type: "GET",
-        url: $('.sellingprice').attr('data-href'),
-        data: { 'pname': pname , 'cname' : cname},
-        success: function (response) {
-          $('#rate' + counter).val(response)
-        },
-        error: function (response) {
-          console.log("error data not found")
-        }
-      })
-
-      for(var i=0;i<product_data.productdata.length;i++){
-        if(product_data.productdata[i].product_name === pname){
-          $('#unit'+counter).val(product_data.productdata[i].unit)
-        }
-        if(product_data.productdata[i].product_name === pname){
-          var id = product_data.productdata[i].id;
-          if(stock.stock_data[i].product_id === id){
-              var stock_check = stock.stock_data[i]
-              if (stock_check.quantity <= 0){
-                $('#qty'+counter).prop('disabled',true)
-                alert("you don't have enough stock")
-              }
-              else{
-                $('#qty'+counter).prop('disabled',false)
-                $('#qty'+counter).attr('max',stock_check.quantity)
-                $('#qty'+counter).attr('title','You have only '+stock_check.quantity+' quantity')
-              }
+        url : $('.selected_product').attr('data-href'),
+        data : {'product_name' : pname},
+        success : function(data) {
+          var product_data = data.product_data
+          $('#unit'+counter).val(product_data.product_unit)
+          $('#rate'+counter).val(parseFloat(product_data.rate))
+          if(product_data.quantity == 0){
+            $('#qty'+counter).prop('disabled',true)
+            alert("you don't have enough stock")
+          } else {
+            $('#qty'+counter).prop('disabled',false)
+            $('#qty'+counter).attr('max', product_data.quantity)
           }
         }
-      }
-
+      })
     })
 
     var id = $(this).closest('tr').attr('itemid');
@@ -355,70 +317,5 @@ $(document).ready(function () {
         $('#gtot').val(gt)
       }
     })
-
-    // $('.gstaddsales').submit(function () {
-    //   var c = $('tbody').find('tr:last').attr('itemid')
-    //   $.ajax({
-    //     type: "GET",
-    //     url: $('#c').attr('data-href'),
-    //     data: { 'c': c },
-    //     success: function (response) {
-    //       console.log(response)
-    //     },
-    //     error: function (response) {
-    //       alert("error c")
-    //     }
-    //   })
-    // })
-
   });
-  // $('#gstaddsales').click(function (){
-  //   var json_data=[];
-  //   $('#itemtable tr').each(function(){
-  //   var billno=$('#bill_no').val()
-  //   var hsncode=$(this).find("td:eq(2) input[type='number']").val()
-  //   var product_name=$(this).find("td:eq(3) select").val()
-  //   var unit=$(this).children().eq(4).text()
-  //   var rate=$(this).find("td:eq(5) input[type='number']").val()
-  //   var qty=$(this).find("td:eq(6) input[type='number']").val()
-  //   var gstp=$(this).find("td:eq(7) input[type='number']").val()
-  //   var gstamt=$(this).find("td:eq(8) input[type='number']").val()
-  //   var total=$(this).find("td:eq(9) input[type='text']").val()
-  //   var single_data={
-  //     'billno':billno,
-  //     'hsncode':hsncode,
-  //     'product_name':product_name,
-  //     'unit':unit,
-  //     'rate':rate,
-  //     'qty':qty,
-  //     'gstp':gstp,
-  //     'gstamt':gstamt,
-  //     'total':total
-  //     }
-  //   json_data.push(single_data);
-  //   })
-  //   var string_data=JSON.stringify(json_data)
-  //   alert(string_data)
-  //   $.ajax({
-  //     url:$('#itemtable').attr('data-href'),
-  //     type:'POST',
-  //     data:{data:string_data}
-  //   })
-  //   .done(function(response){
-  //     if(response['error']==false){
-  //     $('#upt_error').hide();
-  //     $('#upt_success').text(response['errorMessage']);
-  //     $('#upt_success').show();}
-  //     else{
-  //     $('#upt_success').hide();
-  //     $('#upt_error').text(response['errorMessage']);
-  //     $('#upt_error').show();
-  //     }
-  //     })
-  //     .fail(function(){
-  //     $('#upt_success').hide();
-  //     $('#upt_error').text('Something Went Wrong!');
-  //     $('#upt_error').show();
-  //     })
-  // })
 });

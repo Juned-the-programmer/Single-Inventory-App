@@ -10,6 +10,13 @@ class Estimate_sale_bill_number(models.Model):
     def __str__(self):
         return str(self.last_bill_number)
 
+class GST_sale_bill_number(models.Model):
+    last_bill_number = models.IntegerField()
+    id = models.UUIDField(default=uuid.uuid4 , unique=True , primary_key=True , editable=False)
+
+    def __str__(self):
+        return str(self, last_bill_number)
+
 class Estimate_sales(models.Model):
     Bill_no = models.IntegerField()
     customer = models.ForeignKey(Customer_estimate,on_delete=models.CASCADE, related_name="estimate_sales")

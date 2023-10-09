@@ -11,11 +11,5 @@ urlpatterns = [
     path('product_data_estimate/',views.product_data_estimate,name="product_data_estimate"),
     path('selected_product/',views.selected_product, name="selected_product"),
     # Ajax Call for GST Sale Start here
-    path('gstsalec/',views.gstsalec,name="gstsalec"),
-    path('product_data_gst/',views.product_data_gst,name="product_data_gst"),
-    path('getproducts_gst_sale/',views.getproducts_gst_sale,name="getproducts_gst_sale"),
-    path('customer_state_gst/',views.customer_state_gst,name="customer_state_gst"),
-    path('check_stock_gst/',views.check_stock_gst,name="check_stock_gst"),
-    path('sellingprice_gst/',views.sellingprice_gst,name="sellingprice_gst"),
-    path('ownerstate_gst_sale/',views.ownerstate_gst_sale,name="ownerstate_gst_sale")
+    path('customer_state_gst/',views.customer_state_gst,name="customer_state_gst")
 ]

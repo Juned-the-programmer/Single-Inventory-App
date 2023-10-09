@@ -186,14 +186,12 @@ Add Sales
                             <select name="customer" id="cname" class="form-control customer">
                             <option value="-1" selected>-----------------------Select Customer-----------------------</option>
                             {% for i in Customer_data %}
-                                <option value="{{i.fullname}}">{{i.fullname}}</option>
+                                <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
                             </select>   
                         <br>
                     </div>
                 </div>
-
-                <div id="c" data-href="{% url 'gstsalec' %}"></div>
                 <table class="table table-striped table-bordered table-condensed table-hover">
                     <thead class="thead-dark punit">
                         <tr>
@@ -214,10 +212,9 @@ Add Sales
                             <a id="del0" href="#"> <i class="fa fa-trash" style="color: red;"aria-hidden="true"></i> </a>
                         </td>
                         <td>
-                            <input type="number" min="0" class="form-control" id="hsn0" name="hsn0">
+                            <input type="number" min="0" class="form-control" id="hsn0" name="hsn0" required>
                         </td>
                         <td>
-                            <div class="comboprod0" data-href="{% url 'getproducts_gst_sale' %}">
                             <select name="prod0" id="prod0" placeholder="Select Product" class="product-select form-control" >
                                 <option selected>--------Select Product--------</option>
                                 {% for i in Product_data %}
@@ -282,16 +279,16 @@ Add Sales
                         <a href="{% url 'dashboard' %}" class="btn btn-space btn-danger rounded">Cancel</a>
                     </p>
                 </div>
+                <input type="hidden" class="form-control" id="product_count" name="product_count">
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<div class="selected_product" data-href="{% url 'selected_product' %}"></div>
 <div id="st" data-href="{% url 'customer_state_gst' %}"></div>
-<div id="ownerstate_gst" data-href="{% url 'ownerstate_gst' %}"></div>
-<div id="sto" data-href="{% url 'check_stock_gst' %}"></div>
-<div class="product_data_gst" data-href="{% url 'product_data_gst' %}"></div>
-<div class="sellingprice" data-href="{% url 'sellingprice_gst' %}"></div>
+<div class="product_data_estimate" data-href="{% url 'product_data_estimate' %}"></div>
 
 <script src="{% static 'libs/js/jquery-3.5.1.js' %}"></script>
 <script src="{% static 'libs/js/custom/gstsale.js' %}"></script>

@@ -28,18 +28,33 @@ def generate_bill_number(request):
     year = today.strftime("%Y")
     day_of_year = today.strftime("%j")
 
-    # Assuming you have a model named Bill
-    last_bill = Estimate_sale_bill_number.objects.all().first()
+    if request.session["Estimate"]:
+        # Assuming you have a model named Bill
+        last_bill = Estimate_sale_bill_number.objects.all().first()
 
-    if last_bill:
-        last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
-        new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
-    else:
-        new_bill_number = "001"  # First bill of the day
-        bill_number = Estimate_sale_bill_number (
-            last_bill_number = f"{year}{day_of_year}{new_bill_number}"
-        )
-        bill_number.save()
+        if last_bill:
+            last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
+            new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
+        else:
+            new_bill_number = "001"  # First bill of the day
+            bill_number = Estimate_sale_bill_number (
+                last_bill_number = f"{year}{day_of_year}{new_bill_number}"
+            )
+            bill_number.save()
+
+    if request.session["GST"]:
+        # Assuming you have a model named Bill
+        last_bill = GST_sale_bill_number.objects.all().first()
+
+        if last_bill:
+            last_bill_number = str(last_bill.last_bill_number)[8:]  # Extract the last part of the bill number
+            new_bill_number = str(int(last_bill_number) + 1).zfill(3)  # Increment and pad with leading zeros
+        else:
+            new_bill_number = "001"  # First bill of the day
+            bill_number = GST_sale_bill_number (
+                last_bill_number = f"{year}{day_of_year}{new_bill_number}"
+            )
+            bill_number.save()
 
     return f"{year}{day_of_year}{new_bill_number}"
 
@@ -48,6 +63,14 @@ def addsale(request):
     if request.method == 'POST':
         # Check for User Group
         if request.session['Estimate']:
+            # Load Customer Data
+            customer_data = customer_cache()
+            # Selected Customer
+            selected_customer = customer_data.get(id=request.POST['customer'])
+
+            # Load Product Data
+            product_data = product_cache()
+
             # Check for cash on Hand Value
             if len(request.POST['cod']):
                 cash_on_hand = request.POST['cod']
@@ -65,7 +88,7 @@ def addsale(request):
             # Create a Estimate sale data
             Estimatesale = Estimate_sales(
                 Bill_no = request.POST['bill_no'],
-                customer = Customer_estimate.objects.get(id=request.POST['customer']),
+                customer = selected_customer,
                 Total_amount=request.POST['total'],
                 Due_amount=request.POST['oldamt'],
                 Round_off=Round_off,
@@ -73,16 +96,14 @@ def addsale(request):
             )
             
             # Get the customerAccount data based on the customer name 
-            customerAccount = customeraccount_estimate.objects.get(customer_name = request.POST['customer'])
+            customerAccount = selected_customer.customeraccount_estimate
             # Update the Grand Total
             customerAccount.amount = float(Grand_total)
-            
-            customer_data = customer_cache()
             
             if cash_on_hand != 0:
                 # Create a object for Customer Pay when we have a Cash on Hand Value
                 CustomerPay = customerpay_estimate (
-                    customer_name = customer_data.get(id=request.POST['customer']),
+                    customer_name = selected_customer,
                     pending_amount = Grand_total,
                     paid_amount = cash_on_hand,
                     round_off = 0
@@ -95,6 +116,10 @@ def addsale(request):
             # Loop through the list of prodcuts for that Sale
             # esc : Check for declaration
             for i in range(0,int(request.POST['product_count'])):
+
+                # selected Product
+                selected_product = product_cache.get(product_name = request.POST['prod'+str(i)])
+
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:
@@ -113,19 +138,15 @@ def addsale(request):
                 )
 
                 # Get the stock details based on the product_name
-                stock = Stock_estimate.objects.get(product = Product_estimate.objects.get(product_name=request.POST['prod'+str(i)]))
-                c = stock.quantity
-                a = int(c)
-                # Update the quantity
-                b = int(request.POST['qty'+str(i)])
-                stock.quantity = a - b
+                stock = selected_product.stock_estimate
+                stock.quantity = int(stock.quantity) - int(request.POST['qty'+str(i)])
                 # save
                 stock.save()
                 # Save
                 estimate.save()
 
             # Update the bill number in the Bill_number model.
-            last_bill = Bill_number.objects.all().first()
+            last_bill = Estimate_sale_bill_number.objects.all().first()
             last_bill.last_bill_number = request.POST['bill_no']
             last_bill.save()
             
@@ -134,6 +155,15 @@ def addsale(request):
             Estimatesale.save()
 
         if request.session['GST']:
+            # Load Customer Data
+            customer_data = customer_cache_gst()
+            # selected customer data
+            selected_customer = customer_data.get(id = request.POST['customer'])
+
+            # Load Product data
+            product_data = product_cache_gst()
+
+            # Check for Round off values
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
                 print(Round_off)
@@ -141,24 +171,28 @@ def addsale(request):
                 Round_off = 0
                 print(Round_off )
 
+            # Check for CGST
             if len(request.POST['cgst']) >= 1:
                 CGST = request.POST['cgst']
             else:
                 CGST = 0
 
+            # Check for IGST
             if len(request.POST['igst']) >= 1:
                 IGST = request.POST['igst']
             else:
                 IGST = 0
 
+            # Check for SGST
             if len(request.POST['sgst']) >= 1:
                 SGST = request.POST['sgst']
             else:
                 SGST = 0
 
+            # Create a GST sale object
             GSTSALE = gstsale (
                 Bill_no=request.POST['bill_no'],
-                customer_name = Customer_gst.objects.get(id = Customer_gst.objects.get(fullname=request.POST['customer']).id),
+                customer_name = selected_customer,
                 total_amount=request.POST['total'],
                 CGST=CGST,
                 SGST=SGST,
@@ -167,12 +201,17 @@ def addsale(request):
                 Grand_total=request.POST['gtot']
             )
             
-
-            GSTCUSTOMER = customeraccount_gst.objects.get(customer_name = Customer_gst.objects.get(fullname=request.POST['customer']))
-            GSTCUSTOMER.amount = float(GSTCUSTOMER.amount) + float(request.POST['gtot'])
+            # Update the customer Account
+            GSTCUSTOMER = selected_customer.customeraccount_gst
+            grand_total = request.POST['gtot']
+            GSTCUSTOMER.amount = float(GSTCUSTOMER.amount) + float(grand_total)
             
+            # For Loop for Sale Products
+            for i in range(0,int(request.POST['product_count'])):
+                # Selected Product
+                selected_product = product_data.get(product_name = request.POST['prod'+str(i)])
 
-            for i in range(0,gst):
+                # Creating product records
                 Gstsale = gstsales_Product (
                     Bill_no = request.POST['bill_no'],
                     hsncode = request.POST['hsn'+str(i)],
@@ -185,15 +224,20 @@ def addsale(request):
                     total = request.POST['tot'+str(i)]
                 )
 
-                stock = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['prod'+str(i)]))
-                c = stock.quantity
-                a = int(c)
-                b = int(request.POST['qty'+str(i)])
-                stock.quantity = a - b
+                # Updating stock details
+                stock = selected_product.stock_gst
+                stock.quantity = int(stock.quantity) - int(request.POST['qty'+str(i)])
                 stock.save()
 
+                # Save that product record.
                 Gstsale.save()
-            
+
+            # Update the bill number in the Bill_number model.
+            last_bill = GST_sale_bill_number.objects.all().first()
+            last_bill.last_bill_number = request.POST['bill_no']
+            last_bill.save()
+
+            # Save Sale records and update the customer account.
             GSTSALE.save()
             GSTCUSTOMER.save()
 
@@ -209,21 +253,23 @@ def addsale(request):
         if request.session["Manufacture"]:
             Product_data = Product_data.filter(product_type = Product_type.objects.get(product_type="Manufacture"))
             
-        
         # Get the customer Data
         customer_data = customer_cache()
 
         new_billno = generate_bill_number(request)
     
     if request.session['GST']:
-        Product_data = Product_gst.objects.all()
-        Customer_data = Customer_gst.objects.all()
-        
-        if gstsale.objects.all().exists():
-            new_billno = gstsale.objects.last().Bill_no
-            new_billno = new_billno + 1
-        else:
-            new_billno = 1
+        Product_data = product_cache_gst()
+
+        # Get the Manufacture product Data 
+        if request.session["Manufacture"]:
+            Product_data = Product_data.filter(product_type = product_type_gst.objects.get(product_type="Manufacture"))
+
+        # Get the Customer Data
+        customer_data = customer_cache_gst()
+
+        # Get New Bill Number
+        new_billno = generate_bill_number(request)
 
     context = {
         'Product_data' : Product_data,
@@ -515,14 +561,19 @@ def customerdue_estimate(request):
 ''' Here we are checking for weather we have a product details in cache or not if we have then we will go with that or else create a cache here '''
 @login_required(login_url='login')
 def product_data_estimate(request):
-    cache_key = "product_data_estimate_cache" 
-    cached_productdata = cache.get(cache_key)
+    if request.session["Estimate"]:
+        productdata = product_cache()
 
-    productdata = product_cache()
+        if request.session['Manufacture']:
+            product_type = Product_type.objects.get(product_type = "Manufacture")
+            productdata = productdata.filter(product_type = product_type)
 
-    if request.session['Manufacture']:
-        product_type = Product_type.objects.get(product_type = "Manufacture")
-        productdata = productdata.filter(product_type = product_type)
+    if request.session["GST"]:
+        productdata = product_cache_gst()
+
+        if request.session["Manufacture"]:
+            product_type = product_type_gst.objects.get(product_type = "Manufacture")
+            productdata = productdata.filter(product_type = product_type)
 
     return JsonResponse({"productdata": list(productdata.values())})
 
@@ -531,18 +582,32 @@ def product_data_estimate(request):
 As we are validating that if the stock quantity for that product is 0 then we don't allow them to change the add the quantity to sell. ''' 
 @login_required(login_url='login')
 def selected_product(request):
-    productname = request.GET['product_name']
+    if request.session["Estimate"]:
+        productname = request.GET['product_name']
 
-    productdata = product_cache()
+        productdata = product_cache()
+        
+        product_data = productdata.get(product_name = productname)
+        stock_data = Stock_estimate.objects.get(product = product_data.id)
+        print(stock_data.quantity)
+
+        if (stock_data.quantity == 0):
+            quantity = 0
+        else:
+            quantity = stock_data.quantity
     
-    product_data = productdata.get(product_name = productname)
-    stock_data = Stock_estimate.objects.get(product = product_data.id)
-    print(stock_data.quantity)
+    if request.session['GST']:
+        productname = request.GET['product_name']
 
-    if (stock_data.quantity == 0):
-        quantity = 0
-    else:
-        quantity = stock_data.quantity
+        productdata = product_cache_gst()
+
+        product_data = productdata.get(product_name = productname)
+        stock_data = product_data.stock_gst
+
+        if (stock_data.quantity == 0):
+            quantity = 0
+        else:
+            quantity = stock_data.quantity
 
     product_data_values = {
         'product_name' : product_data.product_name,
@@ -553,69 +618,11 @@ def selected_product(request):
 
     return JsonResponse({"product_data" : product_data_values})
 
-# To get the count for the products what we have added in the sales.
-''' It will get the count of that how many products are there in that sale record what we are adding '''
-def estimatesalec(request):
-    global esc
-    esc=int(request.GET['c'])
-    return HttpResponse(esc)
-
 # GST sale Ajax Call
-def gstsalec(request):
-    global gst
-    gst=int(request.GET['c'])
-    return HttpResponse(gst)
-
-def product_data_gst(request):
-    productdata = Product_gst.objects.all()
-    return JsonResponse({"productdata":list(productdata.values())})
-
-def getproducts_gst_sale(request):
-    productdata = Product_gst.objects.all()
-    return JsonResponse({"productdata":list(productdata.values())})
-
 def customer_state_gst(request):
     cname = request.GET['cname'] 
-    customer = Customer_gst.objects.get(id=Customer_gst.objects.get(fullname=cname).id)
+    customer_data = customer_cache_gst()
+    customer = customer_data.get(id = cname)
     state = customer.state
-
-    return HttpResponse(state)
-
-def check_stock_gst(request):
-    stock = Stock_gst.objects.all()
-    return JsonResponse({"stock_data":list(stock.values())})
-
-def sellingprice_gst(request):
-    pname = request.GET['pname']
-    cname = request.GET['cname']
-    rate_ = 0
-    last_price = 0
-    last_rate = 0
-    pk_id = 0
-    
-    if gstsale.objects.filter(customer_name = Customer_gst.objects.get(fullname=cname)).count() >= 1:
-        customer_id = gstsale.objects.filter(customer_name = Customer_gst.objects.get(fullname=cname)).last()
-        pk_id = customer_id.Bill_no
-        
-    if gstsales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).count() >= 1:
-        product_rate = gstsales_Product.objects.filter(product_name=pname).filter(Bill_no=pk_id).last()
-        rate_ = product_rate.rate
-        print(rate_)
-    else:
-        last_price = Product_gst.objects.get(product_name=pname).selling_price
-
-
-    if len(str(rate_)) > 1:
-        last_rate = rate_
-        print(last_rate)
-    else:
-        last_rate = last_price
-        print(last_rate)
-
-    return HttpResponse(last_rate)
-
-def ownerstate_gst_sale(request):
-    state = request.user.profile.state
-    print(state)
 
     return HttpResponse(state)
