@@ -68,11 +68,10 @@ Add Supplier Payment
     });
     $('.suppliername').select2();
         $('.suppliername').on("change",function(){
-            var sid=$(this).val();
-            console.log(sid);
+            var supplier_name = $(this).val();
             $.ajax({
-                url: "{% url 'supplier_dueamount_estimate' %}",
-                data : { 'sid' : sid },
+                url: "{% url 'supplier_dueamount' %}",
+                data : { 'supplier_name' : supplier_name },
                 success : function(data){
                    $('.card .pending-amount').val(data)
                 }
@@ -139,11 +138,11 @@ Add Supplier Payment
     });
     $('.suppliername').select2();
         $('.suppliername').on("change",function(){
-            var sid=$(this).val();
+            var supplier_name = $(this).val();
             // alert(id)
             $.ajax({
-                url: "{% url 'supplier_dueamount_gst' %}",
-                data : { 'sid' : sid },
+                url: "{% url 'supplier_dueamount' %}",
+                data : { 'supplier_name' : supplier_name },
                 success : function(data){
                    $('.card .pending-amount').val(data)
                 }

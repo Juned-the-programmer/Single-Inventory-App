@@ -77,10 +77,10 @@ Add Customer Payment
     });
     $('.customername').select2();
         $('.customername').on("change",function(){
-            var cid=$(this).val();
+            var customer_name = $(this).val();
             $.ajax({
-                url: "{% url 'customer_dueamount_estimate' %}", 
-                data : { 'cid' : cid },
+                url: "{% url 'customer_dueamount' %}", 
+                data : { 'customer_name' : customer_name },
                 success : function(data){
                    $('.card .pending_amount').val(data)
                 }
@@ -106,7 +106,7 @@ Add Customer Payment
                         <select name="customer" id="editable-select" class="form-control customername" >
                         <option value="-1" selected>------Select-------</option>
                         {% for i in customer_data %}
-                            <option value="{{i.id}}">{{i.customer_name}}</option>
+                            <option value="{{i.id}}">{{i.fullname}}</option>
                         {% endfor %}
                         </select>
                     </div>
@@ -156,10 +156,10 @@ Add Customer Payment
     });
     $('.customername').select2();
         $('.customername').on("change",function(){
-            var cid=$(this).val();
+            var customer_name = $(this).val();
             $.ajax({
-                url: "{% url 'customer_dueamount_gst' %}",
-                data : { 'cid' : cid },
+                url: "{% url 'customer_dueamount' %}",
+                data : { 'customer_name' : customer_name },
                 success : function(data){
                    $('.card .pending-amount').val(data)
                 }

@@ -50,24 +50,28 @@ def supplierpayment(request):
             messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
         else:
-            
+            #  Check for round off value
             if len(request.POST['round_off']) >= 1:
                 round_off = request.POST['round_off']
             else:
                 round_off = 0
 
+            # Get all the supplier data
             SupplierPay = supplierpay_gst(
                 supplier_name = supplieraccount_gst.objects.get(id=request.POST['supplier-name']).supplier_name,
                 pending_amount = float(request.POST['pending_amount']),
                 paid_amount = float(request.POST['paid_amount']),
                 round_off = round_off
             )
-        
+
+            # Get the supplier Account details based on the supplier_name
             supplieraccountdata = supplieraccount_gst.objects.get(id=request.POST['supplier-name'])
 
+            # Update the amount for that supplier accordingly
             supplieraccountdata.amount = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
             supplieraccountdata.amount = supplieraccountdata.amount - float(round_off)
 
+            # save
             supplieraccountdata.save()
             SupplierPay.save()
             messages.success(request,"Supplier Payment Done Successfully of "+request.POST['paid_amount']+"!")
@@ -80,7 +84,7 @@ def supplierpayment(request):
     # Check for user Group
     if request.session['GST']:
         # Get all the supplier data
-        supplier_data = Supplier_gst.objects.all()
+        supplier_data = supplier_cache_gst()
 
     date_ = date.today()
     d1 = date_.strftime("%d/%m/%Y")
@@ -125,27 +129,33 @@ def customerpayment(request):
             messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
 
         else:
-
+            # Check for round off values
             if len(request.POST['round_off']) >= 1:
                 round_off = request.POST['round_off']
             else:
                 round_off = 0
 
+            # Load customer data
+            customer_data = customer_cache_gst()
+
             CustomerPay = customerpay_gst (
-                customer_name = customeraccount_gst.objects.get(id=request.POST['customer']).customer_name,
+                customer_name = customer_data.get(id=request.POST['customer']),
                 pending_amount = request.POST['pending_amount'],
                 paid_amount = request.POST['paid_amount'],
                 round_off = round_off,
                 Description = request.POST['Description']
             )
-            CustomerPay.save()
 
-            customerdata = customeraccount_gst.objects.get(id=request.POST['customer'])
+            # Load the customer account data
+            customerdata = customer_data.get(id=request.POST['customer']).customeraccount_gst
 
+            # Update the customer account 
             customerdata.amount  = float(request.POST['pending_amount']) - float(request.POST['paid_amount'])
             customerdata.amount = customerdata.amount - float(round_off)
 
+            # Save
             customerdata.save()
+            CustomerPay.save()
             messages.success(request,"Payment Done Successfully of "+request.POST['paid_amount']+"!")
     
 
@@ -157,8 +167,8 @@ def customerpayment(request):
         customer_data = customer_cache()
     
     if request.session['GST']:
-        customer_data = Customer_gst.objects.all()
-
+        customer_data = customer_cache_gst()
+    
     context = {
         'd1':d1,
         'customer_data':customer_data
@@ -167,42 +177,46 @@ def customerpayment(request):
 
 # To get the supplier due amount for Estimate
 @login_required(login_url='login')
-def supplier_dueamount_estimate(request):
-    sid = request.GET['sid']
+def supplier_dueamount(request):
+    if request.session["Estimate"]:
+        supplier_name = request.GET['supplier_name']
 
-    supplier_data = supplier_cache()
+        supplier_data = supplier_cache()
 
-    supplierdata = supplier_data.get(id=sid)
-    supplier_account = supplierdata.supplieraccount_estimate
-    pendingamount = supplier_account.amount
+        supplierdata = supplier_data.get(id = supplier_name)
+        supplier_account = supplierdata.supplieraccount_estimate
+        pendingamount = supplier_account.amount
+    
+    if request.session["GST"]:
+        supplier_name = request.GET['supplier_name']
+
+        supplier_data = supplier_cache_gst()
+
+        supplierdata = supplier_data.get(id = supplier_name)
+        supplier_account = supplierdata.supplieraccount_gst
+        pendingamount = supplier_account.amount
 
     return HttpResponse(pendingamount)
 
 # To get the customer due amount for Estimate
 @login_required(login_url='login')
-def customer_dueamount_estimate(request):
-    cid = request.GET['cid']
+def customer_dueamount(request):
+    if request.session["Estimate"]:
+        customer_name = request.GET['customer_name']
 
-    customer_data = customer_cache()
+        customer_data = customer_cache()
 
-    customerdata = customer_data.get(id=cid)
-    customer_account = customerdata.customeraccount_estimate
-    pendingamount = customer_account.amount
+        customerdata = customer_data.get(id=customer_name)
+        customer_account = customerdata.customeraccount_estimate
+        pendingamount = customer_account.amount
 
-    return HttpResponse(pendingamount)
+    if request.session["GST"]:
+        customer_name = request.GET['customer_name']
 
-@login_required(login_url='login')
-def customer_dueamount_gst(request):
-    cid = request.GET['cid']
-    customerdata = customeraccount_gst.objects.get(id = customeraccount_gst.objects.get(id=cid).id)
-    pendingamount = customerdata.amount
+        customer_data = customer_cache_gst()
 
-    return HttpResponse(pendingamount)
-
-@login_required(login_url='login')
-def supplier_dueamount_gst(request):
-    sid = request.GET['sid']
-    supplierdata = supplieraccount_gst.objects.get(id = supplieraccount_gst.objects.get(id=sid).id)
-    pendingamount = supplierdata.amount
+        customerdata = customer_data.get(id=customer_data)
+        customer_account = customerdata.customeraccount_gst
+        pendingamount = customer_account.amount
 
     return HttpResponse(pendingamount)

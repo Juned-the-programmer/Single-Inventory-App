@@ -348,7 +348,7 @@ def updatesale(request , pk):
             customerAccount.amount = float(customerAccount.amount) + float(old_amount) 
             
             # Irerate loop to get add the products for that sale
-            for i in range(0,esc):
+            for i in range(0,int(request.POST['product_count'])):
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:
@@ -384,24 +384,32 @@ def updatesale(request , pk):
             messages.success(request, "Sale Updated Successfully ! ")
 
         if request.session['GST']:
+            # Load Customer Data
+            customer_data = customer_cache_gst()
+            customer_data = customer_data.get(id=request.POST['customer'])
+            
+            # Load Product Data
+            product_data = product_cache_gst()
 
+            # Get the Round Off Values
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
-                print(Round_off)
             else:
                 Round_off = 0
-                print(Round_off )
-
+                
+            # Get the CGST Values
             if len(request.POST['cgst']) >= 1:
                 CGST = request.POST['cgst']
             else:
                 CGST = 0
 
+            # Get the IGST Values
             if len(request.POST['igst']) >= 1:
                 IGST = request.POST['igst']
             else:
                 IGST = 0
 
+            # Get the SGST Values
             if len(request.POST['sgst']) >= 1:
                 SGST = request.POST['sgst']
             else:
@@ -413,7 +421,6 @@ def updatesale(request , pk):
             bill_product = gstsales_Product.objects.filter(Bill_no=request.POST['bill_no'])
             
             for j in range(0,saleproduct_count):
-                print(bill_product[j].product_name)
                 add_stock = Stock_gst.objects.get(product=Product_gst.objects.get(product_name=bill_product[j].product_name))
                 add_stock.quantity = add_stock.quantity + bill_product[j].qty
                 add_stock.save()
@@ -421,9 +428,13 @@ def updatesale(request , pk):
             gstsale.objects.get(Bill_no=request.POST['bill_no']).delete()
             gstsales_Product.objects.filter(Bill_no=request.POST['bill_no']).delete()
 
+            # Get the Specific Customer Data
+            selected_customer = customer_data.get(id=request.POST['customer'])
+
+            # Adding the GST sale data
             GSTSALE = gstsale (
                 Bill_no=request.POST['bill_no'],
-                customer_name = Customer_gst.objects.get(id = Customer_gst.objects.get(fullname=request.POST['customer']).id),
+                customer_name = selected_customer,
                 total_amount=request.POST['total'],
                 CGST=CGST,
                 SGST=SGST,
@@ -432,13 +443,15 @@ def updatesale(request , pk):
                 Grand_total=request.POST['gtot']
             )
 
+            # Get the old amount before that sale data
             old_amount = float(request.POST['gtot']) - float(old_grant_total)
             
-            GSTCUSTOMER = customeraccount_gst.objects.get(customer_name = Customer_gst.objects.get(fullname=request.POST['customer']))
+            # Load that customer account to update the amount
+            GSTCUSTOMER = selected_customer.customeraccount_gst
             GSTCUSTOMER.amount = float(GSTCUSTOMER.amount) + float(old_amount)
             
-
-            for i in range(0,gst):
+            # Iterate through the products added.
+            for i in range(0,int(request.POST['product_count'])):
                 Gstsale = gstsales_Product (
                     Bill_no = request.POST['bill_no'],
                     hsncode = request.POST['hsn'+str(i)],
@@ -451,16 +464,21 @@ def updatesale(request , pk):
                     total = request.POST['tot'+str(i)]
                 )
 
-                stock = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['prod'+str(i)]))
-                c = stock.quantity
-                a = int(c)
-                b = int(request.POST['qty'+str(i)])
-                stock.quantity = a - b
+                # Load the product data
+                product_data = product_data.get(product_name = request.POST['prod'+str(i)])
+
+                # Update stock data
+                stock = product_data.stock_gst
+                stock.quantity = int(stock.quantity) - int(request.POST['qty'+str(i)])
+                # Adding stock data
                 stock.save()
 
+                # Adding GST Sale product data
                 Gstsale.save()
             
+            # Adding GST sale data
             GSTSALE.save()
+            # Updatig the customer data
             GSTCUSTOMER.save()
 
             return redirect('viewsale')
@@ -477,15 +495,22 @@ def updatesale(request , pk):
 
         product_data = product_cache()
 
-        if request.user.groups.filter(name="Manufacture").exists():
-            product_data = Product_estimate.objects.filter(product_type=Product_type.objects.get(product_type="Manufacture"))
+        if request.session["Manufacture"]:
+            product_data = product_data.filter(product_type = Product_type.objects.get(product_type="Manufacture"))
 
     if request.session['GST']:
+        # To get the data to get display the update page
         sale_Bill_no = gstsale.objects.get(pk=pk).Bill_no
         sale_data = gstsale.objects.get(Bill_no=sale_Bill_no)
         sale_product = gstsales_Product.objects.filter(Bill_no=sale_Bill_no)
-        customer_data = Customer_gst.objects.all()
-        product_data = Product_gst.objects.all()
+
+        customer_data = customer_cache_gst()
+
+        product_data = product_cache_gst()
+
+        if request.session["Manufacture"]:
+            product_data = product_data.filter(product_type = product_type_gst.objects.get(product_type="Manufacture"))
+
 
     context = {
         'sale_Bill_no' : sale_Bill_no,
