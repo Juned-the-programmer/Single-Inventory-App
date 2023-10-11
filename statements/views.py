@@ -50,7 +50,7 @@ def list_stock(request):
         # Check for User Group
         if request.session['GST']:
             # Get all the stock data for GST
-            stock_data = Stock_gst.objects.all()
+            stock_data = Stock_gst.objects.select_related('product').all()
 
         context = {
             'stock_data' : stock_data

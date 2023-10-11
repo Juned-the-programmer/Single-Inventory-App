@@ -215,7 +215,7 @@ def customer_dueamount(request):
 
         customer_data = customer_cache_gst()
 
-        customerdata = customer_data.get(id=customer_data)
+        customerdata = customer_data.get(id = customer_name)
         customer_account = customerdata.customeraccount_gst
         pendingamount = customer_account.amount
 
