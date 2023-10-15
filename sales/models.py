@@ -52,7 +52,7 @@ class estimatesales_Product(models.Model):
 
 class gstsale(models.Model):
     Bill_no = models.IntegerField()
-    customer_name =  models.ForeignKey(Customer_gst,on_delete=models.CASCADE)
+    customer_name =  models.ForeignKey(Customer_gst,on_delete=models.CASCADE, related_name="gst_sales")
     date = models.DateTimeField(auto_now_add=True)
     total_amount = models.FloatField()
     CGST = models.FloatField()

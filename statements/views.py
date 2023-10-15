@@ -36,7 +36,7 @@ def list_stock(request):
             # Check for User Group
             if request.session['GST']:
                 # Get the stock detail for that product based on the product_name
-                stockdata = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['product_name']))
+                stockdata = Stock_gst.objects.get(product = request.POST['product_name'])
                 # Update the stock quantity
                 stockdata.quantity = stockdata.quantity + int(request.POST['qty'])
                 # Save
@@ -267,7 +267,6 @@ def customer_statement_view(request,pk):
         # Check for User Group
         if request.session['Estimate']:
             # Load a cache Customer Data
-            
             customer_data = customer_cache()
             
             customer_data = customer_data.get(id=pk)
@@ -326,12 +325,61 @@ def customer_statement_view(request,pk):
             return render(request , 'statements/customer_statement_view.html',context)
         
         if request.session['GST']:
-            sale_data = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
-            payment_data = customerpay_gst.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+            # Load a cache Customer Data
+            customer_data = customer_cache_gst()
+            
+            customer_data = customer_data.get(id=pk)
+            
+            # Get the sale data from estimate using filter like dates and customer
+            sale_data = customer_data.gst_sales.filter(date__range=(request.POST['fromdate'], request.POST['todate']))
+            
+            # Processing data.
+            if sale_data.exists():
+                sale_data_aggregates = sale_data.aggregate(
+                    total_amount_sum=Sum('Grand_total'),
+                    round_off_sum=Sum('Round_off')
+                )
+                sale_data_total = sale_data_aggregates.get('total_amount_sum', 0) or 0
+                sale_data_round_off = sale_data_aggregates.get('round_off_sum', 0) or 0
+                sale_data_money = sale_data_total - sale_data_round_off
+                sale_data_money = round(sale_data_money , 2)
+            else:
+                sale_data_total = 0
+                sale_data_round_off = 0
+                sale_data_money = 0
+
+            # Get the payment data for that customer.
+            payment_data = customer_data.customerpay_gst_set.filter(date__range=(request.POST['fromdate'], request.POST['todate']))
+            payment_data_total_money = 0
+            payment_data_round_off_money = 0
+
+            # Processing data
+            if payment_data.exists():
+                payment_data_aggregates = payment_data.aggregate(
+                    payment_data_total = Sum('paid_amount'),
+                    payment_data_round_off = Sum('round_off')
+                )
+                payment_data_total = payment_data_aggregates.get('payment_data_total' , 0) or 0
+                payment_data_round_off = payment_data_aggregates.get('payment_data_round_off' ,  0) or 0
+                payment_data_total_plus_round_off = float(payment_data_total) + float(payment_data_round_off)
+                payment_data_total_money = round(payment_data_total_plus_round_off , 2)
+                payment_data_round_off_money = round(payment_data_round_off , 2)
+            else:
+                payment_data_total = 0
+                payment_data_round_off = 0
+                payment_data_total_money = 0
+                payment_data_round_off_money = 0
+
+            total_data = itertools.zip_longest(payment_data,sale_data)
 
             context = {
-                'sale_data' : sale_data,
-                'payment_data' : payment_data
+                'sale_data_total' : sale_data_total,
+                'sale_data_money' : sale_data_money,
+                'total_data' : total_data,
+                'payment_data_total' : payment_data_total,
+                'payment_data_total_money' : payment_data_total_money,
+                'payment_data_round_off_money' : payment_data_round_off_money,
+                'sale_date_round_off' : sale_data_round_off
             }
             return render(request , 'statements/customer_statement_view.html',context)
 
