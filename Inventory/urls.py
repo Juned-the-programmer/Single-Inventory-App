@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from . import settings
+from django.conf.urls.static import static
 
 if settings.DEBUG:
     import debug_toolbar
@@ -34,3 +35,4 @@ if settings.DEBUG:
         path('daybook/', include('daybook.urls')),
         path('statement/',include('statements.urls')),
     ]
+    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

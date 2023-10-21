@@ -173,6 +173,11 @@ def addpurchase(request):
                 Grand_total=request.POST['gtot']
             )
 
+            if(request.FILES['purchase_invoice']):
+                upload_file = request.FILES['purchase_invoice']
+                if upload_file.name.endswith('.pdf'):
+                    GSTPURCHASE.pdf_invoice = upload_file
+
             GSTSUPPLIER = supplier_data.supplieraccount_gst
             GSTSUPPLIER.amount = float(request.POST['gtot']) + float(GSTSUPPLIER.amount)
             
@@ -230,23 +235,20 @@ def addpurchase(request):
 # To view Purchase data
 @login_required(login_url='login')
 def viewpurchase(request):
-    try:
-        # Check for user Group
-        if request.session["Estimate"]:
-            # Get the product data
-            Purchase_data = Estimate_Purchase.objects.all().prefetch_related('supplier').order_by("-date")
-        
-        # Check for user Group
-        if request.session["GST"]:
-            # Get the product data
-            Purchase_data = GST_Purchase.objects.prefetch_related('supplier_name').all().order_by("-date")
+    # Check for user Group
+    if request.session["Estimate"]:
+        # Get the product data
+        Purchase_data = Estimate_Purchase.objects.all().prefetch_related('supplier').order_by("-date")
+    
+    # Check for user Group
+    if request.session["GST"]:
+        # Get the product data
+        Purchase_data = GST_Purchase.objects.prefetch_related('supplier_name').all().order_by("-date")
 
-        context = {
-            'Purchase_data' : Purchase_data
-        }
-        return render(request,"purchase/viewpurchase.html",context)
-    except:
-        return redirect('error404')
+    context = {
+        'Purchase_data' : Purchase_data
+    }
+    return render(request,"purchase/viewpurchase.html",context)
 
 # To update the Purchase detail
 @login_required(login_url='login')

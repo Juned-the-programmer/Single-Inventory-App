@@ -69,6 +69,7 @@ View Purchase
                             <th>Date</th>
                             <th>View Purchase</th>
                             <th>Edit Purchase</th>
+                            <th>Purchase Invoice</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -83,6 +84,13 @@ View Purchase
                             </td>
                             <td>
                                 <a href="/purchase/updatepurchase/{{i.id}}">Edit</a>
+                            </td>
+                            <td>
+                                {% if i.pdf_invoice %}
+                                    <a href="{{i.pdf_invoice.url}}" target="_blank">Invoice</a>
+                                {% else %}
+                                    NO PDF
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

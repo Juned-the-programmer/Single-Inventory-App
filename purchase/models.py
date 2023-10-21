@@ -53,6 +53,7 @@ class estimatepurchase_Product(models.Model):
 class GST_Purchase(models.Model):
     Bill_no = models.IntegerField()
     supplier_name = models.ForeignKey(Supplier_gst,on_delete=models.CASCADE)
+    pdf_invoice = models.FileField(upload_to = 'Purchase_Invoice/', null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     total_amount = models.FloatField()
     CGST = models.FloatField()
