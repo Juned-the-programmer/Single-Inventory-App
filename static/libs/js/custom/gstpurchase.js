@@ -30,6 +30,19 @@ $(document).ready(function () {
     })
 });
 
+if(product_data.length == 0){
+  $.ajax({
+    type : "GET",
+    url: $('.supplier_product').attr('data-href'),
+    data : {'supplier_name': $('#supplier_gst').val()},
+    success : function (data) {
+      console.log(data)
+        product_data = data
+        supplier_state = data.supplier_state
+    }
+})
+}
+
   var profile_state = $('#owner_state').val();
 
   var counter = 1;

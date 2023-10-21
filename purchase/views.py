@@ -344,6 +344,14 @@ def updatepurchase(request,pk):
             messages.success(request,"Purchase Successfully !")
 
         if request.session["GST"]:
+            #Load the supplier Data
+            supplier_data = supplier_cache_gst()
+            supplierdata = supplier_data.get(id = request.POST['supplier'])
+            supplier_account = supplierdata.supplieraccount_gst
+            
+            # Load Product Data
+            productdata = product_cache_gst()
+
             if len(request.POST['roff']) >= 1:
                 Round_off = request.POST['roff']
             else:
@@ -364,37 +372,41 @@ def updatepurchase(request,pk):
             else:
                 SGST = 0
             
-            old_grant_total = request.POST['grant_total_gst']
+            # Get the purchase bill details
+            purchase_data = GST_Purchase.objects.get(id = pk)
+            Bill_no = purchase_data.Bill_no
+            purchase_product = gstpurchase_Product.objects.filter(Bill_no = Bill_no)
 
-            purchase_product_count = gstpurchase_Product.objects.filter(Bill_no=request.POST['bill_no']).count()
-            bill_product = gstpurchase_Product.objects.filter(Bill_no=request.POST['bill_no'])
+            # Update the Supplier Account values
+            new_bill_total = float(request.POST['gtot']) - float(purchase_data.Grand_total)
+            supplier_account.amount = supplier_account.amount + new_bill_total
+            supplier_account.save()
 
-            for j in range(0,purchase_product_count):
-                print(bill_product[j].product_name)
-                add_stock = Stock_gst.objects.get(product=Product_gst.objects.get(product_name=bill_product[j].product_name))
-                add_stock.quantity = add_stock.quantity - bill_product[j].qty
-                add_stock.save()
+            # Update the Purchase Record
+            purchase_data.supplier_name = supplierdata
+            purchase_data.total_amount = request.POST['total']
+            purchase_data.CGST = CGST
+            purchase_data.SGST = SGST
+            purchase_data.IGST = IGST
+            purchase_data.Round_off = Round_off
+            purchase_data.Grand_total = request.POST['gtot']
+            purchase_data.save()
 
-            GST_Purchase.objects.get(Bill_no=request.POST['bill_no']).delete()
-            gstpurchase_Product.objects.filter(Bill_no=request.POST['bill_no']).delete()
+            # Update the Stock data
+            old_purchase_product_count = int(purchase_product.count())
+            for i in range(0,int(old_purchase_product_count)):
+                product_data = productdata.get(product_name = purchase_product[i].product_name)
+                stock_data = product_data.stock_gst
+                stock_data.quantity = int(stock_data.quantity) - int(purchase_product[i].qty)
+                stock_data.save()
+            
+            # Delete Existing Records for the Product Data
+            purchase_product.delete()
 
-            GSTPURCHASE = GST_Purchase (
-                Bill_no=request.POST['bill_no'],
-                supplier_name = Supplier_gst.objects.get(fullname = request.POST['supplier']),
-                total_amount=request.POST['total'],
-                CGST=CGST,
-                SGST=SGST,
-                IGST=IGST,
-                Round_off=Round_off,
-                Grand_total=request.POST['gtot']
-            )
+            # Update Purchase Products
+            new_purchase_product_count = int(request.POST['product_count'])
 
-            old_amount = float(request.POST['gtot']) - float(old_grant_total)
-
-            GSTSUPPLIER = supplieraccount_gst.objects.get(supplier_name = Supplier_gst.objects.get(fullname=request.POST['supplier']))
-            GSTSUPPLIER.amount = float(GSTSUPPLIER.amount) + float(old_amount)
-
-            for i in range(0,int(request.POST['product_count'])):
+            for i in range(0,new_purchase_product_count):
                 Gstpurchase = gstpurchase_Product (
                 Bill_no = request.POST['bill_no'],
                 hsncode = request.POST['hsn'+str(i)],
@@ -407,16 +419,11 @@ def updatepurchase(request,pk):
                 total = request.POST['tot'+str(i)]
                 )
 
-                stock = Stock_gst.objects.get(product = Product_gst.objects.get(product_name=request.POST['prod'+str(i)]))
-                c = stock.quantity
-                a = int(c)
-                b = int(request.POST['qty'+str(i)])
-                stock.quantity = a + b
-                stock.save()
-
-            Gstpurchase.save()
-            GSTSUPPLIER.save()
-            GSTPURCHASE.save()
+                product_data = productdata.get(product_name = request.POST['prod'+str(i)])
+                stock_data = product_data.stock_gst
+                stock_data.quantity = int(stock_data.quantity) + int(request.POST['qty'+str(i)]) 
+                stock_data.save()
+                Gstpurchase.save()
 
             return redirect('viewpurchase')
             messages.success(request,"Purchase Successfully !")
@@ -440,8 +447,14 @@ def updatepurchase(request,pk):
         purchase_Bill_date = GST_Purchase.objects.get(pk=pk).date
         purchase_data = GST_Purchase.objects.get(Bill_no=purchase_Bill_no)
         purchase_product = gstpurchase_Product.objects.filter(Bill_no=purchase_Bill_no)
-        supplier_data = Supplier_gst.objects.all()
-        product_data = Product_gst.objects.all()
+
+        supplier_data = supplier_cache_gst()
+        product_data = product_cache_gst()
+
+        if request.session["Manufacture"]:
+            product_data = product_data.exclude(product_type=product_type_gst.objects.get(product_type="Manufacture"))
+        else:
+            product_data = productdata
     
     context = {
         'purchase_Bill_no' : purchase_Bill_no,
