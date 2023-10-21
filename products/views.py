@@ -68,7 +68,7 @@ def addproduct(request):
 
             # Populate the new value to caching by refreshing the entire chache
             cache.delete("product_data_estimate_cache")
-            cache_product_data()
+            product_cache()
             
         # Check for user Group
         if request.session['GST'] and 'GST' in request.POST:
@@ -365,10 +365,3 @@ def product_required(request):
         'required_products' : Required_products
     }
     return render(request, 'products/productrequiredtomanufacture.html', context)
-
-''' This is used to update the cache detail. 
-When we add new product then it will update the cache to new details of all the product data '''
-def cache_product_data():
-    cache_key = "product_data_estimate_cache"
-    product_data = Product_estimate.objects.all()
-    cache.set(cache_key, product_data, timeout=None)

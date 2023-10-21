@@ -70,7 +70,7 @@ def customer_payment_list(request):
     # Check for User Group
     if request.session['GST']:
         # Get all the Customer Payment for GST
-        customer_payment = customerpay_gst.objects.all()
+        customer_payment = customerpay_gst.objects.select_related('customer_name').all().order_by("-date")
 
     context = {
         'customer_payment':customer_payment
@@ -89,7 +89,7 @@ def supplier_payment_list(request):
         # Check for user Group
         if request.session['GST']:
             # Get all the supplier payments for GST
-            supplier_payment = supplierpay_gst.objects.all()
+            supplier_payment = supplierpay_gst.objects.select_related('supplier_name').all().order_by("-date")
         
         context = {
             'supplier_payment':supplier_payment
@@ -110,7 +110,7 @@ def customer_Credit(request):
         # Check for User Group
         if request.session['GST']:
             # Get all the customer creadit for GST
-            customer_credit_data = customeraccount_gst.objects.all()
+            customer_credit_data = customeraccount_gst.objects.select_related('customer_name').all()
         
         context = {
             'customer_credit_data':customer_credit_data
@@ -131,7 +131,7 @@ def supplier_credit(request):
         # Check for User Group
         if request.session['GST']:
             # Get all the supplier credit for GST
-            supplier_credit_list = supplieraccount_gst.objects.all()
+            supplier_credit_list = supplieraccount_gst.objects.select_related('supplier_name').all()
 
         context = {
             'supplier_credit_list':supplier_credit_list
@@ -156,7 +156,7 @@ def totalincome(request):
             # Get the daily Income data
             daily_income_data = dailyincome_gst.objects.all()
             # Get the customer payment data
-            customer_income_data = customerpay_gst.objects.all()
+            customer_income_data = customerpay_gst.objects.select_related('customer_name').all().order_by("-date")
 
         context = {
             'daily_income_data':daily_income_data,
@@ -182,7 +182,7 @@ def totalexpense(request):
             # Get the daily Expense data
             daily_expense_data = dailyexpense_gst.objects.all()
             # Get the supplier payment data
-            supplier_expense_data = supplierpay_gst.objects.all()
+            supplier_expense_data = supplierpay_gst.objects.select_related('supplier_name').all().order_by("-date")
         
         context = {
             'daily_expense_data':daily_expense_data,
@@ -212,7 +212,7 @@ def salereport(request):
         if request.session['GST']:
             if request.method == 'POST':
                 # Serach from the sales data between two dates
-                searchsale = gstsale.objects.filter(date__gte = request.POST['fromdate'] , date__lte = request.POST['todate'])
+                searchsale = gstsale.objects.filter(date__range = (request.POST['fromdate'] , request.POST['todate'])).select_related('customer_name')
 
                 context = {
                     'searchsale' : searchsale
@@ -250,9 +250,7 @@ def customerstatement(request):
     # Check for User Group
     if request.session['GST']:
         # Get the customer data for GST
-        customer_data = Customer_gst.objects.all()
-        # Get the customer Pending amount for Estimate
-        customer_pending_amount = customeraccount_estimate.objects.all()
+        customer_data = customer_cache_gst()
 
     context = {
         'customer_data' : customer_data

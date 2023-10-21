@@ -62,7 +62,7 @@ View Customer
                         <tbody>
                         {% for i in customer_data %}
                             <tr>
-                                <td>{{i.customerid}}</td>
+                                <td>{{forloop.counter}}</td>
                                 <td>{{i.fullname}}</td>
                                 <td>
                                     <a href="/statement/customer_statement_view/{{i.id}}">View</a>

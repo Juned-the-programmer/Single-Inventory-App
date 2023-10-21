@@ -239,7 +239,7 @@ def viewpurchase(request):
         # Check for user Group
         if request.session["GST"]:
             # Get the product data
-            Purchase_data = GST_Purchase.objects.all().order_by("-date")
+            Purchase_data = GST_Purchase.objects.prefetch_related('supplier_name').all().order_by("-date")
 
         context = {
             'Purchase_data' : Purchase_data
