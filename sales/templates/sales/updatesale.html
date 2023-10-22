@@ -162,7 +162,7 @@ Edit Sales
                         <br>
                             <label for="validationCustom01"><strong style="color: black;">Customer Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'addcustomer' %}"><i class="fa fa-user-plus" aria-hidden="true"></i></a></strong></label>
                             <select name="customer" id="cname" class="form-control customer">
-                            <option value="{{sale_data.id}}" selected>{{sale_data.customer_name}}</option>
+                            <option value="{{sale_data.customer_name.id}}" selected>{{sale_data.customer_name}}</option>
                             {% for i in customer_data %}
                                 <option value="{{i.id}}">{{i.fullname}}</option>
                             {% endfor %}
@@ -252,7 +252,6 @@ Edit Sales
                             <td align="right" width="75%">Grand Total(Rs.)</td>
                             <td align="right" width="25%"><input type="number" class="form-control" id="gtot" name="gtot" value="{{sale_data.Grand_total}}" placeholder="Grand Total" readonly></td>
                         </tr>
-                        <input type="hidden" class="form-control" id="cod" name="grant_total_gst" placeholder="Cash Payment" value="{{sale_data.Grand_total}}">
                     </tbody>
                 </table>
                 <div class="form-row">
