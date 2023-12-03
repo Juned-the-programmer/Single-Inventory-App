@@ -121,7 +121,6 @@ def updatecustomer(request,pk):
             customer = customer_data.get(pk=pk)
 
             customer.fullname = request.POST['fullname']
-            customer.customerid = request.POST['customerid']
             customer.contactno = request.POST['mobile']
             customer.city = request.POST['city']
             customer.state = request.POST['state']
@@ -140,7 +139,6 @@ def updatecustomer(request,pk):
             customer = customer_data.get(pk=pk)
 
             customer.fullname = request.POST['fullname']
-            customer.customerid = request.POST['customerid']
             customer.contactno = request.POST['mobile']
             customer.gst = request.POST['gstno']
             customer.email = request.POST['email']

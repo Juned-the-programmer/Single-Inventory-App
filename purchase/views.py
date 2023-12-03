@@ -69,7 +69,7 @@ def addpurchase(request):
         # Check for User Group
         if request.session["Estimate"]:
             # Load Supplier Data 
-            supplier_data = supplier_data.objects.get(id=request.POST['supplier'])
+            supplier_data = supplier_data.get(id=request.POST['supplier'])
 
             # Check for round off values
             Round_off = request.POST['roff']
@@ -309,7 +309,7 @@ def updatepurchase(request,pk):
             supplierAccount.amount = float(supplierAccount.amount) + float(old_amount)
             
             # Iterate loop to add the records
-            for i in range(0,estimate_purchase_product_list_count):
+            for i in range(0,int(request.POST['product_count'])):
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
                 else:

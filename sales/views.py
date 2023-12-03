@@ -118,7 +118,7 @@ def addsale(request):
             for i in range(0,int(request.POST['product_count'])):
 
                 # selected Product
-                selected_product = product_cache.get(product_name = request.POST['prod'+str(i)])
+                selected_product = product_data.get(product_name = request.POST['prod'+str(i)])
 
                 if len(request.POST['dis'+str(i)]) >= 1:
                     dis = request.POST['dis'+str(i)]
@@ -284,7 +284,7 @@ def viewsale(request):
     # Check for user Group
     if request.session['Estimate']:
         # Get the sale data
-        Sale_data = Estimate_sales.objects.all().prefetch_related("customer").order_by("-date")
+        Sale_data = Estimate_sales.objects.all()
     
     # Check for user Group
     if request.session['GST']:

@@ -127,7 +127,6 @@ def updatesupplier(request,pk):
 
             # Update the values
             supplier.fullname = request.POST['fullname']
-            supplier.customerid = request.POST['customerid']
             supplier.contactno = request.POST['mobile']
             supplier.city = request.POST['city']
             supplier.state = request.POST['state']

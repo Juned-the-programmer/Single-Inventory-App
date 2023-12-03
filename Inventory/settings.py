@@ -108,6 +108,10 @@ DATABASES = {
     }
 }
 
+# Expire Sessions 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 3600
+
 # Caching
 CACHES = {
     'default': {
